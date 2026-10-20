@@ -10,10 +10,13 @@ ready` green, 95/95. `TODO.md` and `todo/` are repo state, committed.
 - Installed on this machine into both targets, `~/.claude` and
   `~/.config/opencode`: the user's `cli.json` keys survive, backups written.
 - Verified live: the service loads the plugin, `/kaizen` is in the command
-  list, the skill is discovered from `~/.claude/skills`.
-- Unverified, needs a live terminal: the tab marker in the editor, the
-  `/compact` gate (the plugin's command may lose to the built-in), the
-  attention sounds.
+  list, the skill is discovered from `~/.claude/skills`; a compaction after
+  `/kaizen` passed, and the plugin's post-compaction reminder reached the
+  agent (server face).
+- Unverified, needs a live terminal: the tab marker in the editor; the
+  `/compact` gate — this compaction consumed the token, so the next
+  `/compact` must be held back, and if it goes through the override lost to
+  the built-in; the attention sounds.
 - Then the release: tag `v0.3.0`, approval in the GitHub environment
   `release`. The rename may break the npm trusted publishing: re-run
   `npm trust github qol-mini --file release.yml --repo ltruchot/qol-mini-4-ai-tui
