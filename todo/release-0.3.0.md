@@ -1,7 +1,7 @@
 # Release 0.3.0
 
-Everything is on `main`, `vp run ready` green, 96/96. One live confirmation
-away from the tag.
+Everything is on `main`, `vp run ready` green, 96/96. Every live check is
+done; the tag is the only step left.
 
 - [x] fixes shipped: `oncePerEvent` dedup, the `kaizen-gated` entry title,
       the resume repaint (`permission.replied`, `form.replied`,
@@ -10,10 +10,10 @@ away from the tag.
       through the plugin's entry compacted and consumed it
 - [x] live: one reminder per compaction — one `remind-` marker, one
       synthetic message, where the old bytes sent four
-- [ ] live: the refusal's feedback — this repo's token is spent, so
-      `/compact` through "Compact this session (kaizen-gated)" (picked
-      explicitly; the built-in entry compacts ungated) must raise the modal
-      "Compaction held back", and no compaction may run
+- [x] live: the refusal's feedback — a tokenless `/compact` through
+      "Compact this session (kaizen-gated)" raised the modal "Compaction
+      held back" and no compaction ran; the marker green through the
+      resumed run and the attention sounds confirmed with it
 - [ ] tag `v0.3.0`, push it, approve the run in the GitHub environment
       `release`
 - [ ] if the job refuses trusted publishing after the rename:

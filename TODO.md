@@ -2,34 +2,24 @@
 
 ## Where we stopped
 
-The kit serves two agents. Repo renamed `qol-mini-4-ai-tui`, `main` pushed,
-0.3.0 in the package, not yet tagged. `vp run ready` green, 96/96. `TODO.md`
-and `todo/` are repo state, committed.
+The kit serves both agents and every live check is green. Repo renamed
+`qol-mini-4-ai-tui`, `main` pushed, `v0.3.0` tagged. The release job
+awaits approval in the GitHub environment `release`.
 
-- Installed on this machine into both targets, `~/.claude` and
-  `~/.config/opencode`: the user's `cli.json` keys survive, backups written.
-- Verified live in OpenCode: the plugin loads, `/kaizen` runs the skill, a
-  manual compaction released through the plugin's entry consumed the token,
-  the tab marker painted red on a paused session, and the dedup works on the
-  fixed bytes — one reminder per compaction, one marker and one synthetic
-  message, where the old bytes sent four.
-- The 23:25 compaction went through the built-in entry: no `/kaizen`, no
-  token — the soft edge, as documented.
-- Still unseen on the fixed bytes, all observable in one sitting:
-  - the refusal's feedback: this repo's token is spent, so a `/compact`
-    through the `kaizen-gated` entry must raise the modal and the
-    session-routed toast — "Compaction held back";
-  - the marker green while a resumed run works;
-  - the attention sounds.
-- Then the release → todo/release-0.3.0.md: tag `v0.3.0`, approval in the
-  GitHub environment `release`. The rename may break the npm trusted
-  publishing: re-run `npm trust github qol-mini --file release.yml --repo
-  ltruchot/qol-mini-4-ai-tui --env release --allow-publish` if the job
-  refuses.
-- Other machines: `git remote set-url origin
+- Verified live in OpenCode, on the fixed bytes: the plugin loads, `/kaizen`
+  runs the skill, the release path (token honored, then consumed), one
+  reminder per compaction — one marker, one synthetic message — the tab
+  marker red on a paused session and green through the resumed run, the
+  refusal's modal and toast on a tokenless gated `/compact`, and the
+  attention sounds.
+- Next: approve the run in GitHub → todo/release-0.3.0.md. If the job
+  refuses trusted publishing after the rename: `npm trust github qol-mini
+  --file release.yml --repo ltruchot/qol-mini-4-ai-tui --env release
+  --allow-publish`.
+- Other machines, after npm: `git remote set-url origin
   https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then from a clone
-  `git pull && ./install.sh --replace`, or `pnpm dlx qol-mini@latest install
-  --replace` once 0.3.0 is on npm.
+  `git pull && ./install.sh --replace`, or `pnpm dlx qol-mini@latest
+  install --replace`.
 
 ## Later
 
