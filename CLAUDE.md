@@ -40,7 +40,7 @@ Sources are under `packages/qol-mini/src/`.
 | Feature | Source | What you see |
 |---|---|---|
 | Context status line | `kit/hooks/statusline*.ts` | `Opus 5 (1M context) ▓▓▓▓░░░░░░ 88/200k · my-project` |
-| Notification sounds | `kit/hooks/play.ts`, `kit/sounds.ts` | two rising notes when Claude wants you, one low note when a turn or a manual `/compact` ends |
+| Notification sounds | `kit/hooks/play.ts`, `kit/sounds.ts` | two rising notes when the agent wants you, one low note when a turn or a manual `/compact` ends |
 | Tab marker | `kit/hooks/tab-state.ts` | 🟢 working (subagents, background tasks, compaction) · 🔴 blocked on you · 🟡 idle |
 | Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction Claude is told to read `TODO.md` |
 | Skills per project | `commands/`, `core/`, `io/`, `packages/qol-mini/skills/` | `qol-mini skills install qa-pr ./my-project` renders a shipped skill into `.claude/skills/`, records it in `.claude/qol-mini.lock.json`, and merges local edits on update |

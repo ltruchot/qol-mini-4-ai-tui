@@ -10,7 +10,7 @@ const GAUGE = [
 ];
 const SOUNDS = [
   "",
-  "  Two rising notes when Claude is blocked on you, one lower note when a",
+  "  Two rising notes when the agent is blocked on you, one lower note when a",
   "  turn ends. Silent while it waits on a subagent of its own.",
 ];
 const KAIZEN = [

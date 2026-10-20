@@ -10,7 +10,7 @@ both agents. One package, `qol-mini`.
 | | |
 |---|---|
 | **Context gauge** | `Opus 5 (1M context) ▓▓▓▓░░░░░░ 88/200k · my-project` — green, orange at 100k, red at 200k |
-| **Sounds** | two rising notes: Claude waits on you · one low note: turn over |
+| **Sounds** | two rising notes: the agent waits on you · one low note: turn over |
 | **Tab marker** (VS Code, Cursor, opt-in) | `🟢 my-project` working · `🔴 my-project` blocked on you · `🟡 my-project` idle |
 | **Kaizen** | `/compact` refuses until you run `/kaizen`, a review of what this session got wrong |
 | **Skills, per project** | `qol-mini skills install qa-pr ./my-project` — placeholders filled, local edits merged on update |
