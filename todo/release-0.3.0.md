@@ -16,12 +16,12 @@ done; the tag is the only step left.
       resumed run and the attention sounds confirmed with it
 - [ ] live: the silence — after the ST fix, a red session paints its marker
       with no beeps
-- [ ] tag `v0.3.0`, push it, approve the run in the GitHub environment
-      `release`
-- [ ] if the job refuses trusted publishing after the rename:
-      `cd ~ && npm trust github qol-mini --file release.yml --repo
-      ltruchot/qol-mini-4-ai-tui --env release --allow-publish` — the repo's
-      devEngines pins pnpm, so npm trust must run outside it
+- [x] tag `v0.3.0`, push it, approve the run in the GitHub environment
+      `release` — published to npm at 22:29Z
+- [x] the trust after the rename: `cd ~ && npm trust github qol-mini
+      --file release.yml --repo ltruchot/qol-mini-4-ai-tui --env release
+      --allow-publish` — the repo's devEngines pins pnpm (run outside it),
+      and the CLI had no session: `npm login` first, then the OTP
 - [ ] after npm: the other machines move — `git remote set-url origin
       https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then
       `git pull && ./install.sh --replace`, or
