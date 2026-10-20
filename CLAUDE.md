@@ -245,7 +245,9 @@ A prompt that blocks a script or CI is a bug.
   `form.replied` and `form.cancelled` repaint working — without them the
   marker holds its red through the resumed run. `session.execution.interrupted`
   is not wired: the marker holds on Esc, the same known gap as Claude Code.
-- The plugin files load at service start: `install` names `opencode service
+- The service watches the plugin dir: changed files reload hot — retest
+  server-face fixes in place; a live TUI may hold the old command bytes,
+  so restart it before retesting the gate. `install` names `opencode service
   restart` when they moved. `cli.json` and `commands/` reload hot.
 
 ### Skills

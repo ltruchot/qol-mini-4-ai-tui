@@ -76,8 +76,8 @@ by the service and the TUI), `commands/kaizen.md`, and the `cli.json` merge.
 Several plugin copies can be live at once and see one compaction event: the
 first to claim the event through a marker in the state dir sends the one
 reminder. Features are read from the Claude `settings.json`: the two agents
-always show the same set. After the plugin files change, run
-`opencode service restart`.
+always show the same set. The service watches the plugin dir: changed
+files reload hot, no restart.
 
 Not ported: the context gauge, sounds on an unfocused terminal (OpenCode plays
 its attention sounds by its own focus rules), and the tab marker on Windows
