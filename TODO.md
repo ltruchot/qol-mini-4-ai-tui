@@ -2,20 +2,24 @@
 
 ## Where we stopped
 
-The kit serves both agents and every live check is green. Repo renamed
-`qol-mini-4-ai-tui`, `main` pushed, `v0.3.0` tagged. The release job
-awaits approval in the GitHub environment `release`.
+The kit serves both agents. Repo renamed `qol-mini-4-ai-tui`, `main` pushed,
+`v0.3.0` re-tagged on the BEL fix (`6a80bcd`). The release job awaits approval
+in the GitHub environment `release`; the last live check is the silence.
 
 - Verified live in OpenCode, on the fixed bytes: the plugin loads, `/kaizen`
   runs the skill, the release path (token honored, then consumed), one
   reminder per compaction — one marker, one synthetic message — the tab
   marker red on a paused session and green through the resumed run, the
-  refusal's modal and toast on a tokenless gated `/compact`, and the
-  attention sounds.
-- Next: approve the run in GitHub → todo/release-0.3.0.md. If the job
-  refuses trusted publishing after the rename: `npm trust github qol-mini
-  --file release.yml --repo ltruchot/qol-mini-4-ai-tui --env release
-  --allow-publish`.
+  refusal's modal and toast on a tokenless gated `/compact`.
+- The "attention sounds" were a bug: every title write ended in BEL, and the
+  raw `/dev/tty` write racing the TUI's redraw rang — bursts of clipped beeps
+  on red sessions. Fixed with an ST terminator; the retest is the last thing
+  before the approval: restart the TUIs, work normally — the marker paints,
+  nothing rings.
+- Next: `cd ~ && npm trust github qol-mini --file release.yml --repo
+  ltruchot/qol-mini-4-ai-tui --env release --allow-publish` (the repo's
+  devEngines pins pnpm — npm trust must run outside it), then approve the
+  run in GitHub → todo/release-0.3.0.md.
 - Other machines, after npm: `git remote set-url origin
   https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then from a clone
   `git pull && ./install.sh --replace`, or `pnpm dlx qol-mini@latest
