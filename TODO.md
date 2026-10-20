@@ -25,10 +25,10 @@ ready` green, 95/95. `TODO.md` and `todo/` are repo state, committed.
 
 ## Later
 
-- The installer asks, once, whether to keep the kaizen `TODO.md` and `todo/`
-  out of commits on that machine: default no — they are committed; a yes adds
-  them to the global git excludes (`core.excludesFile`). Not the default
-  answer, and never written into a repo's own `.gitignore`.
+- `qol-mini install` asks, among its setup prompts, whether the kaizen `TODO.md`
+  and `todo/` stay in git tracking: default yes — they are committed. A machine
+  that wants them out names the repos, and only those repos' `.gitignore`
+  gains the entries. The kaizen skill neither knows nor decides this.
 - Commit the 0.2.0 skills in the nine rollout repos, each in that repo's own
   flow → todo/skills-rollout.md
 - A shared core for `qodo-pr-review` (finding anatomy, the GraphQL thread queries, the shell
