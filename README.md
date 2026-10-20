@@ -79,8 +79,7 @@ reminder. Features are read from the Claude Code `settings.json`: the two agents
 always show the same set. The service watches the plugin dir: changed
 files reload hot, no restart.
 
-Not ported: the context gauge, sounds on an unfocused terminal (OpenCode plays
-its attention sounds by its own focus rules), and the tab marker on Windows
+Not ported: the context gauge, the sounds, and the tab marker on Windows
 (no `/dev/tty`).
 
 ### Options

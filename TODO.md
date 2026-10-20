@@ -2,25 +2,18 @@
 
 ## Where we stopped
 
-The kit serves both agents. Repo renamed `qol-mini-4-ai-tui`, `v0.3.0`
-tagged on the BEL fix (`6a80bcd`) and published to npm. One live check open:
-the silence.
+The kit serves both agents, released: `v0.3.0` on npm with the ST fix, the
+silence confirmed live. The wording sweep (Claude Code named in full, the
+agent in behavior texts) ships as `v0.3.1`.
 
-- Verified live in OpenCode, on the fixed bytes: the plugin loads, `/kaizen`
-  runs the skill, the release path (token honored, then consumed), one
-  reminder per compaction — one marker, one synthetic message — the tab
-  marker red on a paused session and green through the resumed run, the
-  refusal's modal and toast on a tokenless gated `/compact`.
-- The "attention sounds" were a bug: every title write ended in BEL, and the
-  raw `/dev/tty` write racing the TUI's redraw rang — bursts of clipped beeps
-  on red sessions. Fixed with an ST terminator; the retest is the last thing
-  before the approval: restart the TUIs, work normally — the marker paints,
-  nothing rings. If it stays silent, the README "Not ported" parenthetical
-  about OpenCode's own sounds goes.
-- Next: the silence check, then the other machines: `git remote set-url
-  origin https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then from a
-  clone `git pull && ./install.sh --replace`, or
-  `pnpm dlx qol-mini@latest install --replace`.
+- The "attention sounds" were the BEL terminator of every title write
+  ringing, not a feature: no sound code in the plugin, none in OpenCode —
+  the parenthetical is gone from the README. The release checklist closed:
+  todo/release-0.3.0.md.
+- Other machines: `git remote set-url origin
+  https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then from a clone
+  `git pull && ./install.sh --replace`, or
+  `pnpm dlx qol-mini@latest install --replace` — restart the TUIs after.
 
 ## Later
 

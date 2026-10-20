@@ -13,9 +13,10 @@ done; the tag is the only step left.
 - [x] live: the refusal's feedback — a tokenless `/compact` through
       "Compact this session (kaizen-gated)" raised the modal "Compaction
       held back" and no compaction ran; the marker green through the
-      resumed run and the attention sounds confirmed with it
-- [ ] live: the silence — after the ST fix, a red session paints its marker
-      with no beeps
+      resumed run confirmed with it
+- [x] live: the silence — after the ST fix, a red session paints its marker
+      with no beeps; the earlier "attention sounds" were the BEL terminator
+      ringing, not a feature
 - [x] tag `v0.3.0`, push it, approve the run in the GitHub environment
       `release` — published to npm at 22:29Z
 - [x] the trust after the rename: `cd ~ && npm trust github qol-mini
