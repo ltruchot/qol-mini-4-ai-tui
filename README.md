@@ -1,6 +1,6 @@
-# claude-code-qol-mini
+# qol-mini-4-ai-tui
 
-[![test](https://github.com/ltruchot/claude-code-qol-mini/actions/workflows/test.yml/badge.svg)](https://github.com/ltruchot/claude-code-qol-mini/actions/workflows/test.yml)
+[![test](https://github.com/ltruchot/qol-mini-4-ai-tui/actions/workflows/test.yml/badge.svg)](https://github.com/ltruchot/qol-mini-4-ai-tui/actions/workflows/test.yml)
 
 Quality-of-life kit for [Claude Code](https://code.claude.com) when you run
 several sessions at once: hooks and one status line for every project, skills
@@ -360,7 +360,7 @@ git tag v<version> && git push origin v<version>
 | tag must equal the version in `packages/qol-mini/package.json` | a tag cannot publish another version |
 | the gates of `ready` | nothing unchecked reaches npm |
 | `vp pm pack`, then `npm publish` of the tarball | pnpm resolves the `catalog:` versions when it packs; `npm publish` of the directory would ship them unresolved |
-| trusted publishing | no npm token stored in the repository; configure it once: `npm trust github qol-mini --file release.yml --repo ltruchot/claude-code-qol-mini --env release --allow-publish` |
+| trusted publishing | no npm token stored in the repository; configure it once: `npm trust github qol-mini --file release.yml --repo ltruchot/qol-mini-4-ai-tui --env release --allow-publish` |
 | `environment: release` | the GitHub environment `release` has required reviewers: the job waits for an approval before it can publish |
 
 ## Verified where

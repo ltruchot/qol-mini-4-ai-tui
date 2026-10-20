@@ -2,12 +2,12 @@
   "name": "qol-mini",
   "version": "0.2.1",
   "description": "Minimal Claude Code kit: status line, sounds, tab marker, kaizen review, and skills per project",
-  "homepage": "https://github.com/ltruchot/claude-code-qol-mini#readme",
-  "bugs": "https://github.com/ltruchot/claude-code-qol-mini/issues",
+  "homepage": "https://github.com/ltruchot/qol-mini-4-ai-tui#readme",
+  "bugs": "https://github.com/ltruchot/qol-mini-4-ai-tui/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ltruchot/claude-code-qol-mini.git",
+    "url": "git+https://github.com/ltruchot/qol-mini-4-ai-tui.git",
     "directory": "packages/qol-mini"
   },
   "bin": {

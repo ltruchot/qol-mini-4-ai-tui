@@ -3,8 +3,7 @@ import { lintTools } from "../io/lint-configs.ts";
 import { info, note } from "../io/ui.ts";
 import type { Ctx } from "./context.ts";
 
-export const LINT_DOC =
-  "https://github.com/ltruchot/claude-code-qol-mini#linters-and-managed-skills";
+export const LINT_DOC = "https://github.com/ltruchot/qol-mini-4-ai-tui#linters-and-managed-skills";
 const TITLE = "Keep formatters and linters off managed skills";
 
 // A skill rewritten by a formatter reads as modified, and its next update conflicts

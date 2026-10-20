@@ -10,4 +10,4 @@ pnpm dlx qol-mini --help
 ```
 
 Node.js 22.18+. Documentation:
-[github.com/ltruchot/claude-code-qol-mini](https://github.com/ltruchot/claude-code-qol-mini#readme).
+[github.com/ltruchot/qol-mini-4-ai-tui](https://github.com/ltruchot/qol-mini-4-ai-tui#readme).

@@ -1,10 +1,10 @@
-# Instructions — `claude-code-qol-mini`
+# Instructions — `qol-mini-4-ai-tui`
 
 > Session handoff: read `TODO.md` first — where the last session stopped, and what is left.
 > Open a `todo/` file only for the item you work on. An item done → delete its line and its `todo/` file.
 
 A minimal kit for Claude Code, in one npm package, `qol-mini`, developed at
-`ltruchot/claude-code-qol-mini`. Two scopes: **global** (hooks, status line, sounds,
+`ltruchot/qol-mini-4-ai-tui`. Two scopes: **global** (hooks, status line, sounds,
 the kaizen review, in the Claude config dir) and **project** (skills, in
 `<project>/.claude`). It works on **Linux, macOS, WSL and Windows**, in **VS Code
 and Cursor**.
