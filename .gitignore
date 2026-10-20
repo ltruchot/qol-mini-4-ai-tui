@@ -32,5 +32,9 @@ dist-ssr
 # AI agent worktrees
 .claude/worktrees/
 
+# Kaizen session state, per machine: never committed
+TODO.md
+todo/
+
 # Pack output, packcheck and release build tarballs in tmp dirs
 *.tgz
