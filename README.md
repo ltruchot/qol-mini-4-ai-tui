@@ -75,7 +75,7 @@ Delivered into `~/.config/opencode/`: `plugins/qol-mini/` (two faces, loaded
 by the service and the TUI), `commands/kaizen.md`, and the `cli.json` merge.
 Several plugin copies can be live at once and see one compaction event: the
 first to claim the event through a marker in the state dir sends the one
-reminder. Features are read from the Claude `settings.json`: the two agents
+reminder. Features are read from the Claude Code `settings.json`: the two agents
 always show the same set. The service watches the plugin dir: changed
 files reload hot, no restart.
 
@@ -201,8 +201,8 @@ Run /kaizen to review it, then /compact again.
 | 3 | proposes the handoff lines at the top of `CLAUDE.md`, the split of an oversized `TODO.md`, and a merge of `SESSION_STATE`-style files |
 | 4 | releases the block: `/compact` goes through, once |
 
-After any compaction, a `SessionStart` hook tells Claude to read `TODO.md` when it
-exists.
+After any compaction, the agent is told to read `TODO.md` when it exists: a
+`SessionStart` hook in Claude Code, a reminder from the plugin in OpenCode.
 
 Automatic compaction is never blocked. Skip a review:
 `node ~/.claude/hooks/precompact-kaizen.mjs --release`. In OpenCode the
@@ -227,7 +227,7 @@ qol-mini skills remove qa-pr ./my-project
 | | |
 |---|---|
 | Project argument | any argument holding `/` or `\`, or `.`; none: the git root above the current directory |
-| `--global` | the Claude config dir instead of a project |
+| `--global` | the Claude Code config dir instead of a project |
 | `{{NAME}}` in a skill | asked once, then read from the lock; `QOL_MINI_ANSWER_<NAME>` answers without a prompt |
 | A file you edited | three-way merge; conflict markers when both sides changed a line; `--conflict rej\|ours\|theirs` |
 | `-y`, `--dry-run`, `--json` | no prompt · preview only · machine output for `list` |

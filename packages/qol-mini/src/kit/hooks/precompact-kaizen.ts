@@ -1,5 +1,5 @@
 // Hold back /compact until this session's friction has been reviewed. The
-// review lives in the `kaizen` skill: a PreCompact hook hands Claude nothing,
+// review lives in the `kaizen` skill: a PreCompact hook hands the agent nothing,
 // `exit 2` blocks and shows stderr to the user only.
 //
 //   precompact-kaizen.js                  hook mode, event JSON on stdin

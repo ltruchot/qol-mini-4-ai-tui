@@ -10,7 +10,7 @@ function todoFile(cwd: string): string | undefined {
   return name === undefined ? undefined : join(cwd, name);
 }
 
-// SessionStart with source `compact` is the only channel to Claude after a
+// SessionStart with source `compact` is the only channel to the agent after a
 // compaction: name TODO.md there. No terminalSequence: tab-state.js owns the
 // marker on SessionStart. Any failure returns null, so the session starts clean.
 export function afterCompact(cwd: string): Payload | null {

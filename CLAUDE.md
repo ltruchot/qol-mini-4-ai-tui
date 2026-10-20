@@ -5,7 +5,7 @@
 
 A minimal kit for Claude Code and OpenCode, in one npm package, `qol-mini`,
 developed at `ltruchot/qol-mini-4-ai-tui`. Two scopes: **global** (hooks, status
-line, sounds, the kaizen review, in the Claude config dir; the OpenCode plugin,
+line, sounds, the kaizen review, in the Claude Code config dir; the OpenCode plugin,
 command and `cli.json` merge, in the OpenCode config dir) and **project**
 (skills, in `<project>/.claude`, read by both agents). It works on **Linux,
 macOS, WSL and Windows**, in **VS Code and Cursor**.
@@ -42,7 +42,7 @@ Sources are under `packages/qol-mini/src/`.
 | Context status line | `kit/hooks/statusline*.ts` | `Opus 5 (1M context) ▓▓▓▓░░░░░░ 88/200k · my-project` |
 | Notification sounds | `kit/hooks/play.ts`, `kit/sounds.ts` | two rising notes when the agent wants you, one low note when a turn or a manual `/compact` ends |
 | Tab marker | `kit/hooks/tab-state.ts` | 🟢 working (subagents, background tasks, compaction) · 🔴 blocked on you · 🟡 idle |
-| Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction Claude is told to read `TODO.md` |
+| Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction the agent is told to read `TODO.md` |
 | Skills per project | `commands/`, `core/`, `io/`, `packages/qol-mini/skills/` | `qol-mini skills install qa-pr ./my-project` renders a shipped skill into `.claude/skills/`, records it in `.claude/qol-mini.lock.json`, and merges local edits on update |
 | OpenCode target | `packages/qol-mini/opencode/`, `src/opencode/` | the same features in the OpenCode TUI: tab marker, `/compact` gate, post-compaction reminder, `/kaizen` command |
 
@@ -116,18 +116,18 @@ A prompt that blocks a script or CI is a bug.
 - Reloading the editor window restarts nothing: it reconnects to the same processes.
 - Do not ask for a restart beyond those two cases.
 
-### PreCompact hands Claude nothing
+### PreCompact hands the agent nothing
 
 - `exit 2` blocks the compaction and shows stderr to the **user** only. It never
   reaches the conversation.
 - `PreCompact` accepts no `additionalContext`. `PostCompact` has no decision control.
 - So stderr is two lines addressed to a human, naming `/kaizen`. The review lives in
   the skill, never in the hook.
-- Read the exit-code table by row: stderr goes to Claude on `PreToolUse`, `Stop`,
+- Read the exit-code table by row: stderr goes to the agent on `PreToolUse`, `Stop`,
   `PostToolUse`, not on `PreCompact`, `SessionStart`, `SubagentStart`,
   `PostModelSwitch`.
 - Automatic compaction is never blocked, and no review is possible on it.
-- `SessionStart` with matcher `compact` is the only channel to Claude after a
+- `SessionStart` with matcher `compact` is the only channel to the agent after a
   compaction, manual or automatic. `precompact-kaizen --after-compact` uses it
   to name `TODO.md`, and emits no marker: `tab-state` owns `SessionStart`.
 - The release token is keyed on the working **directory**, not the session: the
@@ -221,7 +221,7 @@ A prompt that blocks a script or CI is a bug.
   runtime: OpenCode resolves `@opencode/plugin` at load, so nothing is built
   and the package gains no dependency. `fmt`, `lint` and the line law skip it;
   a test runs `node --check` on every face.
-- One feature set for both agents: the plugin reads the Claude `settings.json`
+- One feature set for both agents: the plugin reads the Claude Code `settings.json`
   (`configured()` in `opencode/shared.js`), never its own state. Turning a
   feature off unwires both. `installedState()` stays the only source.
 - The config dir resolves as OpenCode resolves it: `$XDG_CONFIG_HOME/opencode`
@@ -235,7 +235,7 @@ A prompt that blocks a script or CI is a bug.
   screen, that is the only way out, and `terminal.title: false` keeps OpenCode
   from rewriting the title. Windows has no `/dev/tty`: no marker there.
 - `/compact` has no PreCompact hook in OpenCode: the TUI plugin registers the
-  command and checks the same token the Claude hook consumes. Verified live:
+  command and checks the same token the Claude Code hook consumes. Verified live:
   the plugin's entry holds back and honors the token; the built-in entry
   keeps its own palette slot and compacts ungated — no plugin removes it. A
   live refusal showed the toast alone is easy to miss: the refusal also

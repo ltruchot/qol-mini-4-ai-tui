@@ -5,7 +5,7 @@ import { row } from "../kit/report.ts";
 import { saveNamed } from "../kit/save-settings.ts";
 import { openIdle, type OpenPlan } from "./plan.ts";
 
-// Write the plan, mirroring the Claude target: created and replaced files,
+// Write the plan, mirroring the Claude Code target: created and replaced files,
 // then cli.json, stale files last. Nothing is written when the plan is idle.
 // `plugin` is true when the plugin files changed: they load at service start
 // only.

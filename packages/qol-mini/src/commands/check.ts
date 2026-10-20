@@ -45,6 +45,6 @@ export function register(cli: CAC): void {
   cli
     .command("check [project]", "Report skill status, exit code for CI")
     .option("--frozen", "Also verify the lock against the shipped template")
-    .option("--global", "Act on the Claude config dir")
+    .option("--global", "Act on the Claude Code config dir")
     .action(runCheck);
 }

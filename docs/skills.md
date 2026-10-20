@@ -9,7 +9,7 @@
 |---|---|
 | an argument holding `/` or `\`, or `.` | that project: `<project>/.claude/skills/` |
 | no project | the git root above the current directory, else the current directory |
-| `--global` | the Claude config dir: `~/.claude/skills/`, or `$CLAUDE_CONFIG_DIR/skills/` |
+| `--global` | the Claude Code config dir: `~/.claude/skills/`, or `$CLAUDE_CONFIG_DIR/skills/` |
 
 ## Commands
 

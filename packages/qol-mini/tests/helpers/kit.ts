@@ -10,7 +10,7 @@ export const RED = "\u{1F534}";
 export const GREEN = "\u{1F7E2}";
 export const YELLOW = "\u{1F7E1}";
 
-// Run `qol-mini <args>` in-process against throwaway config dirs: the Claude
+// Run `qol-mini <args>` in-process against throwaway config dirs: the Claude Code
 // one through CLAUDE_CONFIG_DIR, the OpenCode one through XDG_CONFIG_HOME.
 export async function kit(target: string, args: string[]): Promise<Run> {
   const env = { CLAUDE_CONFIG_DIR: target, XDG_CONFIG_HOME: join(target, "xdg") };

@@ -3,7 +3,7 @@ import { KAIZEN, PLAY, TAB } from "./files.ts";
 import type { Chosen } from "./options.ts";
 import type { Handler, Hooks } from "./ours.ts";
 
-// Red and the rising notes are spent on one thing: Claude cannot go on
+// Red and the rising notes are spent on one thing: the agent cannot go on
 // without you. The two quota types are wired from the reference, not observed.
 const BLOCKING =
   "permission_prompt|agent_needs_input|elicitation_dialog|elicitation_url_dialog" +

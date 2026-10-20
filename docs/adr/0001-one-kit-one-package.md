@@ -16,7 +16,7 @@
   whole installation.
 - One runtime: Node.js. The hooks, the status line, the sound player and the
   installer are TypeScript, bundled with no runtime dependency.
-- Two scopes. Global: `qol-mini install`, into the Claude config dir. Project:
+- Two scopes. Global: `qol-mini install`, into the Claude Code config dir. Project:
   `qol-mini skills …`, into `<project>/.claude`.
 - The skills ship in the package. There is no remote bank, no configuration file,
   no token, no white-label build, no policy, no audit.

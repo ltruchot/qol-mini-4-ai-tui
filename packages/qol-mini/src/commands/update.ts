@@ -24,7 +24,7 @@ export function register(cli: CAC): void {
     .command("update [...args]", "Merge the kit's changes into installed skills")
     .option("--replace", "Take the kit's version of every file edited locally")
     .option("--conflict <mode>", "An edited file on update: inline (default), rej, ours, theirs")
-    .option("--global", "Act on the Claude config dir")
+    .option("--global", "Act on the Claude Code config dir")
     .example("qol-mini skills update ./my-project")
     .example("qol-mini skills update qa-pr --dry-run")
     .action(runUpdate);

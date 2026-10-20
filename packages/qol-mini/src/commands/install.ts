@@ -42,7 +42,7 @@ export function register(cli: CAC): void {
     .command("install [...args]", "Install skills into a project: names, then a project path")
     .option("--replace", "Take the kit's version of every file edited locally")
     .option("--conflict <mode>", "An edited file on update: inline (default), rej, ours, theirs")
-    .option("--global", "Install into the Claude config dir, for every project")
+    .option("--global", "Install into the Claude Code config dir, for every project")
     .example("qol-mini skills install qa-pr ./my-project")
     .example("qol-mini skills install --replace /path/to/my-project")
     .action(runInstall);

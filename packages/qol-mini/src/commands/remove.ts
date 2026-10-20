@@ -43,7 +43,7 @@ export function register(cli: CAC): void {
   cli
     .command("remove [...args]", "Uninstall managed skills")
     .alias("rm")
-    .option("--global", "Act on the Claude config dir")
+    .option("--global", "Act on the Claude Code config dir")
     .example("qol-mini skills remove qa-pr ./my-project")
     .action(runRemove);
 }

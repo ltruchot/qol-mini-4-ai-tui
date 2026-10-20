@@ -6,7 +6,7 @@ import { runVscode } from "./vscode.ts";
 
 const HELP = new Set(["-h", "--help", "help"]);
 
-// Global scope: the kit in the Claude config dir. Null when the command is
+// Global scope: the kit in the Claude Code config dir. Null when the command is
 // not one of ours, so the caller reports it.
 export function runKit(argv: string[]): Promise<number> | number | null {
   const [command, ...rest] = argv;

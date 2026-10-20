@@ -9,7 +9,7 @@ export const block = (data: Settings, key: string): Block => ({
   ...(data[key] as Block | undefined),
 });
 
-// The sounds the kit owns, as absolute paths into the Claude config dir: one
+// The sounds the kit owns, as absolute paths into the Claude Code config dir: one
 // sounds directory serves both agents. OpenCode's own attention events the kit
 // is silent on are mapped to silent.wav, its built-in sound would play them.
 function sounds(claude: string): Record<string, string> {

@@ -1,4 +1,4 @@
-// Paths the kit owns, relative to the Claude config dir. `.mjs`: a bare `.js`
+// Paths the kit owns, relative to the Claude Code config dir. `.mjs`: a bare `.js`
 // with no package.json beside it is not read as an ES module.
 export const STATUSLINE = "statusline-context.mjs";
 export const TAB = "hooks/tab-state.mjs";

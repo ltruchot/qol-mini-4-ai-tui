@@ -36,6 +36,6 @@ export function register(cli: CAC): void {
   cli
     .command("list [project]", "Show shipped and installed skills")
     .alias("ls")
-    .option("--global", "Act on the Claude config dir")
+    .option("--global", "Act on the Claude Code config dir")
     .action(runList);
 }

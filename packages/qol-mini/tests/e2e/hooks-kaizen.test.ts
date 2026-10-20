@@ -38,7 +38,7 @@ test("manual /compact blocks until a review releases it, once", async () => {
   await cleanup(target);
 });
 
-test("after a compaction Claude is told to read TODO.md, when there is one", async () => {
+test("after a compaction the agent is told to read TODO.md, when there is one", async () => {
   const dir = await tmpDir();
   const event = JSON.stringify({ cwd: dir, source: "compact" });
   expect((await hook(gate, ["--after-compact"], event)).out).toBe("");

@@ -23,7 +23,7 @@ export function markers(
 // one beep per title set — and ST is silent everywhere.
 export function hookOutput(state: State, cwd: string): { terminalSequence: string } {
   const dir = cwd === "" ? process.cwd() : cwd;
-  // The folder name tells several Claude terminals apart: ${sequence}
+  // The folder name tells several Claude Code terminals apart: ${sequence}
   // replaces the whole tab title.
   const name = basename(normalize(dir));
   const label = (name === "" ? dir : name).replaceAll(/\p{Cc}/gu, "");

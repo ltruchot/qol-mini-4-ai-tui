@@ -6,7 +6,7 @@ const pkg = JSON.parse(readFileSync(join(import.meta.dirname, "package.json"), "
   version: string;
 };
 
-// Each hook is copied alone into the Claude config dir: one config per entry,
+// Each hook is copied alone into the Claude Code config dir: one config per entry,
 // so no bundle shares a chunk with another.
 const HOOKS = ["tab-state", "precompact-kaizen", "play", "statusline"];
 const one = (entry: string, clean: boolean): object => ({
