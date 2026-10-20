@@ -100,6 +100,31 @@ export function compactionPasses(cwd) {
   }
 }
 
+// Several copies of this file can be live at once, and each copy sees the
+// same compaction event. The first copy to create the event's marker sends
+// the one reminder; the others stay silent. A state directory that cannot
+// be managed fails open: a duplicate reminder beats silence.
+export function oncePerEvent(eventID) {
+  try {
+    const dir = join(claudeDir(), "state");
+    mkdirSync(dir, { recursive: true });
+    const now = Date.now();
+    for (const name of readdirSync(dir)) {
+      if (!name.startsWith("remind-")) continue;
+      try {
+        const file = join(dir, name);
+        if (now - statSync(file).mtimeMs > 3_600_000) unlinkSync(file);
+      } catch {
+        // a sweep race between copies never stops the claim
+      }
+    }
+    closeSync(openSync(join(dir, `remind-${eventID.replaceAll(/[^A-Za-z0-9._-]/g, "-")}`), "wx"));
+    return true;
+  } catch (error) {
+    return error?.code !== "EEXIST";
+  }
+}
+
 // CC_TAB_WORKING, CC_TAB_BLOCKED and CC_TAB_IDLE override each marker; an empty
 // value drops it.
 function markers() {

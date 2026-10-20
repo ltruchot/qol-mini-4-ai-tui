@@ -35,6 +35,11 @@ export default Plugin.define({
     data.on("session.execution.failed", (e) => paint(e.data.sessionID, "blocked"));
     data.on("permission.asked", (e) => paint(e.data.sessionID, "blocked"));
     data.on("form.created", (e) => paint(e.data.form.sessionID, "blocked"));
+    // A pause does not end the execution: the reply, not a new start, is
+    // what resumes it — without these the red holds through the resumed run.
+    data.on("permission.replied", (e) => paint(e.data.sessionID, "working"));
+    data.on("form.replied", (e) => paint(e.data.sessionID, "working"));
+    data.on("form.cancelled", (e) => paint(e.data.sessionID, "working"));
     // A retry with an action waits on you; one without resumes alone
     data.on("session.status", (e) => {
       const status = e.data.status;
@@ -51,15 +56,17 @@ export default Plugin.define({
     const first = active();
     if (first !== undefined) still(first);
 
-    // /compact goes through only after /kaizen wrote the token. The gate is
-    // checked here, at the command, because OpenCode has no PreCompact hook.
+    // The gate rides on this command because OpenCode has no PreCompact hook.
+    // The built-in /compact keeps its own palette entry and is beyond a
+    // plugin: chosen, it compacts ungated — the documented soft edge. This
+    // entry is the one that holds back until /kaizen wrote the token.
     keymap.layer(() => ({
       mode: "global",
       priority: 100,
       commands: [
         {
           id: "qol-mini.compact",
-          title: "Compact this session",
+          title: "Compact this session (kaizen-gated)",
           slash: { name: "compact", arguments: true },
           run: async () => {
             const sessionID = active();

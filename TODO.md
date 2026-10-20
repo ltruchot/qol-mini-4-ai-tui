@@ -2,21 +2,32 @@
 
 ## Where we stopped
 
-The kit serves two agents. GitHub repo renamed to `qol-mini-4-ai-tui` (old URL
-redirects), `main` pushed: the OpenCode target is in — plugin (service + TUI
-faces), `commands/kaizen.md`, the `cli.json` merge, tests, docs. `vp run
-ready` green, 95/95. `TODO.md` and `todo/` are repo state, committed.
+The kit serves two agents. Repo renamed `qol-mini-4-ai-tui`, `main` pushed,
+0.3.0 in the package, not yet tagged. `vp run ready` green, 96/96. `TODO.md`
+and `todo/` are repo state, committed.
 
 - Installed on this machine into both targets, `~/.claude` and
   `~/.config/opencode`: the user's `cli.json` keys survive, backups written.
-- Verified live: the service loads the plugin, `/kaizen` is in the command
-  list, the skill is discovered from `~/.claude/skills`; a compaction after
-  `/kaizen` passed, and the plugin's post-compaction reminder reached the
-  agent (server face).
-- Unverified, needs a live terminal: the tab marker in the editor; the
-  `/compact` gate — this compaction consumed the token, so the next
-  `/compact` must be held back, and if it goes through the override lost to
-  the built-in; the attention sounds.
+- Verified live in OpenCode: the plugin loads, `/kaizen` runs the skill, the
+  post-compaction reminder reaches the agent, a manual compaction released
+  through the plugin's entry consumed the token, and the tab marker painted
+  red on a paused session — both faces load and act.
+- Three live findings, all fixed on `main`, all waiting for a re-test:
+  - the reminder fired four times per compaction — several plugin copies see
+    one event; `oncePerEvent` now claims it through an exclusive marker in
+    the state dir, swept after an hour, and one reminder goes out;
+  - the built-in `/compact` keeps its own palette entry and compacts
+    ungated — a live manual compaction passed with no token; no plugin
+    removes it, our entry is titled `kaizen-gated`, the README names the
+    soft edge;
+  - the marker held its red through a resumed run: a pause does not end the
+    execution and nothing repainted on the reply — `permission.replied`,
+    `form.replied` and `form.cancelled` now repaint working.
+- Needs a live terminal: restart OpenCode, the service and every TUI, so no
+  plugin copy predates the fix, then check — one reminder per compaction;
+  `/compact` through the `kaizen-gated` entry with no token: held back with
+  the toast; the marker green while a resumed run works; the attention
+  sounds.
 - Then the release: tag `v0.3.0`, approval in the GitHub environment
   `release`. The rename may break the npm trusted publishing: re-run
   `npm trust github qol-mini --file release.yml --repo ltruchot/qol-mini-4-ai-tui

@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { execa } from "execa";
 import { expect, test } from "vite-plus/test";
 import { kit, openDir, readJson } from "../helpers/kit.ts";
@@ -24,5 +25,26 @@ test("the shipped plugin parses: node --check on every face", async () => {
   for (const file of ["index.js", "tui.js", "shared.js"]) {
     const run = await execa("node", ["--check", join(SHIPPED, file)]);
     expect(run.exitCode).toBe(0);
+  }
+});
+
+test("one reminder per compaction event, however many copies see it", async () => {
+  const home = await tmpDir();
+  const source = JSON.stringify(pathToFileURL(join(SHIPPED, "shared.js")).href);
+  const claim = async (id: string): Promise<number> => {
+    const { exitCode } = await execa("node", ["--input-type=module"], {
+      input: `import { oncePerEvent } from ${source}; process.exit(oncePerEvent(${JSON.stringify(id)}) ? 0 : 1)`,
+      env: { ...process.env, CLAUDE_CONFIG_DIR: home },
+      reject: false,
+    });
+    return exitCode ?? 1;
+  };
+  try {
+    expect(await claim("evt_same")).toBe(0);
+    expect(await claim("evt_same")).toBe(1);
+    expect(await claim("../escape")).toBe(0);
+    expect(existsSync(join(home, "state", "remind-..-escape"))).toBe(true);
+  } finally {
+    await cleanup(home);
   }
 });

@@ -233,13 +233,16 @@ A prompt that blocks a script or CI is a bug.
   screen, that is the only way out, and `terminal.title: false` keeps OpenCode
   from rewriting the title. Windows has no `/dev/tty`: no marker there.
 - `/compact` has no PreCompact hook in OpenCode: the TUI plugin registers the
-  command and checks the same token the Claude hook consumes. The built-in
-  command may win over the plugin's: verify live before claiming the gate.
+  command and checks the same token the Claude hook consumes. Verified live:
+  the plugin's entry holds back and honors the token; the built-in entry
+  keeps its own palette slot and compacts ungated — no plugin removes it.
 - Events, not hooks: `session.execution.*` for working and idle,
   `permission.asked`, `form.created`, `session.status` (a retry with an action
   is blocked on you, one without resumes alone), `session.compaction.*` for the
-  reminder. `session.execution.interrupted` is not wired: the marker holds on
-  Esc, the same known gap as Claude Code.
+  reminder. A pause does not end the execution: `permission.replied`,
+  `form.replied` and `form.cancelled` repaint working — without them the
+  marker holds its red through the resumed run. `session.execution.interrupted`
+  is not wired: the marker holds on Esc, the same known gap as Claude Code.
 - The plugin files load at service start: `install` names `opencode service
   restart` when they moved. `cli.json` and `commands/` reload hot.
 

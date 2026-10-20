@@ -4,7 +4,7 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { Plugin } from "@opencode/plugin";
-import { configured, optedOut } from "./shared.js";
+import { configured, oncePerEvent, optedOut } from "./shared.js";
 
 function todoFile(dir) {
   try {
@@ -42,7 +42,7 @@ export default Plugin.define({
           const dir = event.location?.directory ?? "";
           if (dir === "" || !configured().kaizen || optedOut(dir, "kaizen")) continue;
           const text = reminder(dir);
-          if (text !== undefined)
+          if (text !== undefined && oncePerEvent(event.id))
             await ctx.session.synthetic({ sessionID: event.data.sessionID, text });
         } catch {
           // one unreadable event never stops the stream

@@ -66,15 +66,18 @@ to both, and the kaizen tokens, the sounds and the opt-out file are shared.
 |---|---|---|
 | Skills | `.claude/skills/`, a skill is a slash command | the same files, discovered from `.claude/skills`; loaded by the agent or `@name` |
 | `/kaizen` | the skill's command | `commands/kaizen.md`, delivered into the OpenCode config dir |
-| `/compact` gate | a `PreCompact` hook | the plugin's `/compact`: held back until `/kaizen` ran |
+| `/compact` gate | a `PreCompact` hook | the plugin's `/compact` entry, held back until `/kaizen` ran; the built-in entry is beyond a plugin and compacts ungated |
 | Sounds | a hook plays `~/.claude/sounds` | `attention` in `cli.json`, playing the same files |
 | Tab marker | a hook emits the title sequence | the plugin emits it on `/dev/tty`; `terminal.title` is set to `false` |
 | Context gauge | the status line | not ported: the TUI footer shows context already |
 
 Delivered into `~/.config/opencode/`: `plugins/qol-mini/` (two faces, loaded
 by the service and the TUI), `commands/kaizen.md`, and the `cli.json` merge.
-Features are read from the Claude `settings.json`: the two agents always show
-the same set. After the plugin files change, run `opencode service restart`.
+Several plugin copies can be live at once and see one compaction event: the
+first to claim the event through a marker in the state dir sends the one
+reminder. Features are read from the Claude `settings.json`: the two agents
+always show the same set. After the plugin files change, run
+`opencode service restart`.
 
 Not ported: the context gauge, sounds on an unfocused terminal (OpenCode plays
 its attention sounds by its own focus rules), and the tab marker on Windows
@@ -202,7 +205,9 @@ After any compaction, a `SessionStart` hook tells Claude to read `TODO.md` when 
 exists.
 
 Automatic compaction is never blocked. Skip a review:
-`node ~/.claude/hooks/precompact-kaizen.mjs --release`.
+`node ~/.claude/hooks/precompact-kaizen.mjs --release`. In OpenCode the
+built-in `/compact` entry is beyond a plugin: it compacts ungated, and the
+plugin's own entry is the one that holds back.
 
 ## Skills
 
@@ -402,8 +407,8 @@ git tag v<version> && git push origin v<version>
 | CI: Linux, macOS | the test suite |
 | CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
 | WSL2, VS Code, a live session | the tab marker, the sounds, `/compact` held back then released by `/kaizen` |
-| WSL2, the OpenCode service, a live session | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills` |
-| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; the OpenCode TUI face — tab marker, `/compact` gate, attention sounds |
+| WSL2, the OpenCode service and TUI, live sessions | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills`, a manual compaction released through the plugin's entry with the token honored, the tab marker painted red on a paused session |
+| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; the OpenCode TUI face — the marker's resume after a pause, attention sounds, the gate's refusal side, one reminder per compaction after the fix |
 
 ## Related
 
