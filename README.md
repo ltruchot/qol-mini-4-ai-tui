@@ -407,8 +407,8 @@ git tag v<version> && git push origin v<version>
 | CI: Linux, macOS | the test suite |
 | CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
 | WSL2, VS Code, a live session | the tab marker, the sounds, `/compact` held back then released by `/kaizen` |
-| WSL2, the OpenCode service and TUI, live sessions | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills`, a manual compaction released through the plugin's entry with the token honored, a tokenless `/compact` held back by the plugin's entry, the tab marker painted red on a paused session |
-| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; the OpenCode TUI face — the marker's resume after a pause, the refusal's modal and toast, attention sounds, one reminder per compaction after the fix |
+| WSL2, the OpenCode service and TUI, live sessions | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills`, a manual compaction released through the plugin's entry with the token honored, a tokenless `/compact` held back by the plugin's entry, one reminder per compaction after the fix, the tab marker painted red on a paused session |
+| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; the OpenCode TUI face — the marker's resume after a pause, the refusal's modal and toast, attention sounds |
 
 ## Related
 

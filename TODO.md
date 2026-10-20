@@ -8,30 +8,24 @@ and `todo/` are repo state, committed.
 
 - Installed on this machine into both targets, `~/.claude` and
   `~/.config/opencode`: the user's `cli.json` keys survive, backups written.
-- Verified live in OpenCode: the plugin loads, `/kaizen` runs the skill, the
-  post-compaction reminder reaches the agent, a manual compaction released
-  through the plugin's entry consumed the token, and the tab marker painted
-  red on a paused session — both faces load and act.
-- Three live findings, all fixed on `main`, all waiting for a re-test:
-  - the reminder fired four times per compaction — several plugin copies see
-    one event; `oncePerEvent` now claims it through an exclusive marker in
-    the state dir, swept after an hour, and one reminder goes out;
-  - the built-in `/compact` keeps its own palette entry and compacts
-    ungated — a live manual compaction passed with no token; no plugin
-    removes it, our entry is titled `kaizen-gated`, the README names the
-    soft edge;
-  - the marker held its red through a resumed run: a pause does not end the
-    execution and nothing repainted on the reply — `permission.replied`,
-    `form.replied` and `form.cancelled` now repaint working.
-- Needs a live terminal: restart OpenCode, the service and every TUI, so no
-  plugin copy predates the fix, then check — one reminder per compaction;
-  `/compact` through the `kaizen-gated` entry with no token: held back with
-  the toast; the marker green while a resumed run works; the attention
-  sounds.
-- Then the release: tag `v0.3.0`, approval in the GitHub environment
-  `release`. The rename may break the npm trusted publishing: re-run
-  `npm trust github qol-mini --file release.yml --repo ltruchot/qol-mini-4-ai-tui
-  --env release --allow-publish` if the job refuses.
+- Verified live in OpenCode: the plugin loads, `/kaizen` runs the skill, a
+  manual compaction released through the plugin's entry consumed the token,
+  the tab marker painted red on a paused session, and the dedup works on the
+  fixed bytes — one reminder per compaction, one marker and one synthetic
+  message, where the old bytes sent four.
+- The 23:25 compaction went through the built-in entry: no `/kaizen`, no
+  token — the soft edge, as documented.
+- Still unseen on the fixed bytes, all observable in one sitting:
+  - the refusal's feedback: this repo's token is spent, so a `/compact`
+    through the `kaizen-gated` entry must raise the modal and the
+    session-routed toast — "Compaction held back";
+  - the marker green while a resumed run works;
+  - the attention sounds.
+- Then the release → todo/release-0.3.0.md: tag `v0.3.0`, approval in the
+  GitHub environment `release`. The rename may break the npm trusted
+  publishing: re-run `npm trust github qol-mini --file release.yml --repo
+  ltruchot/qol-mini-4-ai-tui --env release --allow-publish` if the job
+  refuses.
 - Other machines: `git remote set-url origin
   https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then from a clone
   `git pull && ./install.sh --replace`, or `pnpm dlx qol-mini@latest install
