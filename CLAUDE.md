@@ -44,7 +44,7 @@ Sources are under `packages/qol-mini/src/`.
 | Tab marker | `kit/hooks/tab-state.ts` | 🟢 working (subagents, background tasks, compaction) · 🔴 blocked on you · 🟡 idle |
 | Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction Claude is told to read `TODO.md` |
 | Skills per project | `commands/`, `core/`, `io/`, `packages/qol-mini/skills/` | `qol-mini skills install qa-pr ./my-project` renders a shipped skill into `.claude/skills/`, records it in `.claude/qol-mini.lock.json`, and merges local edits on update |
-| OpenCode target | `packages/qol-mini/opencode/`, `src/opencode/` | the same features in the OpenCode TUI: tab marker, `/compact` gate, post-compaction reminder, `/kaizen` command, attention sounds |
+| OpenCode target | `packages/qol-mini/opencode/`, `src/opencode/` | the same features in the OpenCode TUI: tab marker, `/compact` gate, post-compaction reminder, `/kaizen` command |
 
 | Command | Does |
 |---|---|
@@ -68,6 +68,8 @@ A prompt that blocks a script or CI is a bug.
   with no error. Keep the test that requires it at the root.
 - Only OSC 0/1/2/9/99/777 and BEL pass. One byte outside the allowlist drops the
   whole field silently: strip control characters from anything interpolated.
+- A sequence ends in BEL or ST — ours ends in ST: some terminals ring on a BEL
+  terminator, one beep per title set.
 - It is applied in interactive sessions only, never under `-p` or the Agent SDK.
 - A hook has no terminal: `/dev/tty` is unreachable. `terminalSequence` is the only
   way to write to it.

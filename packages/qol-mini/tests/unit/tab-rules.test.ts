@@ -7,8 +7,10 @@ import { GREEN, RED, YELLOW } from "../helpers/kit.ts";
 test("terminalSequence is a root field holding one OSC 0 title", () => {
   const body = hookOutput("blocked", "/tmp/demo/");
   expect(Object.keys(body)).toStrictEqual(["terminalSequence"]);
-  expect(body.terminalSequence).toBe(`\u001B]0;${RED} demo\u0007`);
-  expect(hookOutput("working", "/tmp/de\u0007mo\u001B").terminalSequence).toContain(" demo\u0007");
+  expect(body.terminalSequence).toBe(`\u001B]0;${RED} demo\u001B\\`);
+  expect(hookOutput("working", "/tmp/de\u0007mo\u001B").terminalSequence).toContain(
+    " demo\u001B\\",
+  );
   expect(new Set(Object.values(markers({}))).size).toBe(3);
   expect(markers({ CC_TAB_IDLE: "[zz]", CC_TAB_WORKING: "" })).toMatchObject({
     idle: "[zz]",

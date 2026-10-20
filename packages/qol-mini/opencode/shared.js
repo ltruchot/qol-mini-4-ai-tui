@@ -137,14 +137,16 @@ function markers() {
 
 // The tab title the editor reads through ${sequence}. Control characters are
 // stripped: a byte outside the title breaks the sequence. The TUI owns the
-// screen; /dev/tty is the only way out to the terminal's title.
+// screen; /dev/tty is the only way out to the terminal's title. The title
+// ends in ST, not BEL: the raw write races the TUI's redraw, and a BEL met
+// outside a parsed title rings — ST never does.
 export function writeMarker(state, cwd) {
   try {
     const dir = cwd === "" ? process.cwd() : cwd;
     const label = basename(dir).replaceAll(/\p{Cc}/gu, "");
     const title = `${markers()[state]} ${label}`.trim();
     const tty = openSync("/dev/tty", "w");
-    writeSync(tty, `\u001B]0;${title}\u0007`);
+    writeSync(tty, `\u001B]0;${title}\u001B\\`);
     closeSync(tty);
   } catch {
     // no /dev/tty (Windows), or a directory that no longer resolves

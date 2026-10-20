@@ -19,6 +19,8 @@ export function markers(
 // is a root field: nested in hookSpecificOutput it is ignored with no error.
 // Only OSC 0/1/2/9/99/777 and BEL pass, and one byte outside that allowlist
 // drops the whole field, so control characters are stripped from the label.
+// The title ends in ST, not BEL: some terminals ring on a BEL terminator —
+// one beep per title set — and ST is silent everywhere.
 export function hookOutput(state: State, cwd: string): { terminalSequence: string } {
   const dir = cwd === "" ? process.cwd() : cwd;
   // The folder name tells several Claude terminals apart: ${sequence}
@@ -26,5 +28,5 @@ export function hookOutput(state: State, cwd: string): { terminalSequence: strin
   const name = basename(normalize(dir));
   const label = (name === "" ? dir : name).replaceAll(/\p{Cc}/gu, "");
   const title = `${markers()[state]} ${label}`.trim();
-  return { terminalSequence: `\u001B]0;${title}\u0007` };
+  return { terminalSequence: `\u001B]0;${title}\u001B\\` };
 }

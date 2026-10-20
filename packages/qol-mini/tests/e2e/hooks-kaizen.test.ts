@@ -18,7 +18,7 @@ test("manual /compact blocks until a review releases it, once", async () => {
   const held = await run(["--marker"]);
   expect(held.code).toBe(2);
   expect(held.err).toContain("Run /kaizen");
-  expect(JSON.parse(held.out)).toHaveProperty("terminalSequence", `\u001B]0;${RED} proj\u0007`);
+  expect(JSON.parse(held.out)).toHaveProperty("terminalSequence", `\u001B]0;${RED} proj\u001B\\`);
   expect((await run([])).out).toBe("");
 
   await hook(gate, ["--release"], "", { ...env, cwd: other });
