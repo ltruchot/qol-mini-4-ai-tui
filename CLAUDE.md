@@ -235,7 +235,9 @@ A prompt that blocks a script or CI is a bug.
 - `/compact` has no PreCompact hook in OpenCode: the TUI plugin registers the
   command and checks the same token the Claude hook consumes. Verified live:
   the plugin's entry holds back and honors the token; the built-in entry
-  keeps its own palette slot and compacts ungated — no plugin removes it.
+  keeps its own palette slot and compacts ungated — no plugin removes it. A
+  live refusal showed the toast alone is easy to miss: the refusal also
+  raises a modal with the same words.
 - Events, not hooks: `session.execution.*` for working and idle,
   `permission.asked`, `form.created`, `session.status` (a retry with an action
   is blocked on you, one without resumes alone), `session.compaction.*` for the

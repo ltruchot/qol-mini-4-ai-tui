@@ -6,9 +6,8 @@
 import { Plugin } from "@opencode/plugin/tui";
 import { compactionPasses, configured, optedOut, writeMarker } from "./shared.js";
 
-const BLOCKED =
-  "Compaction held back: this session's friction has not been reviewed.\n" +
-  "Run /kaizen to review it, then /compact again.";
+const HELD_TITLE = "Compaction held back";
+const HELD_BODY = "This session's friction has not been reviewed.\nRun /kaizen to review it, then /compact again.";
 
 export default Plugin.define({
   id: "qol-mini.tui",
@@ -73,7 +72,16 @@ export default Plugin.define({
             if (sessionID === undefined) return;
             const dir = dirOf(sessionID);
             if (configured().kaizen && !optedOut(dir, "kaizen") && !compactionPasses(dir)) {
-              ui.toast.show({ title: "qol-mini", message: BLOCKED, variant: "warning", duration: 8000 });
+              // The refusal speaks twice: a live session showed the toast alone
+              // is easy to miss, so a modal carries the same words.
+              ui.toast.show({
+                title: HELD_TITLE,
+                message: HELD_BODY,
+                variant: "warning",
+                duration: 8000,
+                sessionID,
+              });
+              await ui.dialog.alert({ title: HELD_TITLE, message: HELD_BODY });
               return;
             }
             await client.session.compact({ sessionID });
