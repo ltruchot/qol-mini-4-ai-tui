@@ -3,6 +3,8 @@ import { join } from "node:path";
 import { wav } from "./wav.ts";
 
 // Two rising notes: you are waited on. One lower, quieter note: a turn ended.
+// OpenCode's attention plays its own sound for events the kit is silent on:
+// silent.wav holds those, and the installer maps them to it.
 const TONES: Record<string, Buffer> = {
   "needs-you.wav": wav(
     [
@@ -12,6 +14,7 @@ const TONES: Record<string, Buffer> = {
     0.28,
   ),
   "done.wav": wav([[440, 0.2]], 0.2),
+  "silent.wav": wav([[440, 0.01]], 0),
 };
 
 // Sound files are never regenerated: users drop their own

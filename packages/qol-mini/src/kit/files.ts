@@ -5,7 +5,7 @@ export const TAB = "hooks/tab-state.mjs";
 export const KAIZEN = "hooks/precompact-kaizen.mjs";
 export const PLAY = "sounds/play.mjs";
 export const KAIZEN_SKILL = "skills/kaizen/SKILL.md";
-export const SOUNDS = ["needs-you.wav", "done.wav"];
+export const SOUNDS = ["needs-you.wav", "done.wav", "silent.wav"];
 
 // Delivered file -> bundle in dist/
 export const BUNDLES: Record<string, string> = {

@@ -1,24 +1,14 @@
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { readConfig } from "../io/config-file.ts";
 import { type Chosen, DEFAULTS } from "./options.ts";
 
 export type Settings = Record<string, unknown>;
 
 // settings.json as an object; a missing or empty file is {}
-export function readSettings(target: string): Settings {
-  let raw: string;
-  try {
-    raw = readFileSync(join(target, "settings.json"), "utf8");
-  } catch {
-    return {};
-  }
-  return JSON.parse(raw.trim() === "" ? "{}" : raw) as Settings;
-}
+export const readSettings = (target: string): Settings => readConfig(join(target, "settings.json"));
 
-function limit(command: string, name: string, fallback: number): number {
-  const found = new RegExp(`--${name} (\\d+)`).exec(command)?.[1];
-  return found !== undefined && Number(found) > 0 ? Number(found) : fallback;
-}
+const limit = (command: string, name: string, fallback: number): number =>
+  Number(new RegExp(`--${name} (\\d+)`).exec(command)?.[1] ?? fallback) || fallback;
 
 // What settings.json says is installed: options overlay this, so an update
 // reproduces the setup in place. With nothing of ours there, the defaults.

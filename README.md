@@ -2,9 +2,10 @@
 
 [![test](https://github.com/ltruchot/qol-mini-4-ai-tui/actions/workflows/test.yml/badge.svg)](https://github.com/ltruchot/qol-mini-4-ai-tui/actions/workflows/test.yml)
 
-Quality-of-life kit for [Claude Code](https://code.claude.com) when you run
-several sessions at once: hooks and one status line for every project, skills
-per project. One package, `qol-mini`.
+Quality-of-life kit for [Claude Code](https://code.claude.com) and
+[OpenCode](https://opencode.ai) when you run several sessions at once: hooks
+and one status line for every project, skills per project. One install wires
+both agents. One package, `qol-mini`.
 
 | | |
 |---|---|
@@ -31,7 +32,7 @@ pnpm dlx qol-mini skills install qa-pr /path/to/my-project  #    or name them
 
 | Step | Writes into | Then |
 |---|---|---|
-| 1 | `~/.claude` (or `$CLAUDE_CONFIG_DIR`) | start a new Claude Code session |
+| 1 | `~/.claude` (or `$CLAUDE_CONFIG_DIR`), `~/.config/opencode` (or `$XDG_CONFIG_HOME/opencode`) | start a new Claude Code session; `opencode service restart` |
 | 2 | `/path/to/my-project/.claude/skills/` and `.claude/qol-mini.lock.json` | commit both; start a new session in that project |
 
 A skill asks for its values once (`qa-pr`: the GitHub repo, the production URL).
@@ -52,8 +53,32 @@ the tab marker only.
 
 Then start a new Claude Code session. Reloading the editor window is not enough.
 
-Writes into `~/.claude` (or `$CLAUDE_CONFIG_DIR`). `settings.json` is merged, not
+Writes into `~/.claude` (or `$CLAUDE_CONFIG_DIR`) and `~/.config/opencode` (or
+`$XDG_CONFIG_HOME/opencode`). `settings.json` and `cli.json` are merged, not
 replaced, and backed up first. Your own hooks, permissions and plugins survive.
+
+## OpenCode
+
+One install wires both agents with one feature set: each option below applies
+to both, and the kaizen tokens, the sounds and the opt-out file are shared.
+
+| Feature | In Claude Code | In OpenCode |
+|---|---|---|
+| Skills | `.claude/skills/`, a skill is a slash command | the same files, discovered from `.claude/skills`; loaded by the agent or `@name` |
+| `/kaizen` | the skill's command | `commands/kaizen.md`, delivered into the OpenCode config dir |
+| `/compact` gate | a `PreCompact` hook | the plugin's `/compact`: held back until `/kaizen` ran |
+| Sounds | a hook plays `~/.claude/sounds` | `attention` in `cli.json`, playing the same files |
+| Tab marker | a hook emits the title sequence | the plugin emits it on `/dev/tty`; `terminal.title` is set to `false` |
+| Context gauge | the status line | not ported: the TUI footer shows context already |
+
+Delivered into `~/.config/opencode/`: `plugins/qol-mini/` (two faces, loaded
+by the service and the TUI), `commands/kaizen.md`, and the `cli.json` merge.
+Features are read from the Claude `settings.json`: the two agents always show
+the same set. After the plugin files change, run `opencode service restart`.
+
+Not ported: the context gauge, sounds on an unfocused terminal (OpenCode plays
+its attention sounds by its own focus rules), and the tab marker on Windows
+(no `/dev/tty`).
 
 ### Options
 
@@ -285,7 +310,8 @@ echo "tab sounds" > <project>/.claude/qol-mini-off   # the kaizen review stays
 | `tab` | the tab marker |
 | `sounds` | the sounds |
 
-Skills are never concerned: they are files in the project.
+Skills are never concerned: they are files in the project. The OpenCode plugin
+asks the same file the same questions: one opt-out covers both agents.
 
 ## Files
 
@@ -295,9 +321,14 @@ Skills are never concerned: they are files in the project.
 ├── hooks/tab-state.mjs
 ├── hooks/precompact-kaizen.mjs
 ├── skills/kaizen/SKILL.md
-├── sounds/{play.mjs,needs-you.wav,done.wav}
+├── sounds/{play.mjs,needs-you.wav,done.wav,silent.wav}
 ├── state/                      kaizen tokens, one per project directory
 └── settings.json               statusLine + hooks, merged
+
+~/.config/opencode/
+├── plugins/qol-mini/           index.js (service), tui.js (TUI), shared.js
+├── commands/kaizen.md          the /kaizen command
+└── cli.json                    attention sounds + terminal.title, merged
 
 <project>/.claude/
 ├── skills/<name>/              rendered skills
@@ -371,7 +402,8 @@ git tag v<version> && git push origin v<version>
 | CI: Linux, macOS | the test suite |
 | CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
 | WSL2, VS Code, a live session | the tab marker, the sounds, `/compact` held back then released by `/kaizen` |
-| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows |
+| WSL2, the OpenCode service, a live session | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills` |
+| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; the OpenCode TUI face — tab marker, `/compact` gate, attention sounds |
 
 ## Related
 

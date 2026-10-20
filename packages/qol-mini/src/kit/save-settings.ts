@@ -19,10 +19,13 @@ export function backup(file: string): string | null {
 }
 
 // Called only when the merge changes the file: a no-op run leaves no backup
-export function saveSettings(target: string, data: Settings): string | null {
-  const file = join(target, "settings.json");
+export function saveNamed(target: string, name: string, data: Settings): string | null {
+  const file = join(target, name);
   mkdirSync(dirname(file), { recursive: true });
   const copy = backup(file);
   writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
   return copy;
 }
+
+export const saveSettings = (target: string, data: Settings): string | null =>
+  saveNamed(target, "settings.json", data);

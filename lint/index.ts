@@ -5,9 +5,14 @@ import { OFF_TESTS } from "./off-tests.ts";
 
 type Lint = NonNullable<ViteUserConfig["lint"]>;
 
-// Every oxlint category on, exceptions documented next to their reason
+// Every oxlint category on, exceptions documented next to their reason.
+// opencode/ is plugin code shipped for the OpenCode runtime, skills/ is prose.
 export const lint: Lint = {
-  ignorePatterns: ["packages/qol-mini/tests/fixtures/**"],
+  ignorePatterns: [
+    "packages/qol-mini/tests/fixtures/**",
+    "packages/qol-mini/skills/**",
+    "packages/qol-mini/opencode/**",
+  ],
   jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
   plugins: ["typescript", "unicorn", "oxc", "import", "promise", "node", "vitest"],
   categories: {

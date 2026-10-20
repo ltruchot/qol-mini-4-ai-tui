@@ -36,7 +36,10 @@ test("a past release is purged, the user's settings and options survive", async 
     hooks: { Stop: [{ hooks: [mine] }] },
   });
   const left = await readdir(target);
-  expect(left.filter((name) => !name.startsWith("settings.json"))).toStrictEqual([]);
+  // `xdg` holds the other target's throwaway config, isolated by the helper
+  expect(left.filter((name) => !name.startsWith("settings.json") && name !== "xdg")).toStrictEqual(
+    [],
+  );
   expect(left.length).toBeGreaterThan(1);
   expect((await kit(target, ["uninstall"])).out).toContain("Nothing changed");
   expect(await readdir(target)).toHaveLength(left.length);

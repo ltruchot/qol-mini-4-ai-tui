@@ -1,7 +1,7 @@
 {
   "name": "qol-mini",
-  "version": "0.2.1",
-  "description": "Minimal Claude Code kit: status line, sounds, tab marker, kaizen review, and skills per project",
+  "version": "0.3.0",
+  "description": "Minimal kit for Claude Code and OpenCode: status line, sounds, tab marker, kaizen review, and skills per project",
   "homepage": "https://github.com/ltruchot/qol-mini-4-ai-tui#readme",
   "bugs": "https://github.com/ltruchot/qol-mini-4-ai-tui/issues",
   "license": "MIT",
@@ -15,6 +15,7 @@
   },
   "files": [
     "dist",
+    "opencode",
     "skills"
   ],
   "type": "module",

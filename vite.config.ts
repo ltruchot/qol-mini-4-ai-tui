@@ -1,8 +1,13 @@
 import { defineConfig } from "vite-plus";
 import { lint } from "./lint/index.ts";
 
-// Fixtures are test data and skills are shipped prose: never format, never lint
-const fixtures = ["packages/qol-mini/tests/fixtures/**", "packages/qol-mini/skills/**"];
+// Fixtures are test data, skills are shipped prose, opencode is shipped plugin
+// code for another runtime: never format, never lint
+const fixtures = [
+  "packages/qol-mini/tests/fixtures/**",
+  "packages/qol-mini/skills/**",
+  "packages/qol-mini/opencode/**",
+];
 
 export default defineConfig({
   staged: {

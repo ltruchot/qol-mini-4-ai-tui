@@ -14,7 +14,7 @@ test("a mono 16-bit WAV, never regenerated over a file dropped in", async () => 
   expect(tone).toHaveLength(44 + 8820 * 2);
   const dir = await tmpDir();
   await writeFile(join(dir, "done.wav"), "mine");
-  expect(generateSounds(dir)).toStrictEqual(["needs-you.wav"]);
+  expect(generateSounds(dir)).toStrictEqual(["needs-you.wav", "silent.wav"]);
   expect(await readFile(join(dir, "done.wav"), "utf8")).toBe("mine");
   expect((await readFile(join(dir, "needs-you.wav"))).length).toBeGreaterThan(1000);
   expect(generateSounds(dir)).toStrictEqual([]);

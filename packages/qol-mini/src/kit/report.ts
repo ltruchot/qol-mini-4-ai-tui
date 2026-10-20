@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { print } from "../io/ui.ts";
 
 // One line per file, the verb in a 14-character column
@@ -14,10 +15,12 @@ export function printOptout(): void {
   ]);
 }
 
-export function printClash(target: string, files: string[]): void {
+export function printClash(clashes: { target: string; files: string[] }[]): void {
   print([
-    `${files.length} file(s) in ${target} differ from what this version ships:`,
-    ...files.map((file) => `  ${file}`),
+    ...clashes.flatMap(({ target, files }) => [
+      `${files.length} file(s) in ${target} differ from what this version ships:`,
+      ...files.map((file) => `  ${join(target, file)}`),
+    ]),
     "",
     "Nothing was written. The installer creates what is missing and never",
     "overwrites what is there: it cannot tell an older version from an edit",
@@ -37,6 +40,9 @@ export const USAGE = [
   "  --alert N      gauge turns red at N tokens (default 200000)",
   "  --defaults     install the defaults without asking",
   "  --replace      overwrite delivered files that differ",
+  "",
+  "  One run wires two agents with one feature set: Claude Code in ~/.claude",
+  "  (or $CLAUDE_CONFIG_DIR), OpenCode in ~/.config/opencode (or $XDG_CONFIG_HOME).",
   "",
   "       qol-mini uninstall",
   "       qol-mini vscode [--dry-run] [--force] [--revert]",

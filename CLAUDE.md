@@ -3,11 +3,12 @@
 > Session handoff: read `TODO.md` first — where the last session stopped, and what is left.
 > Open a `todo/` file only for the item you work on. An item done → delete its line and its `todo/` file.
 
-A minimal kit for Claude Code, in one npm package, `qol-mini`, developed at
-`ltruchot/qol-mini-4-ai-tui`. Two scopes: **global** (hooks, status line, sounds,
-the kaizen review, in the Claude config dir) and **project** (skills, in
-`<project>/.claude`). It works on **Linux, macOS, WSL and Windows**, in **VS Code
-and Cursor**.
+A minimal kit for Claude Code and OpenCode, in one npm package, `qol-mini`,
+developed at `ltruchot/qol-mini-4-ai-tui`. Two scopes: **global** (hooks, status
+line, sounds, the kaizen review, in the Claude config dir; the OpenCode plugin,
+command and `cli.json` merge, in the OpenCode config dir) and **project**
+(skills, in `<project>/.claude`, read by both agents). It works on **Linux,
+macOS, WSL and Windows**, in **VS Code and Cursor**.
 
 **Purpose, which settles the trade-offs**: a model that is not working is a model you
 could hand something to. Every signal answers *is it running* first: green is
@@ -43,11 +44,12 @@ Sources are under `packages/qol-mini/src/`.
 | Tab marker | `kit/hooks/tab-state.ts` | 🟢 working (subagents, background tasks, compaction) · 🔴 blocked on you · 🟡 idle |
 | Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction Claude is told to read `TODO.md` |
 | Skills per project | `commands/`, `core/`, `io/`, `packages/qol-mini/skills/` | `qol-mini skills install qa-pr ./my-project` renders a shipped skill into `.claude/skills/`, records it in `.claude/qol-mini.lock.json`, and merges local edits on update |
+| OpenCode target | `packages/qol-mini/opencode/`, `src/opencode/` | the same features in the OpenCode TUI: tab marker, `/compact` gate, post-compaction reminder, `/kaizen` command, attention sounds |
 
 | Command | Does |
 |---|---|
-| `qol-mini install` | global scope: copies the hook bundles, merges `settings.json` (`kit/install.ts`) |
-| `qol-mini uninstall` | removes what `install` added (`kit/uninstall.ts`) |
+| `qol-mini install` | global scope: copies the hook bundles, merges `settings.json`, delivers the OpenCode target (`kit/install.ts`, `opencode/`) |
+| `qol-mini uninstall` | removes what `install` added, from both targets (`kit/uninstall.ts`) |
 | `qol-mini vscode` | sets the editor (`kit/vscode.ts`) |
 | `qol-mini skills install\|update\|list\|check\|remove` | project scope, or `--global` |
 
@@ -211,6 +213,36 @@ A prompt that blocks a script or CI is a bug.
 - An editor `settings.json` is JSONC: insert the key textually, never parse and
   reserialize.
 
+### The OpenCode target
+
+- `packages/qol-mini/opencode/` is plugin code shipped as-is for the OpenCode
+  runtime: OpenCode resolves `@opencode/plugin` at load, so nothing is built
+  and the package gains no dependency. `fmt`, `lint` and the line law skip it;
+  a test runs `node --check` on every face.
+- One feature set for both agents: the plugin reads the Claude `settings.json`
+  (`configured()` in `opencode/shared.js`), never its own state. Turning a
+  feature off unwires both. `installedState()` stays the only source.
+- The config dir resolves as OpenCode resolves it: `$XDG_CONFIG_HOME/opencode`
+  else `~/.config/opencode`. The tests isolate it through `XDG_CONFIG_HOME`.
+- `cli.json` accepts documented keys only: `attention.sound`,
+  `attention.sounds`, `terminal.title`. Never write another one.
+- A delivered slash command stays active on disk, unlike an unwired hook:
+  turning kaizen off removes `commands/kaizen.md` (`stale` in the OpenCode
+  plan).
+- The tab marker writes the title sequence to `/dev/tty`: the TUI owns the
+  screen, that is the only way out, and `terminal.title: false` keeps OpenCode
+  from rewriting the title. Windows has no `/dev/tty`: no marker there.
+- `/compact` has no PreCompact hook in OpenCode: the TUI plugin registers the
+  command and checks the same token the Claude hook consumes. The built-in
+  command may win over the plugin's: verify live before claiming the gate.
+- Events, not hooks: `session.execution.*` for working and idle,
+  `permission.asked`, `form.created`, `session.status` (a retry with an action
+  is blocked on you, one without resumes alone), `session.compaction.*` for the
+  reminder. `session.execution.interrupted` is not wired: the marker holds on
+  Esc, the same known gap as Claude Code.
+- The plugin files load at service start: `install` names `opencode service
+  restart` when they moved. `cli.json` and `commands/` reload hot.
+
 ### Skills
 
 - One bank: `packages/qol-mini/skills/`, shipped in the package. `QOL_MINI_BANK`
@@ -321,12 +353,13 @@ vp run -r build && vp run packcheck
 - No dependency at runtime: everything is bundled. A new dev dependency gets an
   exact pin in the `pnpm-workspace.yaml` catalog.
 - Hooks are tested as real processes with the event JSON on stdin; the installer
-  and the skills commands run in-process against `CLAUDE_CONFIG_DIR` and temporary
-  projects. No test touches `~/.claude`.
+  and the skills commands run in-process against `CLAUDE_CONFIG_DIR` and
+  temporary projects. No test touches `~/.claude` or `~/.config/opencode`.
 
-A change is delivered when it is installed: `~/.claude` holds a copy, and editing the
-repo changes nothing on screen. `CLAUDE_CONFIG_DIR` points any command at a throwaway
-directory.
+A change is delivered when it is installed: `~/.claude` and
+`~/.config/opencode` hold a copy, and editing the repo changes nothing on
+screen. `CLAUDE_CONFIG_DIR` and `XDG_CONFIG_HOME` point any command at
+throwaway directories.
 
 ## Release
 

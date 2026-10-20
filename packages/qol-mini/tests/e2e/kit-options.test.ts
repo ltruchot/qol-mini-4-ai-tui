@@ -39,6 +39,7 @@ test("thresholds go on the command line, defaults stay off it", async () => {
     "done.wav",
     "needs-you.wav",
     "play.mjs",
+    "silent.wav",
   ]);
   expect((await kit(target, ["--help"])).out).toContain("qol-mini install [options]");
   await cleanup(target);

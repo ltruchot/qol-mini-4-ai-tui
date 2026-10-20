@@ -8,6 +8,7 @@ const titleOff = (data: Settings): unknown => (data["env"] as Settings | undefin
 
 // The `env` block and a skills directory created after startup need a new
 // session; nothing else does, so a restart is named in those two cases only.
+// The OpenCode plugin loads at service start: it is named when its files moved.
 export function hints(
   chosen: Chosen,
   before: Settings,
@@ -15,11 +16,14 @@ export function hints(
   newSkillsDir: boolean,
   settingsChanged: boolean,
   removed: boolean,
+  open: { plugin: boolean } | null,
 ): void {
   print([""]);
   if (chosen.tabs && titleOff(merged) !== titleOff(before))
     print(["Tab marker: run `qol-mini vscode`, then start a new session."]);
   if (newSkillsDir) print(["Kaizen: /kaizen appears in a new session."]);
+  if (open !== null && open.plugin)
+    print(["OpenCode: run `opencode service restart`, then start a new session."]);
   printOptout();
   // The file watcher reloads hooks after a delay: the handlers a session holds
   // until then name the files just removed
