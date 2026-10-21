@@ -2,18 +2,18 @@
 
 ## Where we stopped
 
-The kit serves both agents, released: `v0.3.0` on npm with the ST fix, the
-silence confirmed live. The wording sweep (Claude Code named in full, the
-agent in behavior texts) ships as `v0.3.1`.
+The harmonizer ships as `v0.4.0`: `qol-mini harmonize
+<project>|check|undo|scan`, both directions, AGENTS.md canonical, `vp run
+ready` green, 119/119. No repo was written: the four real ones saw dry-runs
+only. The tag is pushed; the run in the GitHub environment `release` waits
+for its approval → todo/release-0.4.0.md
 
-- The "attention sounds" were the BEL terminator of every title write
-  ringing, not a feature: no sound code in the plugin, none in OpenCode —
-  the parenthetical is gone from the README. The release checklist closed:
-  todo/release-0.3.0.md.
-- Other machines: `git remote set-url origin
-  https://github.com/ltruchot/qol-mini-4-ai-tui.git`, then from a clone
-  `git pull && ./install.sh --replace`, or
-  `pnpm dlx qol-mini@latest install --replace` — restart the TUIs after.
+- The first live write closes the release checklist: `harmonize <repo>` on
+  one repo, then a Claude Code session and an OpenCode session in it, both
+  reading AGENTS.md. The dry-runs and the suite are the proof so far.
+- Other machines: `pnpm dlx qol-mini@latest install --replace` — restart the
+  TUIs after; each repo: `pnpm dlx qol-mini@latest harmonize <repo>`, then
+  commit the lock and the generated files.
 
 ## Later
 
