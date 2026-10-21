@@ -2,18 +2,20 @@
 
 ## Where we stopped
 
-`qol-mini@0.5.0` is on npm (`+ qol-mini@0.5.0` in the run log): its
-converters write OpenCode 2.1's native shapes, checked by
-`@opencode/schema`. `qol-mini@0.4.0` writes output OpenCode 2.1 drops:
-run no `harmonize` from 0.4.0 on a real repo. → todo/release-0.5.0.md
-- Then, per repo: `harmonize <repo> --dry-run`, read the named losses, then
-  `--only rules` first, then a full run; a Claude Code session and an
-  OpenCode session in it, both reading AGENTS.md. Commit the lock.
-- Other machines: `pnpm dlx qol-mini@latest install --replace`, restart the
-  TUIs after.
+**Top priority on restart**: the Claude Code tab marker regressed. A turn
+ending on a question stays green instead of red; colors seen out of place
+earlier too. Lead: since 0.5.0, `SubagentStop` paints green, and Claude
+Code's internal agents (prompt suggestions, recap) fire it after the turn's
+`Stop`. Confirm with `claude --debug`, then fix → todo/tab-marker-regression.md
+
+`qol-mini@0.5.2` is released, `main` level with `origin`, `vp run ready`
+green, 153 tests. Rollout on real repos and the first live sessions in both
+agents → todo/harmonize-rollout.md
 
 ## Later
 
+- Port the test suite's POSIX paths and file modes to Windows, then drop
+  `continue-on-error` from the `test-windows` job in `.github/workflows/test.yml`
 - Harmonizer follow-ups: hooks compiled to OpenCode plugin shims, the home
   directory audit (`harmonize --global`), a CI job calling `harmonize check`,
   a validation pass under Orca (parallel worktrees vs `qol-mini-off`) →

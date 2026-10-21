@@ -365,11 +365,16 @@ A prompt that blocks a script or CI is a bug.
 - A hook that returns `additionalContext` leaves no transcript entry and no
   terminal output. Running it by hand proves the script, not the wiring: for
   that, start with `claude --debug` and read `~/.claude/debug/<session-id>.txt`.
+- Check what OpenCode loads in a repo: `HOME` and `XDG_*` on a scratch dir,
+  `opencode service set port <free>` first, or it takes the real service's
+  port; then `opencode api GET /api/agent` or `/api/command` with
+  `-H "x-opencode-directory:<repo>"`, repeated until more than the built-ins
+  show; `opencode service stop` after, same env.
 - Wake another session with `SendMessage` to make its hooks fire.
 - `/proc/PID/environ` cannot show a variable set by `settings.json`.
 - The shell is zsh: quote a word that starts with `=` and any glob passed as an
   argument, and wrap a command in a function, not in a variable: `$CMD args` is
-  one word there.
+  one word there. Never name a variable `path`: zsh ties it to `$PATH`.
 - To interrupt a running tool, accept its permission prompt first: Esc on the dialog
   is a rejection and the tool never runs.
 - Verify a negative result before concluding.
