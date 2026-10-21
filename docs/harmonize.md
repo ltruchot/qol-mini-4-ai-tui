@@ -86,9 +86,16 @@ never converted.
 
 A run warns when a `CLAUDE.md`, a `.claude/CLAUDE.md` or a `CLAUDE.local.md`
 sits in or above the repo: those files make Claude Code skip `AGENTS.md`, and
-the bridge mode is the answer. A repo holding two different rules files is a
-conflict: nothing is written until `--replace` says which side wins, `--from
-claude` keeps `CLAUDE.md`, `--from opencode` keeps `AGENTS.md`.
+the bridge mode is the answer.
+
+Two rules files where one imports the other (`Follow @CLAUDE.md` in
+AGENTS.md, or `@AGENTS.md` plus other lines in CLAUDE.md) are one set of
+rules: AGENTS.md becomes the importing file with the imported one in place
+of the import line, and the replaced line is named. OpenCode does not expand
+imports, so before the merge it read the importing file alone. Two rules
+files that differ otherwise are a conflict: nothing is written until
+`--replace` says which side wins, `--from claude` keeps `CLAUDE.md`, `--from
+opencode` keeps `AGENTS.md`.
 
 ## The lock
 

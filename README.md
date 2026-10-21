@@ -179,7 +179,7 @@ qol-mini harmonize scan ~/workspace          # list repos, write nothing
 
 | Converts | Claude Code | OpenCode 2.1 |
 |---|---|---|
-| Rules | `CLAUDE.md` | `AGENTS.md`, the canonical file; `--rules bridge\|symlink` for the exceptions |
+| Rules | `CLAUDE.md` | `AGENTS.md`, the canonical file; a file importing the other is merged; `--rules bridge\|symlink` for the exceptions |
 | Permissions | `permissions` in settings.json | `permissions` array in opencode.json; a legacy `permission` map is read |
 | Commands | `.claude/commands/*.md` | `.opencode/commands/*.md`; `context: fork` <-> `subagent` |
 | Agents | `.claude/agents/*.md` | `.opencode/agents/*.md`; a `tools` list stays an allowlist |

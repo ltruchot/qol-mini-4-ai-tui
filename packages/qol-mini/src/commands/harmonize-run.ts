@@ -18,7 +18,6 @@ export async function runHarmonize(project: string | undefined, opts: HOpts): Pr
   intro("qol-mini harmonize");
   for (const line of report(p)) print([line]);
   if (p.conflicts.length > 0) {
-    for (const conflict of p.conflicts) warn(conflict);
     outro(pc.red("nothing written"));
     return 1;
   }

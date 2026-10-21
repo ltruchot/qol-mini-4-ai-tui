@@ -13,10 +13,11 @@ export async function bridge(
   file: string,
   rel: string,
   slots: Slots,
+  content = BRIDGE_IMPORT,
 ): Promise<UndoOp[]> {
   slots.next += 1;
   const had = await saveSlot(root, slots.next, file);
-  await put(file, Buffer.from(BRIDGE_IMPORT));
+  await put(file, Buffer.from(content));
   return had ? [{ op: "write", path: rel, slot: slots.next }] : [{ op: "write", path: rel }];
 }
 

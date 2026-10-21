@@ -27,7 +27,7 @@ export async function plan(
   const recorded = harmony?.rules ?? "pure";
   const mode = on("rules") ? (opts.rules ?? recorded) : recorded;
   const rules = on("rules")
-    ? planRules(det.state, mode, opts.replace, from)
+    ? planRules(det.state, mode, opts.replace, from, det.merged)
     : { intents: [], conflict: null };
   const reads = await readConfigs(lay);
   const cfg = configs(c, reads);

@@ -15,6 +15,8 @@ export function notesFor(
   const notes: string[] = [];
   const warnings: string[] = [];
   if (det.state === "none") notes.push("rules: no rules file, nothing renamed");
+  if (det.merged !== null && intents.some((i) => i.content !== undefined))
+    notes.push(`rules: ${det.merged.note}`);
   if (det.markers.cc.skills.length > 0)
     notes.push(
       `skills: OpenCode discovers ${det.markers.cc.skills.join(", ")} from .claude/skills`,

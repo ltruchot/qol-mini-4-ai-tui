@@ -8,9 +8,8 @@ import { rootJoin } from "./write.ts";
 
 export type Slots = { next: number };
 
-// Run the rule moves in order, recording what undo replays backwards: a move
-// renames, a removal keeps the bytes (file) or the target (symlink), the
-// bridge lays down `@AGENTS.md`, a symlink falls back to it when refused.
+// Run the rule moves in order, recording what undo replays backwards; a
+// removal or a write keeps what it replaces
 export async function runIntents(
   root: string,
   intents: Intent[],
@@ -24,7 +23,8 @@ export async function runIntents(
       await rename(file, rootJoin(root, intent.to ?? ""));
       ops.push({ op: "mv", path: intent.path, to: intent.to });
     } else if (intent.op === "unlink") ops.push(...(await remove(root, file, intent.path, slots)));
-    else if (intent.op === "write") ops.push(...(await bridge(root, file, intent.path, slots)));
+    else if (intent.op === "write")
+      ops.push(...(await bridge(root, file, intent.path, slots, intent.content)));
     else {
       const out = await bridgeOrLink(root, file, intent, slots);
       ops.push(...out.ops);

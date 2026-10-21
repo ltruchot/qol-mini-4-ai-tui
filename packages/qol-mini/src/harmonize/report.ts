@@ -14,7 +14,8 @@ export function report(p: Plan): string[] {
 const intentLine = (intent: Plan["intents"][number]): string => {
   if (intent.op === "mv") return `mv ${intent.path} -> ${intent.to}`;
   if (intent.op === "symlink") return `symlink ${intent.path} -> ${intent.to}`;
-  if (intent.op === "write") return `write ${intent.path} (@AGENTS.md)`;
+  if (intent.op === "write")
+    return `write ${intent.path} (${intent.content === undefined ? "@AGENTS.md" : "merged"})`;
   return `rm ${intent.path}`;
 };
 

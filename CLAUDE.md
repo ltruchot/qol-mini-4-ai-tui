@@ -310,8 +310,10 @@ A prompt that blocks a script or CI is a bug.
 - The first run decides the source of truth; a re-run keeps it, `--from`
   overrides. Auto-detection is not stable once both sides exist: a flip would
   convert the tool's own output back.
-- A repo holding two different rules files is a conflict: nothing is written
-  until `--replace` names the winner. A generated markdown file edited by hand
+- Two rules files where one imports the other merge into AGENTS.md, the
+  import line replaced by the imported file (`core/harmonize/rules-merge.ts`):
+  OpenCode does not expand `@` imports. Two that differ otherwise are a
+  conflict: nothing is written until `--replace` names the winner. A generated markdown file edited by hand
   is named, not overwritten; one the kit never wrote is never overwritten.
 - A JSON config the user wrote (`opencode.json(c)`, `settings.json`,
   `.mcp.json`) is patched in place with `jsonc-parser`: only owned keys move,
