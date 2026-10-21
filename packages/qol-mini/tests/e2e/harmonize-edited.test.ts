@@ -23,7 +23,7 @@ test("an edited generated file is named, not overwritten; --replace takes it", a
     unknown
   >;
   expect(after["mine"]).toBe(true);
-  expect(after["permission"]).toContainEqual({
+  expect(after["permissions"]).toContainEqual({
     action: "shell",
     resource: "git *",
     effect: "allow",

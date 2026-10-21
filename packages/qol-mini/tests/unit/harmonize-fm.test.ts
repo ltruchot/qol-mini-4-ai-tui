@@ -1,37 +1,47 @@
 import { expect, test } from "vite-plus/test";
-import { ccToOcTools } from "../../src/core/harmonize/fm-tools.ts";
-import { ocToCcTools } from "../../src/core/harmonize/fm-tools-oc.ts";
 import { ccToOcAgent } from "../../src/core/harmonize/fm-agent.ts";
 import { ocToCcAgent } from "../../src/core/harmonize/fm-agent-oc.ts";
-import { toCcModel, toOcModel } from "../../src/core/harmonize/model.ts";
 
-test("command tools convert both ways, lossy named", () => {
-  expect(ccToOcTools(["Read", "Bash(git:*)", "Task"])).toStrictEqual({
-    tools: { read: true, bash: true, task: true },
-    lossy: ["Bash(git:*)"],
-  });
-  expect(ocToCcTools({ read: true, bash: false })).toStrictEqual({ allowed: ["Read"], lossy: [] });
-  expect(ocToCcTools({ bash: "git *" })).toStrictEqual({
-    allowed: ["Bash"],
-    lossy: ["bash: git *"],
-  });
+test("an agent allowlist stays an allowlist in OpenCode", () => {
+  const oc = ccToOcAgent(
+    { name: "rev", description: "d", tools: "Read, Bash(git:*)", disallowedTools: ["Bash(rm *)"] },
+    "rev",
+  );
+  expect(oc.data["permissions"]).toStrictEqual([
+    { action: "*", resource: "*", effect: "deny" },
+    { action: "read", resource: "*", effect: "allow" },
+    { action: "shell", resource: "git *", effect: "allow" },
+    { action: "shell", resource: "*", effect: "deny" },
+  ]);
+  expect(oc.lossy).toStrictEqual([]);
 });
 
-test("agent frontmatter converts both ways, cosmetics dropped by name", () => {
-  const oc = ccToOcAgent({ name: "rev", description: "d", tools: "Read, Grep", color: "yellow" });
+test("agent fields map or are named, never dropped", () => {
+  const data = {
+    name: "x",
+    description: "d",
+    model: "opus",
+    maxTurns: 5,
+    color: "cyan",
+    memory: "user",
+  };
+  const oc = ccToOcAgent(data, "y");
   expect(oc.data).toStrictEqual({
-    name: "rev",
     description: "d",
     mode: "subagent",
-    permission: { read: "allow", grep: "allow" },
+    model: "anthropic/claude-opus-5-5",
+    steps: 5,
+    color: "#00a2c7",
   });
-  expect(oc.lossy).toStrictEqual(["color yellow"]);
-  const back = ocToCcAgent({ ...oc.data, permission: { read: "allow", deny: "bash" } });
-  expect(back.data["tools"]).toStrictEqual(["Read"]);
-});
-
-test("model aliases gain and lose their provider prefix", () => {
-  expect(toOcModel("sonnet")).toStrictEqual({ model: "anthropic/claude-sonnet-4-5", known: true });
-  expect(toCcModel("anthropic/claude-opus-4-8")).toStrictEqual({ model: "opus", known: true });
-  expect(toOcModel("grok/moon").known).toBe(true);
+  expect(oc.lossy).toStrictEqual(["memory has no OpenCode form", "name x: OpenCode names it y"]);
+  const back = ocToCcAgent({ ...oc.data, permission: { "*": "deny", read: "allow" } }, "y");
+  expect(back?.data).toStrictEqual({
+    name: "y",
+    description: "d",
+    tools: ["Read"],
+    model: "opus",
+    maxTurns: 5,
+    color: "cyan",
+  });
+  expect(ocToCcAgent({ description: "d", disable: true }, "z")).toBeNull();
 });

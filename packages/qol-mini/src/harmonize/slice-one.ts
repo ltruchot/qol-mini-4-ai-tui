@@ -8,14 +8,13 @@ import { guardFile, guardNotes } from "./guard.ts";
 import { plannedFile } from "./planned-file.ts";
 import type { Planned } from "./plan-types.ts";
 
-export type Convert = (data: Record<string, unknown>) => {
-  data: Record<string, unknown>;
-  lossy: string[];
-};
+export type Convert = (
+  data: Record<string, unknown>,
+  stem: string,
+) => { data: Record<string, unknown>; lossy: string[] } | null;
 export type OneOut = { planned: Planned[]; warnings: string[]; notes: string[] };
 
-// Convert one markdown file: the frontmatter goes through `convert`, the
-// target is guarded, the lossy keys and skip reasons are named.
+// One markdown file through `convert`, the target guarded, losses named
 export async function convertOne(
   kind: ArtifactKind,
   sourceDir: string,
@@ -28,7 +27,9 @@ export async function convertOne(
   convert: Convert,
 ): Promise<OneOut> {
   const { data, body } = split(text);
-  const md = convert(data);
+  const md = convert(data, name.replace(/\.md$/, ""));
+  const source = rel({ root }, join(sourceDir, name));
+  if (md === null) return { planned: [], warnings: [`${source}: disabled, skipped`], notes: [] };
   const bytes = Buffer.from(withFrontmatter(md.data, body));
   const file = join(targetDir, name);
   const relPath = rel({ root }, file);
@@ -39,7 +40,6 @@ export async function convertOne(
     prev[relPath],
     replace,
   );
-  const source = rel({ root }, join(sourceDir, name));
   const planned =
     guard === "create" || guard === "refresh"
       ? [plannedFile(kind, root, file, bytes, source, hashBytes(Buffer.from(text)))]

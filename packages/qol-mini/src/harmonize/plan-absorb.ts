@@ -1,8 +1,8 @@
 import type { Json, JsonResult } from "./read.ts";
-import type { SliceOut } from "./plan-io.ts";
+import type { MergeOut, SliceOut } from "./plan-io.ts";
 
 export type Acc = { sources: Record<string, string>; mine: string[] };
-type Into = (data: Json, base: Json, mine: string[]) => { mine: string[]; warnings: string[] };
+type Into = (data: Json, base: Json, mine: string[]) => MergeOut;
 
 // Convert one source file into a shared base when it parses: unparseable
 // files are named as conflicts, absent files skipped without a word.
@@ -23,4 +23,5 @@ export function absorb(
   acc.sources[name] = read.hash;
   acc.mine.push(...merged.mine);
   out.warnings.push(...merged.warnings);
+  out.conflicts.push(...(merged.conflicts ?? []));
 }

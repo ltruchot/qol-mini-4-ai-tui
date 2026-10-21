@@ -18,6 +18,8 @@ const one = (entry: string, clean: boolean): object => ({
   dts: false, // tsgo spawns EBUSY under WSL
   exports: false,
   define: { __QOL_MINI_VERSION__: JSON.stringify(pkg.version) },
+  // ESM entries first: a UMD `main` (jsonc-parser) requires its parts at runtime
+  inputOptions: { resolve: { mainFields: ["module", "main"] } },
 });
 
 export default defineConfig({

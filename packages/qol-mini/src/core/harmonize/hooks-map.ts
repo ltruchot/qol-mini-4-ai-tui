@@ -1,13 +1,14 @@
-// Claude Code hook events -> OpenCode plugin events. Report only: a hook body
-// is an arbitrary command, so the mapping names what a plugin must listen to.
+// Claude Code hook events -> what an OpenCode 2.1 plugin listens to: a bus
+// event, or a `hooks.trigger(domain, name)` hook. Report only: a hook body is
+// an arbitrary command, so the mapping names what a plugin must listen to.
 export const HOOK_MAP: readonly [string, string][] = [
   ["SessionStart", "session.created"],
   ["SessionEnd", "session.deleted"],
-  ["UserPromptSubmit", "chat.message"],
-  ["PreToolUse", "tool.execute.before"],
-  ["PostToolUse", "tool.execute.after"],
+  ["UserPromptSubmit", "hook session/prompt"],
+  ["PreToolUse", "hook tool/execute.before"],
+  ["PostToolUse", "hook tool/execute.after"],
   ["Notification", "tui.toast.show"],
-  ["PermissionRequest", "permission.asked"],
+  ["PermissionRequest", "permission.asked, hook permission/evaluate"],
   ["PreCompact", "session.compaction.started"],
   ["PostCompact", "session.compaction.ended"],
   ["SubagentStop", "session.idle (partial)"],

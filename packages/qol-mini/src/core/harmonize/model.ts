@@ -1,23 +1,28 @@
-// Model alias -> provider/model. A value with a "/" is a provider/model already:
-// passed through. An alias outside the table passes through with a warning by
-// the caller: OpenCode and Claude Code both fail on names they cannot resolve.
+// Claude Code model aliases <-> OpenCode `provider/model` ids (models.dev).
+// An alias follows the latest model of its family: update the table when a
+// family moves. OpenCode rejects a model that is not `provider/model`: a
+// command carrying one is dropped on load, so a value with no mapping is
+// omitted and named, never copied.
 export const MODEL_ALIAS: Record<string, string> = {
-  sonnet: "anthropic/claude-sonnet-4-5",
-  opus: "anthropic/claude-opus-4-8",
-  haiku: "anthropic/claude-haiku-4-5",
-  "sonnet[1m]": "anthropic/claude-sonnet-4-5[1m]",
-  "opus[1m]": "anthropic/claude-opus-4-8[1m]",
+  opus: "anthropic/claude-opus-5-5",
+  sonnet: "anthropic/claude-sonnet-5-5",
+  haiku: "anthropic/claude-haiku-5-5",
+  fable: "anthropic/claude-fable-5-1",
 };
 
-export function toOcModel(model: string): { model: string; known: boolean } {
-  if (model.includes("/")) return { model, known: true };
-  const mapped = MODEL_ALIAS[model];
-  return mapped === undefined ? { model, known: false } : { model: mapped, known: true };
+const OC_MODEL = /^[^/#]+\/[^#]+(?:#[^#]+)?$/;
+
+export function toOcModel(model: string): string | null {
+  const alias = MODEL_ALIAS[model.replace(/\[1m\]$/, "")];
+  if (alias !== undefined) return alias;
+  if (/^claude-[a-z0-9-]+$/.test(model)) return `anthropic/${model}`;
+  return OC_MODEL.test(model) ? model : null;
 }
 
-export function toCcModel(model: string): { model: string; known: boolean } {
+// `inherit` and an omitted model mean the same in Claude Code
+export function toCcModel(model: string): string | null {
   const alias = Object.entries(MODEL_ALIAS).find(([, full]) => full === model);
-  if (alias !== undefined) return { model: alias[0], known: true };
-  if (model.includes("/")) return { model, known: false };
-  return { model, known: true };
+  if (alias !== undefined) return alias[0];
+  const anthropic = /^anthropic\/(claude-[a-z0-9-]+)$/.exec(model);
+  return anthropic?.[1] ?? null;
 }

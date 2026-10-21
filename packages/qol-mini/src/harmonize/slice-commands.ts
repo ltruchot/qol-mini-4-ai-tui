@@ -1,46 +1,40 @@
-import { ccToOcTools } from "../core/harmonize/fm-tools.ts";
-import { ocToCcTools } from "../core/harmonize/fm-tools-oc.ts";
+import { plain, unknownKeys, type Fm } from "../core/harmonize/fm-agent-map.ts";
+import { toCcModel, toOcModel } from "../core/harmonize/model.ts";
 
-// Command frontmatter: the body and the known keys travel, `allowed-tools`
-// <-> `tools` convert, `name` stays in the filename, the rest is named lossy.
-const KEEP = ["description", "argument-hint", "model", "effort"];
+// Command frontmatter. OpenCode 2.1 knows `description`, `agent`, `model` and
+// `subagent`; Claude Code runs a command in a subagent with `context: fork`
+// and `agent`. `allowed-tools` grants tools without asking for one turn:
+// OpenCode has no per-command grant, so it is named, not converted. The body
+// travels untouched: `$ARGUMENTS`, `$1` and `` !`cmd` `` read the same in both.
+const CC_KNOWN = ["name", "description", "model", "context", "agent"];
+const OC_KNOWN = ["description", "model", "agent", "subagent", "subtask"];
 
-export function ccToOcCommand(data: Record<string, unknown>): {
-  data: Record<string, unknown>;
-  lossy: string[];
-} {
-  const out: Record<string, unknown> = {};
-  const lossy: string[] = [];
-  for (const key of KEEP) if (data[key] !== undefined) out[key] = data[key];
-  if (data["allowed-tools"] !== undefined) {
-    const { tools, lossy: lost } = ccToOcTools(data["allowed-tools"]);
-    if (Object.keys(tools).length > 0) out["tools"] = tools;
-    lossy.push(...lost);
+export function ccToOcCommand(data: Record<string, unknown>): Fm {
+  const lossy = unknownKeys(data, CC_KNOWN, "OpenCode");
+  const out: Record<string, unknown> = { description: data["description"] };
+  const model = plain(data["model"]);
+  if (model !== null && model !== "inherit") {
+    out["model"] = toOcModel(model) ?? undefined;
+    if (out["model"] === undefined) lossy.push(`model ${model} has no provider/model form`);
   }
-  for (const key of Object.keys(data))
-    if (key !== "allowed-tools" && key !== "name" && !KEEP.includes(key))
-      lossy.push(`${key} has no OpenCode form`);
+  if (data["context"] === "fork") {
+    out["subagent"] = true;
+    if (data["agent"] !== undefined) out["agent"] = data["agent"];
+  } else if (data["agent"] !== undefined) lossy.push("agent without context: fork is ignored");
   return { data: out, lossy };
 }
 
-export function ocToCcCommand(data: Record<string, unknown>): {
-  data: Record<string, unknown>;
-  lossy: string[];
-} {
-  const out: Record<string, unknown> = {};
-  const lossy: string[] = [];
-  for (const key of KEEP) if (data[key] !== undefined) out[key] = data[key];
-  if (data["tools"] !== undefined) {
-    const { allowed, lossy: lost } = ocToCcTools(data["tools"]);
-    if (allowed.length > 0) out["allowed-tools"] = allowed;
-    lossy.push(...lost);
-  }
-  for (const key of Object.keys(data))
-    if (key !== "tools" && key !== "name" && key !== "agent" && !KEEP.includes(key))
-      lossy.push(`${key} has no Claude Code form`);
+export function ocToCcCommand(data: Record<string, unknown>): Fm {
+  const lossy = unknownKeys(data, OC_KNOWN, "Claude Code");
+  const out: Record<string, unknown> = { description: data["description"] };
+  const model = plain(data["model"]);
+  if (model !== null) out["model"] = toCcModel(model) ?? undefined;
+  if (model !== null && out["model"] === undefined) lossy.push(`model ${model}`);
+  const forked = (data["subagent"] ?? data["subtask"]) === true;
+  if (forked) out["context"] = "fork";
   if (data["agent"] !== undefined) {
-    const agent = typeof data["agent"] === "string" ? data["agent"] : JSON.stringify(data["agent"]);
-    lossy.push(`agent ${agent} has no Claude Code form`);
+    if (forked) out["agent"] = data["agent"];
+    else lossy.push(`agent ${plain(data["agent"]) ?? "?"}: Claude Code runs it inline`);
   }
   return { data: out, lossy };
 }

@@ -23,7 +23,9 @@ export function planConfigToOc(
     out.conflicts.push(`${ocRel}: unparseable (${reads.ocConfig.error})`);
   const acc: Acc = { sources: {}, mine: [] };
   const mine = prevArt?.mine ?? [];
-  absorb(out, acc, reads.settings, rel(lay, lay.settings), base, mine, permToOc);
+  absorb(out, acc, reads.settings, rel(lay, lay.settings), base, mine, (data, into, owned) =>
+    permToOc(data, into, owned, replace),
+  );
   absorb(out, acc, reads.mcpJson, rel(lay, lay.mcpJson), base, mine, mcpToOc);
   // Nothing ours to add or remove: no file appears where the source has nothing
   if (acc.mine.length === 0 && mine.length === 0) return out;

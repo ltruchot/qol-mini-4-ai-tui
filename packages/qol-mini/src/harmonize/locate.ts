@@ -1,9 +1,10 @@
 import { join } from "node:path";
 import { exists } from "../io/fs.ts";
 
-// A repo may keep its OpenCode config at the root or under `.opencode/`, its
-// commands in `command/` or `commands/`. What exists wins; new files take the
-// documented location: root `opencode.json`, plural `commands`.
+// A repo may keep its OpenCode config at the root or under `.opencode/`, as
+// `opencode.json` or `opencode.jsonc` (OpenCode reads both), its commands in
+// `command/` or `commands/`. What exists wins; new files take the documented
+// location: root `opencode.json`, plural `commands`.
 export async function existing(...files: string[]): Promise<string | undefined> {
   for (const file of files) if (await exists(file)) return file;
   return undefined;
@@ -11,7 +12,11 @@ export async function existing(...files: string[]): Promise<string | undefined> 
 
 export async function configAt(root: string): Promise<string> {
   const ocDir = join(root, ".opencode");
-  const found = await existing(join(root, "opencode.json"), join(ocDir, "opencode.json"));
+  const names = ["opencode.json", "opencode.jsonc"];
+  const found = await existing(
+    ...names.map((n) => join(root, n)),
+    ...names.map((n) => join(ocDir, n)),
+  );
   return found ?? join(root, "opencode.json");
 }
 

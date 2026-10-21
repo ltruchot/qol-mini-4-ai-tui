@@ -1,46 +1,50 @@
 import { ccToOc, type OcPerm } from "../core/harmonize/perm-cc.ts";
-import { ccPerms, ocPerms, ocToRules, type MergeOut } from "../core/harmonize/perm-apply.ts";
+import { ocToCc, type CcRule } from "../core/harmonize/perm-oc.ts";
+import { ocPerms } from "../core/harmonize/perm-apply.ts";
+import { ccPerms } from "../core/harmonize/perm-apply-cc.ts";
+import { exceptions, weakens } from "../core/harmonize/perm-order.ts";
+import { readOcRules } from "../core/harmonize/perm-read.ts";
 import type { Json } from "./read.ts";
+import type { MergeOut } from "./plan-io.ts";
 
-const EFFECTS = ["allow", "deny", "ask"] as const;
+const EFFECTS = ["allow", "ask", "deny"] as const;
 const pick = (value: unknown): string[] => (Array.isArray(value) ? value.map(String) : []);
-const isPerm = (p: OcPerm): boolean =>
-  typeof p?.action === "string" && typeof p?.resource === "string" && typeof p?.effect === "string";
+const UNCONVERTED = ["defaultMode", "additionalDirectories"];
 
-// Claude Code settings -> OpenCode config. A rule with no OpenCode form is
-// named, never dropped silently. A `permission` that is not an array (the
-// agent frontmatter map form) is named and left untouched: a mixed shape
-// would break the config.
-export function permToOc(settings: Json, config: Json, prev: string[]): MergeOut {
+// Claude Code settings -> the native `permissions` array of opencode.json. A
+// rule with no OpenCode form is named, never dropped silently. OpenCode reads
+// a legacy `permission` map before that array: a converted rule that would
+// override a stricter legacy rule is a conflict until --replace.
+export function permToOc(settings: Json, config: Json, prev: string[], replace: boolean): MergeOut {
   const perms = (settings["permissions"] as Json | undefined) ?? {};
   const add: OcPerm[] = [];
-  const warnings: string[] = [];
+  const warnings = UNCONVERTED.filter((k) => k in perms).map((k) => `permissions.${k}: no form`);
   for (const effect of EFFECTS)
     for (const rule of pick(perms[effect])) {
       const oc = ccToOc(rule, effect);
       if (oc === null) warnings.push(`permission ${rule} has no OpenCode form`);
-      else add.push(oc);
+      else add.push(...oc.perms);
+      if (typeof oc?.lossy === "string") warnings.push(oc.lossy);
     }
-  if (config["permission"] !== undefined && !Array.isArray(config["permission"]))
-    return {
-      mine: [],
-      warnings: [...warnings, "opencode.json permission is not an array, left untouched"],
-    };
+  const { legacy, bad } = readOcRules(config);
+  warnings.push(...bad.map((b) => `opencode.json ${b}: not a permission rule`));
+  const weaker = weakens(legacy, add).map((w) => `opencode.json legacy permission: ${w}`);
+  if (weaker.length > 0 && !replace) return { mine: [], warnings, conflicts: weaker };
+  warnings.push(...weaker);
   return { mine: ocPerms(config, prev, add), warnings };
 }
 
-// OpenCode config -> Claude Code settings
+// OpenCode config -> Claude Code settings, every rule in evaluation order
 export function permToCc(config: Json, settings: Json, prev: string[]): MergeOut {
-  const raw = config["permission"];
-  if (!Array.isArray(raw))
-    return {
-      mine: [],
-      warnings: raw === undefined ? [] : ["permission is not an array, left untouched"],
-    };
-  const perms: OcPerm[] = raw.map((p) => p as OcPerm);
-  const valid = perms.filter((p) => isPerm(p));
-  const bad = perms
-    .filter((p) => !isPerm(p))
-    .map((p) => `permission entry ${JSON.stringify(p)} has no Claude Code form`);
-  return { mine: ccPerms(settings, prev, ocToRules(valid)), warnings: bad };
+  const { legacy, native, bad } = readOcRules(config);
+  const all = [...legacy, ...native];
+  const warnings = [...bad.map((b) => `${b}: not a permission rule`), ...exceptions(all)];
+  const rules: CcRule[] = [];
+  for (const perm of all) {
+    const cc = ocToCc(perm);
+    if (cc === null)
+      warnings.push(`permission ${perm.action} "${perm.resource}" has no Claude Code form`);
+    else rules.push(cc);
+  }
+  return { mine: ccPerms(settings, prev, rules), warnings };
 }
