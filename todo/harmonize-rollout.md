@@ -1,6 +1,6 @@
 # Harmonize rollout
 
-`qol-mini@0.5.2` on npm: OpenCode 2.1 native output checked by
+`qol-mini@0.5.3` on npm: OpenCode 2.1 native output checked by
 `@opencode/schema`, rules files that import each other merged, kept files
 git ignores named after every run. Run no `harmonize` from 0.4.0.
 
