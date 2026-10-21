@@ -406,6 +406,10 @@ A tag `v<version>` matching `packages/qol-mini/package.json` publishes to npm fr
 - The job runs in the GitHub environment `release`, which has required reviewers:
   a pushed tag publishes nothing until the run is approved. The npm trust names
   that environment. Keep `environment: release` in the workflow.
+- Approve a waiting run with `gh api -X POST
+  repos/ltruchot/qol-mini-4-ai-tui/actions/runs/<run>/pending_deployments
+  --input -` and `{"environment_ids": [<id>], "state": "approved"}`: form
+  fields fail on the id, it goes as a JSON integer array.
 - Actions are pinned by commit SHA and npm by version: the job holds the right
   to publish.
 
@@ -413,3 +417,6 @@ A tag `v<version>` matching `packages/qol-mini/package.json` publishes to npm fr
   through `devEngines`. Run `npm login` and `npm publish` from `packages/qol-mini`.
 - Publish the tarball made by `vp pm pack`, never the directory: pnpm resolves the
   `catalog:` versions when it packs. The README holds the commands.
+- A publish is verified by the run log, not `npm view`: the `+
+  qol-mini@<version>` line in the job output is the proof, the registry
+  serves a new version minutes later.
