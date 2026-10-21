@@ -14,9 +14,13 @@ const truthy = (value: unknown): boolean => typeof value === "string" && value !
 export function resolveState(state: State, data: Payload): State | null {
   // Only the main thread paints green: a subagent fires its own PostToolBatch
   // after the orchestrator's Stop. Red from a subagent is a real block.
-  // SubagentStop always carries agent_id: it is the orchestrator resuming.
+  // SubagentStop always carries agent_id: it is the orchestrator resuming,
+  // unless agent_type is empty — an internal agent (prompt suggestions,
+  // `/btw`) that finishes after the turn's Stop.
+  if (data["hook_event_name"] === "SubagentStop")
+    return state === "working" && !truthy(data["agent_type"]) ? null : state;
   const fromAgent = truthy(data["agent_id"]) || truthy(data["agent_type"]);
-  if (state === "working" && fromAgent && data["hook_event_name"] !== "SubagentStop") return null;
+  if (state === "working" && fromAgent) return null;
   if (state !== "idle") return state;
   // Parked on background work is not idle: the session resumes on its own.
   if (pausedOnBackground(data)) return "working";

@@ -159,6 +159,8 @@ A prompt that blocks a script or CI is a bug.
   Only the main thread paints green: skip `working` when `agent_id` or `agent_type`
   is present, except on `SubagentStop`, which always carries both: it is the
   orchestrator resuming. Red from a subagent stays.
+- Internal agents (prompt suggestions, `/btw`) fire `SubagentStop` after the
+  turn's `Stop`, with `agent_type` empty: no green there, or it paints over red.
 - `Stop` with a non-empty `background_tasks` or `session_crons` stays green and
   silent: the session wakes itself. The registry can lag by one task at the instant
   it settles; do not treat it as exact.
@@ -171,6 +173,9 @@ A prompt that blocks a script or CI is a bug.
 - A turn ending on a question is a plain `Stop`. Rule: the last non-empty line of
   `last_assistant_message`, stripped of markdown emphasis and closing brackets, ends
   with `?` → red and `needs-you`. Background work outranks it. Keep it that narrow.
+- `idle_prompt` fires a minute after `Stop`, with no `last_assistant_message`:
+  `tab-state` reads the newest main-thread text from the transcript
+  (`kit/hooks/last-text.ts`), or yellow paints over that red.
 - Wired from the reference, **not observed**: `quota_auto_resume_stale` and
   `quota_auto_resume_disabled` red with sound, `quota_auto_resume_fired` green,
   `StopFailure` red without sound. If one misbehaves, unwire it in `kit/wire.ts`.

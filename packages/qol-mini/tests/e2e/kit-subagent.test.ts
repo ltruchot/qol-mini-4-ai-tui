@@ -15,5 +15,8 @@ test("the delivered SubagentStop handler paints green, a subagent's batch does n
   expect(await run("SubagentStop", agent)).toContain(GREEN);
   expect(await run("PostToolBatch", agent)).toBe("");
   expect(await run("PostToolBatch", {})).toContain(GREEN);
+  // An internal agent (prompt suggestions) stops after the turn's Stop
+  const internal = { agent_id: "a2", agent_type: "", stop_hook_active: false };
+  expect(await run("SubagentStop", internal)).toBe("");
   await cleanup(target);
 });
