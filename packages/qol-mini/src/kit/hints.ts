@@ -25,6 +25,7 @@ export function hints(
   if (open !== null && open.plugin)
     print(["OpenCode: run `opencode service restart`, then start a new session."]);
   printOptout();
+  print(["Make any repo run under both agents: `qol-mini harmonize scan <dir>` lists them."]);
   // The file watcher reloads hooks after a delay: the handlers a session holds
   // until then name the files just removed
   if (removed) print(["A session already running can fail one hook before it reloads."]);
