@@ -333,6 +333,9 @@ A prompt that blocks a script or CI is a bug.
 - The tests run the sources; `tests/e2e/bin-harmonize.test.ts` runs the
   bundle. The bundler resolves `module` before `main`: a UMD `main` that
   requires its parts at runtime breaks the bundle only.
+- A kept file git ignores is a warning naming the `.gitignore` line, never a
+  conflict (`harmonize/gitignored.ts`): the run still writes. A tracked file
+  is never reported: git keeps it whatever the ignore rules say.
 - Backups for `undo` live under `~/.cache/qol-mini/harmony/<repo>/`; slot
   numbers only grow, so an artifact carried between runs keeps its slot.
 - Hooks are reported with the OpenCode event or hook a plugin listens to,

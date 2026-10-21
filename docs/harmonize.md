@@ -109,6 +109,11 @@ keeping `skills`. A generated file edited since the run is left in place and
 named, with the section and its backups, until `undo --replace`.
 Commit the lock: `check` and `undo` read it on every machine.
 
+Every run but a conflict ends naming the kept files git ignores: AGENTS.md,
+CLAUDE.md under `bridge` or `symlink`, the lock and each generated file,
+with the `.gitignore` line that ignores it (`git check-ignore -v`). Nothing
+is blocked: removing that line is the user's call.
+
 A repo that runs its own installer-managed trees (`.opencode/` fully managed
 by another tool) still harmonizes: generated files the run does not own are
 never overwritten without `--replace`, and a name it would overwrite is named

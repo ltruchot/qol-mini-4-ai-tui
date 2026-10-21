@@ -196,6 +196,7 @@ qol-mini harmonize scan ~/workspace          # list repos, write nothing
 | `--replace` | settle a CLAUDE.md/AGENTS.md conflict, overwrite a generated file edited by hand, override a stricter legacy permission |
 | Existing config | `opencode.json(c)`, `settings.json`, `.mcp.json` are patched in place: comments, key order and indent kept |
 | Lossy | every key, rule or server with no counterpart is named in the output, never dropped silently |
+| `.gitignore` | a kept file git ignores (AGENTS.md, a generated file, the lock) is named with the rule that ignores it, after every run |
 | Re-run | idempotent: a repo in sync writes nothing |
 | The lock | a `harmonize` section in `.claude/qol-mini.lock.json`, commit it |
 | `undo` | replays every run backwards; a file edited since is left in place unless `--replace`; `--dry-run` lists the steps |
