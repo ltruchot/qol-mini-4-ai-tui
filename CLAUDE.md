@@ -17,8 +17,8 @@ activity, not rest. Show which session wants you; keep the others busy.
 **Vocabulary**: *kit*, *setup*, *hooks*. Never *harness*: in this ecosystem it means
 the agent runtime itself.
 
-**Language**: US English everywhere — README, code, comments, this file, commit
-messages. The repo is public.
+**Language**: US English in everything committed — README, code, comments, this
+file, commit messages. The repo is public. The conversation is in the user's language.
 
 **Commits**: a message states the change and its technical reason. It never names a
 person, never narrates a session, a conversation or a review exchange, never speaks
