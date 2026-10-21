@@ -19,7 +19,8 @@ export async function checkHarmony(
 ): Promise<{ rows: Row[]; worst: ExitCode }> {
   const lay = await layout(root);
   const det = await detect(lay, root);
-  const rows: Row[] = [{ path: "rules", status: rulesStatus(det.state, harmony.rules) }];
+  const rules = rulesStatus(det.state, harmony.rules, harmony.ops.length > 0);
+  const rows: Row[] = [{ path: "rules", status: rules }];
   for (const [key, art] of Object.entries(harmony.artifacts)) {
     const file = join(root, key);
     if (!(await exists(file))) {

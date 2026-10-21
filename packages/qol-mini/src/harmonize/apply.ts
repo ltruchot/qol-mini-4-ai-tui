@@ -13,6 +13,7 @@ function startSlot(prev: Harmony | undefined): Slots {
 }
 
 // Execute a plan: rule moves first, generated files second, then the lock.
+// The new moves append to the recorded ones: undo replays them all backwards.
 // The lock keeps its skills section untouched.
 export async function apply(
   root: string,
@@ -27,7 +28,7 @@ export async function apply(
     from: p.from,
     rules: p.rulesMode,
     artifacts,
-    ops: intents.ops,
+    ops: [...(prev?.ops ?? []), ...intents.ops],
   };
   const lock = await readLock(paths(root));
   lock.harmonize = harmony;

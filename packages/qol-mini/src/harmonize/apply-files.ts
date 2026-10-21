@@ -17,9 +17,12 @@ export async function writeFiles(
 ): Promise<Record<string, Artifact>> {
   const artifacts: Record<string, Artifact> = structuredClone(prev);
   for (const file of files) {
+    // A tracked file keeps its first record: undo deletes what this kit
+    // created and restores the user's bytes, never an earlier output of ours
+    const before = prev[file.rel];
     const had = await exists(file.file);
-    let slot: number | undefined;
-    if (had) {
+    let slot = before?.slot;
+    if (before === undefined && had) {
       slots.next += 1;
       slot = slots.next;
       await saveSlot(root, slot, file.file);
@@ -27,7 +30,7 @@ export async function writeFiles(
     await put(file.file, file.bytes);
     artifacts[file.rel] = {
       kind: file.kind,
-      created: !had,
+      created: before?.created ?? !had,
       hash: hashBytes(file.bytes),
       sources: file.sources,
       mine: file.mine,

@@ -27,3 +27,16 @@ export type Plan = {
   notes: string[];
   conflicts: string[];
 };
+
+// The parts of a run `--only` selects
+export const SLICES = ["rules", "perm", "mcp", "commands", "agents"] as const;
+export type Slice = (typeof SLICES)[number];
+
+// Validated options: `auto` detects the source of truth again, no `only`
+// selects every slice
+export type PlanOpts = {
+  from?: Side | "auto" | undefined;
+  rules?: RuleMode | undefined;
+  replace: boolean;
+  only?: Slice[] | undefined;
+};

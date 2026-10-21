@@ -10,8 +10,10 @@ export type HOpts = {
   json?: boolean;
   dryRun?: boolean;
   replace?: boolean;
-  from?: string;
-  rules?: string;
+  // raw flag values, validated by optsOf
+  from?: unknown;
+  rules?: unknown;
+  only?: unknown;
 };
 
 export type HCtx = { root: string; lock: LockFile; yes: boolean; json: boolean; dryRun: boolean };
@@ -29,9 +31,3 @@ export async function hContext(opts: HOpts, project?: string): Promise<HCtx> {
     dryRun: opts.dryRun === true,
   };
 }
-
-export const optsOf = (opts: HOpts): { from?: string; rules?: string; replace: boolean } => ({
-  ...(opts.from === undefined ? {} : { from: opts.from }),
-  ...(opts.rules === undefined ? {} : { rules: opts.rules }),
-  replace: opts.replace === true,
-});

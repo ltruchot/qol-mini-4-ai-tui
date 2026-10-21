@@ -3,19 +3,27 @@ import { readLock, writeLock } from "../io/lock.ts";
 import { paths } from "../io/paths.ts";
 import { clearStore } from "./backup.ts";
 import { undoOp } from "./undo-ops.ts";
-import { undoArtifact } from "./undo-slot.ts";
+import type { UndoPlan } from "./undo-plan.ts";
+import { undoStep } from "./undo-slot.ts";
 
 // Undo replays the recorded moves backwards and restores the generated files
 // from their slots, then drops the harmonize section and the backup store.
-// The lock keeps its skills section.
-export async function undo(root: string, harmony: Harmony): Promise<string[]> {
+// A file edited since the run stays tracked with the store: `undo --replace`
+// finishes. The lock keeps its skills section.
+export async function undo(root: string, p: UndoPlan, harmony: Harmony): Promise<string[]> {
   const warnings: string[] = [];
-  for (const op of harmony.ops.toReversed()) await undoOp(root, op, warnings);
-  for (const [rel, art] of Object.entries(harmony.artifacts).toReversed())
-    await undoArtifact(root, rel, art, warnings);
+  for (const op of p.ops) await undoOp(root, op, warnings);
+  for (const step of p.steps) await undoStep(root, step, warnings);
+  const kept = p.steps.filter((s) => s.action === "edited");
   const lock = await readLock(paths(root));
-  Reflect.deleteProperty(lock, "harmonize");
+  if (kept.length === 0) Reflect.deleteProperty(lock, "harmonize");
+  else
+    lock.harmonize = {
+      ...harmony,
+      ops: [],
+      artifacts: Object.fromEntries(kept.map((s) => [s.rel, s.art])),
+    };
   await writeLock(paths(root), lock);
-  await clearStore(root);
+  if (kept.length === 0) await clearStore(root);
   return warnings;
 }

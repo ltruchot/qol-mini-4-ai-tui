@@ -1,5 +1,7 @@
 import { loadSlot } from "./backup.ts";
-import type { Artifact, UndoOp } from "../core/schema/harmony.ts";
+import type { UndoOp } from "../core/schema/harmony.ts";
+import { stepLine } from "./undo-lines.ts";
+import type { Step } from "./undo-plan.ts";
 import { link, prune, put, rootJoin } from "./write.ts";
 
 // A file we removed comes back from its slot; a bridge we created just goes.
@@ -17,23 +19,14 @@ export async function withSlot(
   await put(file, await loadSlot(root, op.slot));
 }
 
-// A generated file: created by us disappears, replaced by us comes back
-export async function undoArtifact(
-  root: string,
-  rel: string,
-  art: Artifact,
-  warnings: string[],
-): Promise<void> {
-  const file = rootJoin(root, rel);
-  if (art.created) {
-    await prune(file, root);
-    return;
-  }
-  if (art.slot === undefined) {
-    warnings.push(`${rel}: no backup slot, left in place`);
-    return;
-  }
-  await put(file, await loadSlot(root, art.slot));
+// A generated file: created by us disappears, replaced by us comes back, one
+// edited since the run or with no backup stays and is named
+export async function undoStep(root: string, step: Step, warnings: string[]): Promise<void> {
+  const file = rootJoin(root, step.rel);
+  if (step.action === "delete") await prune(file, root);
+  else if (step.action === "restore" && step.art.slot !== undefined)
+    await put(file, await loadSlot(root, step.art.slot));
+  else warnings.push(stepLine(step));
 }
 
 export async function linkOrWarn(target: string, file: string, warnings: string[]): Promise<void> {

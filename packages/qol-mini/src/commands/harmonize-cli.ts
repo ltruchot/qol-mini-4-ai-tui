@@ -16,9 +16,10 @@ function harmonizeCli(): CAC {
   cli.option("-y, --yes", "Skip prompts, fail on missing answers");
   cli.option("--json", "Machine output where supported");
   cli.option("--dry-run", "Plan and preview, write nothing");
-  cli.option("--replace", "Overwrite a generated file you edited");
+  cli.option("--replace", "Overwrite, or let undo remove, a generated file you edited");
   cli.option("--from <side>", "Source of truth: claude, opencode, auto (default)");
   cli.option("--rules <mode>", "pure (default), bridge, symlink");
+  cli.option("--only <slices>", "Some of rules,perm,mcp,commands,agents, default all");
   for (const register of [run, check, undo, scan]) register(cli);
   cli.help();
   return cli;

@@ -18,8 +18,10 @@ const intentLine = (intent: Plan["intents"][number]): string => {
   return `rm ${intent.path}`;
 };
 
+export const idle = (p: Plan): boolean => p.intents.length === 0 && p.files.length === 0;
+
 // Machine output: the plan without bytes
-export function jsonOf(p: Plan): unknown {
+export function jsonOf(p: Plan): Record<string, unknown> {
   return {
     from: p.from,
     rules: { mode: p.rulesMode, state: p.state },
