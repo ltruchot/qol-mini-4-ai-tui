@@ -2,14 +2,12 @@
 
 ## Where we stopped
 
-**Top priority on restart**: the Claude Code tab marker regressed. A turn
-ending on a question stays green instead of red; colors seen out of place
-earlier too. Lead: since 0.5.0, `SubagentStop` paints green, and Claude
-Code's internal agents (prompt suggestions, recap) fire it after the turn's
-`Stop`. Confirm with `claude --debug`, then fix → todo/tab-marker-regression.md
+Tab marker fixed and verified live (red kept on a question, yellow on a
+plain end): an internal agent's `SubagentStop` paints nothing, `idle_prompt`
+reads the question from the transcript. Committed on `main`, not pushed, not
+released: next is 0.5.3.
 
-`qol-mini@0.5.2` is released, `main` level with `origin`, `vp run ready`
-green, 153 tests. Rollout on real repos and the first live sessions in both
+`qol-mini@0.5.2` is the published version; `vp run ready` green, 154 tests. Rollout on real repos and the first live sessions in both
 agents → todo/harmonize-rollout.md
 
 ## Later
