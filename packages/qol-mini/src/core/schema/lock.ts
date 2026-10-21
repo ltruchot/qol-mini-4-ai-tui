@@ -1,8 +1,8 @@
 import { z } from "zod";
+import { Harmony } from "./harmony.ts";
 import { MAX_NAME, SKILL_NAME } from "../names.ts";
+import { SHA256 } from "./sha.ts";
 
-export const SHA40 = /^[0-9a-f]{40}$/;
-export const SHA256 = /^[0-9a-f]{64}$/;
 // Relative, no dot-dot segment, no backslash: Windows would read one as a separator
 const REL = /^(?!\/)(?!.*\\)(?!.*(^|\/)\.\.(\/|$)).+$/;
 
@@ -23,9 +23,14 @@ export const LockEntry = z.object({
   secrets: z.array(z.string()),
 });
 
-// Keys are skill names, path is pinned to .claude/skills/<name>: a lock cannot escape
+// Keys are skill names, path is pinned to .claude/skills/<name>: a lock cannot escape.
+// `harmonize` is the cross-agent state of the repo, written by `qol-mini harmonize`.
 export const LockFile = z
-  .object({ version: z.literal(1), skills: z.record(SkillName, LockEntry) })
+  .object({
+    version: z.literal(1),
+    skills: z.record(SkillName, LockEntry),
+    harmonize: Harmony.optional(),
+  })
   .refine((l) => Object.entries(l.skills).every(([n, e]) => e.path === `.claude/skills/${n}`), {
     message: "lock entry path must be .claude/skills/<name>",
   });
