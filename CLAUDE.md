@@ -131,7 +131,9 @@ A prompt that blocks a script or CI is a bug.
 - Automatic compaction is never blocked, and no review is possible on it.
 - `SessionStart` with matcher `compact` is the only channel to the agent after a
   compaction, manual or automatic. `precompact-kaizen --after-compact` uses it
-  to name `TODO.md`, and emits no marker: `tab-state` owns `SessionStart`.
+  to name `TODO.md`, and emits no marker: `tab-state` owns `SessionStart`,
+  under matcher `startup|resume|clear` only — an automatic compaction happens
+  mid-turn, and yellow there would hide a working model.
 - The release token is keyed on the working **directory**, not the session: the
   skill writes it from a plain shell, a manual `/kaizen` arms the next `/compact`,
   and one project's review does not release another's.
@@ -155,7 +157,8 @@ A prompt that blocks a script or CI is a bug.
   `PostToolBatch` and `SubagentStop`, the last moments before work resumes.
 - Subagents fire `PostToolBatch` on their own loop, after the main thread's `Stop`.
   Only the main thread paints green: skip `working` when `agent_id` or `agent_type`
-  is present. Red from a subagent stays.
+  is present, except on `SubagentStop`, which always carries both: it is the
+  orchestrator resuming. Red from a subagent stays.
 - `Stop` with a non-empty `background_tasks` or `session_crons` stays green and
   silent: the session wakes itself. The registry can lag by one task at the instant
   it settles; do not treat it as exact.
@@ -199,8 +202,15 @@ A prompt that blocks a script or CI is a bug.
 - The installer reads the bundles from `dist/`: build before `install` from a clone.
 - Every delivered file is created if missing, left if identical, and if different
   **nothing at all is written** and the files are named. `--replace` overwrites.
+  One exception: a file that differs only by the quoted node path (the kaizen
+  `SKILL.md` names `process.execPath`) is rewritten without `--replace`.
 - `settings.json` is written, with a `.bak-` copy, only when the merge changes it.
-  Same for `uninstall`.
+  Same for `uninstall`. Every config write is a temp file then a rename
+  (`writeFileAtomic`); a symlinked file is written at its target.
+- `uninstall` cleans `settings.json` and `cli.json` before it removes a file: a
+  config that fails to parse stops it with every hook still pointing at its
+  script. A sound or the kaizen `SKILL.md` that differs from what install
+  delivers is kept and named.
 - Sound files are never regenerated: users drop their own.
 - Options overlay `installedState()`: `--replace` alone keeps the installed options.
   With nothing of ours in `settings.json`, the base is the defaults. `--defaults` is
@@ -235,7 +245,8 @@ A prompt that blocks a script or CI is a bug.
   plan).
 - The tab marker writes the title sequence to `/dev/tty`: the TUI owns the
   screen, that is the only way out, and `terminal.title: false` keeps OpenCode
-  from rewriting the title. Windows has no `/dev/tty`: no marker there.
+  from rewriting the title. Windows has no `/dev/tty`: no marker there, and no
+  `terminal.title` in `cli.json`, so OpenCode keeps its own.
 - `/compact` has no PreCompact hook in OpenCode: the TUI plugin registers the
   command and checks the same token the Claude Code hook consumes. Verified live:
   the plugin's entry holds back and honors the token; the built-in entry
@@ -300,15 +311,30 @@ A prompt that blocks a script or CI is a bug.
   overrides. Auto-detection is not stable once both sides exist: a flip would
   convert the tool's own output back.
 - A repo holding two different rules files is a conflict: nothing is written
-  until `--replace` names the winner. A generated file edited by hand is
-  named, not overwritten; a file the kit never wrote is never overwritten.
+  until `--replace` names the winner. A generated markdown file edited by hand
+  is named, not overwritten; one the kit never wrote is never overwritten.
+- A JSON config the user wrote (`opencode.json(c)`, `settings.json`,
+  `.mcp.json`) is patched in place with `jsonc-parser`: only owned keys move,
+  comments and key order stay. Never reserialize it: in OpenCode's legacy
+  `permission` map, key order is precedence.
+- OpenCode output is the 2.1 native form, decoded in the tests by
+  `@opencode/schema` (`tests/helpers/opencode.ts`): `permissions` array,
+  `mcp.servers`, native agent keys. A command whose `model` is not
+  `provider/model` fails that decode and OpenCode drops it without a word.
+  Why: `docs/adr/0004-opencode-output-is-checked-against-its-schema.md`.
+- Precedence: Claude Code applies deny, ask, allow; OpenCode the last
+  matching rule. Converted rules go allow, ask, deny, ahead of the user's
+  own `permissions`. Overriding a stricter legacy rule is a conflict.
 - `settings.local.json` is machine-local: reported, never converted. MCP
-  values that are literal, not `${VAR}`, are named before they can land in a
-  committed file.
+  values that are literal, not `${VAR}` or `{env:VAR}`, are named before they
+  can land in a committed file.
+- The tests run the sources; `tests/e2e/bin-harmonize.test.ts` runs the
+  bundle. The bundler resolves `module` before `main`: a UMD `main` that
+  requires its parts at runtime breaks the bundle only.
 - Backups for `undo` live under `~/.cache/qol-mini/harmony/<repo>/`; slot
   numbers only grow, so an artifact carried between runs keeps its slot.
-- Hooks are reported with their plugin-event mapping, not converted: a hook
-  body is an arbitrary command.
+- Hooks are reported with the OpenCode event or hook a plugin listens to,
+  not converted: a hook body is an arbitrary command.
 - Scan walks named roots only, never `/` or the home directory, and a dir
   holding `.git` is scanned, not descended into.
 
@@ -353,7 +379,8 @@ A prompt that blocks a script or CI is a bug.
 | CI: Linux, macOS | the test suite |
 | CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
 | This machine: WSL2, VS Code, a live session | the tab marker on screen, the sounds heard, `/compact` held back then released by `/kaizen`; the marker back in a project whose opt-out file names `kaizen` |
-| Never | `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL |
+| This machine: OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads: `opencode debug config` shows the `permissions` and `mcp.servers`, `debug agents` the agent with its allowlist, `GET /api/command` the command |
+| Never | `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL; a harmonized repo in a live session of either agent |
 
 The README states this. Do not claim more.
 
@@ -412,11 +439,14 @@ A tag `v<version>` matching `packages/qol-mini/package.json` publishes to npm fr
   fields fail on the id, it goes as a JSON integer array.
 - Actions are pinned by commit SHA and npm by version: the job holds the right
   to publish.
+- The job restores no cache (`cache: false`), keeps no git token
+  (`persist-credentials: false`), and fails unless the tagged commit is an
+  ancestor of `origin/main`, checked before anything installs.
 
 - `npm` refuses to run at the repository root: the root `package.json` pins pnpm
   through `devEngines`. Run `npm login` and `npm publish` from `packages/qol-mini`.
 - Publish the tarball made by `vp pm pack`, never the directory: pnpm resolves the
-  `catalog:` versions when it packs. The README holds the commands.
+  `catalog:` versions when it packs. `docs/release.md` holds the commands.
 - A publish is verified by the run log, not `npm view`: the `+
   qol-mini@<version>` line in the job output is the proof, the registry
   serves a new version minutes later.

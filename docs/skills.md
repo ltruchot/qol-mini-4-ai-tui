@@ -18,9 +18,9 @@
 | `install <names…>` | renders each skill and writes it; a skill already installed is updated |
 | `install` | on a console: a picker; otherwise every installed skill |
 | `update [names…]` | merges the shipped version into the installed one |
-| `list` | shipped skills and their status, plus directories written by hand |
+| `list`, alias `ls` | shipped skills and their status, plus directories written by hand |
 | `check` | one status per installed skill, and an exit code |
-| `remove <names…>` | deletes the directory, the lock entry and the secrets |
+| `remove <names…>`, alias `rm` | deletes the directory, the lock entry and the secrets |
 
 | Option | Effect |
 |---|---|
@@ -30,6 +30,7 @@
 | `--dry-run` | preview, write nothing |
 | `--json` | `list` as JSON |
 | `--frozen` | `check` also re-renders the template and compares it to the lock |
+| `--cwd <dir>` | the directory a relative project, or the git root lookup, starts from |
 
 Without a console, nothing is asked.
 

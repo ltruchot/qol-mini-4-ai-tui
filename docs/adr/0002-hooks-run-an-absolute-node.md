@@ -26,6 +26,6 @@
   project pins.
 - Removing the Node version that ran the installer stops every hook and the status
   line at once. The status line going blank is the visible sign.
-- The README names the cause and the command in its troubleshooting entries.
+- The README names the cause and the command in its "Troubleshooting" table.
 - Not measured: how each version manager lays out its binaries, and which ones keep
   a removed version's path alive.

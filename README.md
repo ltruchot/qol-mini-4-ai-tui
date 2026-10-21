@@ -2,10 +2,13 @@
 
 [![test](https://github.com/ltruchot/qol-mini-4-ai-tui/actions/workflows/test.yml/badge.svg)](https://github.com/ltruchot/qol-mini-4-ai-tui/actions/workflows/test.yml)
 
-Quality-of-life kit for [Claude Code](https://code.claude.com) and
-[OpenCode](https://opencode.ai) when you run several sessions at once: hooks
-and one status line for every project, skills per project. One install wires
-both agents. One package, `qol-mini`.
+Kit for [Claude Code](https://code.claude.com) and
+[OpenCode](https://opencode.ai): hooks and a status line for every project,
+skills per project, one repo harmonized for both agents. One install wires both
+agents. One package, `qol-mini`.
+
+For several sessions at once: each one shows whether it is running, waiting on
+you, or idle.
 
 | | |
 |---|---|
@@ -17,14 +20,21 @@ both agents. One package, `qol-mini`.
 | **Harmonize, per repo** | `qol-mini harmonize /path/to/repo` — one repo, both agents: rules, permissions, commands, agents, MCP |
 | **Opt out, per project** | `touch <project>/.claude/qol-mini-off` — [what it silences](#leave-one-project-alone) |
 
-Linux, macOS, WSL, Windows. Node.js 22.18+. MIT.
+| Supported | |
+|---|---|
+| Node.js | `>=22.18` |
+| Claude Code | `>=2.1.277`, which reads `AGENTS.md` |
+| OpenCode | `>=2.1`, published as `@opencode/*` on npm; the `opencode-ai` package is 1.x |
+| OS | Linux, macOS, WSL, Windows |
+| Editor (tab marker) | VS Code, Cursor |
+| License | MIT |
 
 ## Quick start
 
-Needs Node.js 22.18+. Nothing to clone.
+Nothing to clone.
 
 ```bash
-pnpm dlx qol-mini install                                   # 1. global: asks four yes/no questions
+pnpm dlx qol-mini install                                   # 1. global: asks four yes/no questions, plus two thresholds when the gauge is on
 pnpm dlx qol-mini skills install /path/to/my-project        # 2. skills: pick from a list
 pnpm dlx qol-mini skills install qa-pr /path/to/my-project  #    or name them
 ```
@@ -48,15 +58,84 @@ Shipped skills: `css-modern`, `datastar`, `npm-vulnerability-check`, `qa-pr`, `v
 | `qol-mini vscode` | `./install-vscode.sh` |
 | `qol-mini skills install` | `./install-skills.sh` |
 | `qol-mini skills <other>` | `./scripts/qol-mini.sh skills <other>` |
+| `qol-mini --version`, `-v` | |
 
-`qol-mini install --defaults` asks nothing. `qol-mini vscode` sets the editor for
-the tab marker only.
+| `qol-mini install` asks | When |
+|---|---|
+| four yes/no questions: gauge, sounds, kaizen, tab marker | no option and a real console |
+| two numbers: the orange and the red threshold | the gauge answered yes |
+| nothing | any option, or a stdin that is not a console |
 
 Then start a new Claude Code session. Reloading the editor window is not enough.
 
 Writes into `~/.claude` (or `$CLAUDE_CONFIG_DIR`) and `~/.config/opencode` (or
 `$XDG_CONFIG_HOME/opencode`). `settings.json` and `cli.json` are merged, not
 replaced, and backed up first. Your own hooks, permissions and plugins survive.
+
+### Options
+
+Each option changes one thing and keeps the rest as installed.
+
+| | |
+|---|---|
+| `--statusline` / `--no-statusline` | gauge (default on) |
+| `--sounds` / `--no-sounds` | sounds (default on) |
+| `--kaizen` / `--no-kaizen` | compaction review (default on) |
+| `--tab-state` / `--no-tab-state` | tab marker (default off, see [its cost](#tab-marker)) |
+| `--warn N` / `--alert N` | gauge thresholds (100000 / 200000) |
+| `--defaults` | every default, no questions |
+| `--replace` | overwrite a delivered file you edited |
+
+### Editor
+
+`qol-mini vscode` sets `terminal.integrated.tabs.title` in every user
+`settings.json` found for VS Code, VS Code Insiders, VSCodium and Cursor, for the
+tab marker only.
+
+| | |
+|---|---|
+| `--dry-run` | print what would change, write nothing |
+| `--force` | write the setting again where it is already set |
+| `--revert` | remove the setting |
+
+### Update
+
+```bash
+pnpm dlx qol-mini@latest install --replace
+```
+
+Keeps your options. Without `--replace`, an edited file makes the installer stop
+and write nothing. Your own sound files are never overwritten.
+
+A project that runs its own setup is left alone with
+[`.claude/qol-mini-off`](#leave-one-project-alone).
+
+### Uninstall
+
+```bash
+pnpm dlx qol-mini uninstall
+```
+
+Removes what was installed, nothing else.
+
+### Clone or npm
+
+| | From a clone | From npm |
+|---|---|---|
+| Needs | Node.js, git, Vite+ to build | Node.js |
+| Install | `git clone`, then `./install.sh` | `pnpm dlx qol-mini install` |
+| Skills in a project | `./install-skills.sh qa-pr <project>` | `pnpm dlx qol-mini skills install qa-pr <project>` |
+| Update | `git pull && ./install.sh --replace` | `pnpm dlx qol-mini@latest install --replace` |
+| Left on the machine | the clone | nothing: `dlx` runs from a temporary cache, the hooks are copied into `~/.claude` |
+
+### Troubleshooting
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| status line blank, no hook runs | the hooks name the absolute path of the Node that ran the installer; a version manager removed or replaced it | `pnpm dlx qol-mini@latest install --replace` |
+| `install` stops and names files | a delivered file was edited | `--replace` overwrites it |
+| no tab marker | one of its [three requirements](#tab-marker) is missing | `qol-mini vscode`, `install --tab-state`, a new session |
+| no sound | no player on `PATH` | see [Sounds](#sounds) |
 
 ## OpenCode
 
@@ -85,74 +164,45 @@ Not ported: the context gauge, the sounds, and the tab marker on Windows
 
 ## Harmonize
 
-One repo, both agents: whatever the repo holds for one side gains its
-counterpart on the other, in one run per repo.
+One repo, both agents. The first run picks the source of truth, the side
+the repo already uses; every run converts that side to the other one.
+Targets Claude Code 2.1.277+ and OpenCode 2.1+.
 
 ```bash
 qol-mini harmonize /path/to/my-project        # plan, show, write
 qol-mini harmonize /path/to/my-project --dry-run
+qol-mini harmonize /path/to/my-project --only rules   # one slice first
 qol-mini harmonize check /path/to/my-project  # exit 0 in sync, 1 update, 2 drift
-qol-mini harmonize undo /path/to/my-project
+qol-mini harmonize undo /path/to/my-project --dry-run
 qol-mini harmonize scan ~/workspace          # list repos, write nothing
 ```
 
-| Converts | Claude Code | OpenCode |
+| Converts | Claude Code | OpenCode 2.1 |
 |---|---|---|
-| Rules | `CLAUDE.md` | `AGENTS.md` — the canonical file, `--rules bridge\|symlink` for the exceptions |
-| Permissions | `permissions` in settings.json | `permission` array in opencode.json |
-| Commands | `.claude/commands/*.md` | `.opencode/commands/*.md` |
-| Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` |
-| MCP | `.mcp.json` | `mcp` in opencode.json |
+| Rules | `CLAUDE.md` | `AGENTS.md`, the canonical file; `--rules bridge\|symlink` for the exceptions |
+| Permissions | `permissions` in settings.json | `permissions` array in opencode.json; a legacy `permission` map is read |
+| Commands | `.claude/commands/*.md` | `.opencode/commands/*.md`; `context: fork` <-> `subagent` |
+| Agents | `.claude/agents/*.md` | `.opencode/agents/*.md`; a `tools` list stays an allowlist |
+| MCP | `.mcp.json`, `${VAR}` | `mcp.servers` in opencode.json, `{env:VAR}`; legacy flat entries are read |
+| Models | `opus`, `sonnet`, `haiku`, `fable` | `anthropic/claude-*`; an unmapped model is omitted and named |
 | Skills | `.claude/skills/` | the same files, discovered natively |
-| Hooks | settings.json | reported with their plugin-event mapping |
+| Hooks | settings.json | reported with their plugin event or hook |
 
 | | |
 |---|---|
-| `--from claude\|opencode` | the source of truth: auto-detected on the first run, kept after, `--from` overrides |
-| `--rules pure\|bridge\|symlink` | what CLAUDE.md becomes: gone (default), `@AGENTS.md`, or a symlink |
-| `--replace` | overwrite a generated file edited by hand |
+| `--from claude\|opencode\|auto` | the source of truth: detected on the first run, kept after; `auto` detects again |
+| `--rules pure\|bridge\|symlink` | what CLAUDE.md becomes: gone (default), `@AGENTS.md`, or a symlink; kept on a re-run |
+| `--only rules,perm,mcp,commands,agents` | convert these slices only; a later run completes the rest |
+| `--replace` | settle a CLAUDE.md/AGENTS.md conflict, overwrite a generated file edited by hand, override a stricter legacy permission |
+| Existing config | `opencode.json(c)`, `settings.json`, `.mcp.json` are patched in place: comments, key order and indent kept |
+| Lossy | every key, rule or server with no counterpart is named in the output, never dropped silently |
 | Re-run | idempotent: a repo in sync writes nothing |
 | The lock | a `harmonize` section in `.claude/qol-mini.lock.json`, commit it |
-| Backups | `~/.cache/qol-mini/harmony/<repo>/`, used by `undo` |
-| Reads | `--json`, `--dry-run`, `-y`, `--cwd` |
+| `undo` | replays every run backwards; a file edited since is left in place unless `--replace`; `--dry-run` lists the steps |
+| Backups | `~/.cache/qol-mini/harmony/<repo>/` |
+| Output | `--json`, `--dry-run`, `-y`, `--cwd` |
 
 Details: [docs/harmonize.md](docs/harmonize.md).
-
-### Options
-
-Each option changes one thing and keeps the rest as installed.
-
-| | |
-|---|---|
-| `--statusline` / `--no-statusline` | gauge (default on) |
-| `--sounds` / `--no-sounds` | sounds (default on) |
-| `--kaizen` / `--no-kaizen` | compaction review (default on) |
-| `--tab-state` / `--no-tab-state` | tab marker (default off, see cost below) |
-| `--warn N` / `--alert N` | gauge thresholds (100000 / 200000) |
-| `--defaults` | every default, no questions |
-| `--replace` | overwrite a delivered file you edited |
-
-### Update
-
-```bash
-pnpm dlx qol-mini@latest install --replace
-```
-
-Keeps your options. Without `--replace`, an edited file makes the installer stop
-and write nothing. The hooks are registered with the path of the Node binary that
-ran the installer: after a Node upgrade through a version manager, run it again.
-Your own sound files are never overwritten.
-
-A project that runs its own setup is left alone with
-[`.claude/qol-mini-off`](#leave-one-project-alone).
-
-### Uninstall
-
-```bash
-pnpm dlx qol-mini uninstall
-```
-
-Removes what was installed, nothing else.
 
 ## Context gauge
 
@@ -254,14 +304,16 @@ qol-mini skills install qa-pr ./my-project    # into ./my-project/.claude/skills
 qol-mini skills install ./my-project          # pick from a list; without a console, the installed ones
 qol-mini skills update ./my-project           # merge the kit's changes, keep local edits
 qol-mini skills install --replace ./my-project   # take the kit's version of every edited file
-qol-mini skills list ./my-project
+qol-mini skills list ./my-project             # alias: ls
 qol-mini skills check ./my-project            # exit 0 ok, 1 update, 2 modified, 3 tampered
-qol-mini skills remove qa-pr ./my-project
+qol-mini skills check --frozen ./my-project   # also re-render the template, compare it to the lock
+qol-mini skills remove qa-pr ./my-project     # alias: rm
 ```
 
 | | |
 |---|---|
 | Project argument | any argument holding `/` or `\`, or `.`; none: the git root above the current directory |
+| `--cwd <dir>` | the directory a relative project, or the git root lookup, starts from |
 | `--global` | the Claude Code config dir instead of a project |
 | `{{NAME}}` in a skill | asked once, then read from the lock; `QOL_MINI_ANSWER_<NAME>` answers without a prompt |
 | A file you edited | three-way merge; conflict markers when both sides changed a line; `--conflict rej\|ours\|theirs` |
@@ -388,52 +440,11 @@ vp run ready      # format, lint, types, 50-line gate, tests, build, pack check
 
 | CI job (`.github/workflows/test.yml`) | Runs on | Checks |
 |---|---|---|
-| `ready` | Linux, macOS | the same gates as `vp run ready` |
+| `ready` | Linux, macOS; Linux under Node 22.18.0 | the same gates as `vp run ready` |
+| `test-windows` | Windows | `vp run -r test`; reported, not gating |
 | `install-cycle` | Linux, macOS, Windows | the built CLI on a real runner: install, update with `--replace`, a delivered hook run alone, a skill installed and checked, uninstall leaving `settings.json` empty |
 
-## Publish
-
-What a published version changes for a user:
-
-| | From a clone | From npm |
-|---|---|---|
-| Needs | Node.js, git, Vite+ to build | Node.js |
-| Install | `git clone`, then `./install.sh` | `pnpm dlx qol-mini install` |
-| Skills in a project | `./install-skills.sh qa-pr <project>` | `pnpm dlx qol-mini skills install qa-pr <project>` |
-| Update | `git pull && ./install.sh --replace` | `pnpm dlx qol-mini@latest install --replace` |
-| Left on the machine | the clone | nothing: `dlx` runs from a temporary cache, the hooks are copied into `~/.claude` |
-
-`npx qol-mini <command>` and `npm install -g qol-mini` are the same package.
-
-### By hand
-
-| Step | Command, from `packages/qol-mini` | Note |
-|---|---|---|
-| 1. Log in | `npm login` | once per machine |
-| 2. Build and pack | `vp run build && vp pm pack` | writes `qol-mini-<version>.tgz`, `catalog:` versions resolved |
-| 3. Publish | `npm publish qol-mini-<version>.tgz` | opens a browser page to authenticate |
-| 3, under WSL | `BROWSER=wslview npm publish qol-mini-<version>.tgz` | WSL has no browser to open |
-| 4. Check | `npm view qol-mini version` | prints the version just published |
-
-| Error | Cause | Fix |
-|---|---|---|
-| `EBADDEVENGINES … "pnpm" does not match "npm"` | `npm` was run at the repository root, whose `package.json` pins pnpm | `cd packages/qol-mini` |
-| `Set the BROWSER environment variable` | WSL: the authentication page cannot be opened | `BROWSER=wslview`, or `--auth-type=legacy` to type a one-time code in the terminal |
-| `404` on step 4 | step 3 stopped before publishing | run step 3 again: the tarball is still there |
-
-### From CI
-
-```bash
-git tag v<version> && git push origin v<version>
-```
-
-| Step of `.github/workflows/release.yml` | Why |
-|---|---|
-| tag must equal the version in `packages/qol-mini/package.json` | a tag cannot publish another version |
-| the gates of `ready` | nothing unchecked reaches npm |
-| `vp pm pack`, then `npm publish` of the tarball | pnpm resolves the `catalog:` versions when it packs; `npm publish` of the directory would ship them unresolved |
-| trusted publishing | no npm token stored in the repository; configure it once: `npm trust github qol-mini --file release.yml --repo ltruchot/qol-mini-4-ai-tui --env release --allow-publish` |
-| `environment: release` | the GitHub environment `release` has required reviewers: the job waits for an approval before it can publish |
+Release: [docs/release.md](docs/release.md).
 
 ## Verified where
 
@@ -444,7 +455,8 @@ git tag v<version> && git push origin v<version>
 | CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
 | WSL2, VS Code, a live session | the tab marker, the sounds, `/compact` held back then released by `/kaizen` |
 | WSL2, the OpenCode service and TUI, live sessions | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills`, a manual compaction released through the plugin's entry with the token honored, a tokenless `/compact` held back by the plugin's entry, one reminder per compaction after the fix, the tab marker painted red on a paused session and green through the resumed run, the refusal's modal and toast on a tokenless gated `/compact` |
-| WSL2, Node 24 | `harmonize --dry-run` on four real repos (claw-manager, this kit, gods-monorepo, modern-coder-24vram-harness) and `harmonize scan` over a 24-repo workspace |
+| WSL2, Node 24 | `harmonize --dry-run` on four real repos (this kit and three legacy-layout repos, one of them a monorepo) and `harmonize scan` over a 24-repo workspace |
+| WSL2, OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads in OpenCode: the `permissions` and `mcp.servers` in `debug config`, the agent and its allowlist in `debug agents`, the command in `GET /api/command` |
 | Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; a `harmonize` write followed by live sessions in both agents — the dry-runs and the suite are the proof so far |
 
 ## Related

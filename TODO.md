@@ -2,17 +2,18 @@
 
 ## Where we stopped
 
-The harmonizer is on npm: `qol-mini@0.4.0`, the run log shows
-`+ qol-mini@0.4.0`, provenance signed, the registry serves the version.
-The checklist → todo/release-0.4.0.md
+A full review against OpenCode 2.1.2 (its code) and Claude Code 2.1.306
+(its docs) rewrote the converters; the work is in the tree, not committed,
+`vp run ready` green. `qol-mini@0.4.0` on npm writes OpenCode output that
+OpenCode 2.1 drops (a `permission` array, commands with an alias model):
+run no `harmonize` from 0.4.0 on a real repo.
 
-- No repo was written: the four real ones saw dry-runs only. The first
-  live write closes the checklist: `harmonize <repo>` on one repo, then
-  a Claude Code session and an OpenCode session in it, both reading
-  AGENTS.md.
-- Other machines: `pnpm dlx qol-mini@latest install --replace` — restart
-  the TUIs after; each repo: `pnpm dlx qol-mini@latest harmonize <repo>`,
-  then commit the lock and the generated files.
+- Commit, release 0.5.0 → todo/release-0.5.0.md
+- Then, per repo: `harmonize <repo> --dry-run`, read the named losses, then
+  `--only rules` first, then a full run; a Claude Code session and an
+  OpenCode session in it, both reading AGENTS.md. Commit the lock.
+- Other machines: `pnpm dlx qol-mini@latest install --replace`, restart the
+  TUIs after.
 
 ## Later
 
@@ -27,5 +28,5 @@ The checklist → todo/release-0.4.0.md
 - Commit the 0.2.0 skills in the nine rollout repos, each in that repo's own
   flow → todo/skills-rollout.md
 - A shared core for `qodo-pr-review` (finding anatomy, the GraphQL thread queries, the shell
-  traps): gods-monorepo and wordpress-theme-st-jo hold two forks with opposite merge policies,
+  traps): a monorepo and a WordPress theme hold two forks with opposite merge policies,
   which stay local.
