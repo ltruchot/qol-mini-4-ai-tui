@@ -17,6 +17,10 @@ agent in behavior texts) ships as `v0.3.1`.
 
 ## Later
 
+- Harmonizer follow-ups: hooks compiled to OpenCode plugin shims, the home
+  directory audit (`harmonize --global`), a CI job calling `harmonize check`,
+  a validation pass under Orca (parallel worktrees vs `qol-mini-off`) →
+  todo/harmonize.md
 - `qol-mini install` asks, among its setup prompts, whether the kaizen `TODO.md`
   and `todo/` stay in git tracking: default yes — they are committed. A machine
   that wants them out names the repos, and only those repos' `.gitignore`

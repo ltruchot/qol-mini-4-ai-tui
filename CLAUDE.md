@@ -44,6 +44,7 @@ Sources are under `packages/qol-mini/src/`.
 | Tab marker | `kit/hooks/tab-state.ts` | 🟢 working (subagents, background tasks, compaction) · 🔴 blocked on you · 🟡 idle |
 | Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction the agent is told to read `TODO.md` |
 | Skills per project | `commands/`, `core/`, `io/`, `packages/qol-mini/skills/` | `qol-mini skills install qa-pr ./my-project` renders a shipped skill into `.claude/skills/`, records it in `.claude/qol-mini.lock.json`, and merges local edits on update |
+| Harmonize per repo | `commands/harmonize-*.ts`, `harmonize/`, `core/harmonize/` | `qol-mini harmonize <project>` makes a repo run under both agents: AGENTS.md canonical, permissions, commands, agents and MCP converted each way, hooks and skills reported; `check` and `undo` run off the lock's `harmonize` section |
 | OpenCode target | `packages/qol-mini/opencode/`, `src/opencode/` | the same features in the OpenCode TUI: tab marker, `/compact` gate, post-compaction reminder, `/kaizen` command |
 
 | Command | Does |
@@ -52,6 +53,7 @@ Sources are under `packages/qol-mini/src/`.
 | `qol-mini uninstall` | removes what `install` added, from both targets (`kit/uninstall.ts`) |
 | `qol-mini vscode` | sets the editor (`kit/vscode.ts`) |
 | `qol-mini skills install\|update\|list\|check\|remove` | project scope, or `--global` |
+| `qol-mini harmonize <project>\|check\|undo\|scan` | repo scope, both agents: one command converts, `check` exits for CI, `undo` restores, `scan` lists repos under named roots |
 
 `install.sh`, `uninstall.sh`, `install-vscode.sh`, `install-skills.sh` and their
 `.ps1` twins run the same commands from a clone, through `scripts/qol-mini.sh`.
@@ -283,6 +285,32 @@ A prompt that blocks a script or CI is a bug.
 - The bank's `SKILL.md` frontmatter holds only the fields of the skills reference; a
   field outside the table is ignored by Claude Code with no error.
   `tests/unit/shipped-skills.test.ts` holds the list.
+
+### Harmonizer
+
+- `qol-mini harmonize` makes one repo run under both agents. Sources:
+  `src/commands/harmonize-*.ts`, `src/harmonize/`, `src/core/harmonize/`.
+  The design lives in `docs/adr/0003-agents-md-is-the-canonical-rules-file.md`
+  and `docs/harmonize.md`.
+- AGENTS.md is the canonical rules file: `--rules pure` leaves it alone in the
+  repo, `bridge` and `symlink` are the named fallbacks. Rules files are never
+  lock artifacts: `check` verifies the layout state, not a hash — AGENTS.md is
+  the user's file.
+- The first run decides the source of truth; a re-run keeps it, `--from`
+  overrides. Auto-detection is not stable once both sides exist: a flip would
+  convert the tool's own output back.
+- A repo holding two different rules files is a conflict: nothing is written
+  until `--replace` names the winner. A generated file edited by hand is
+  named, not overwritten; a file the kit never wrote is never overwritten.
+- `settings.local.json` is machine-local: reported, never converted. MCP
+  values that are literal, not `${VAR}`, are named before they can land in a
+  committed file.
+- Backups for `undo` live under `~/.cache/qol-mini/harmony/<repo>/`; slot
+  numbers only grow, so an artifact carried between runs keeps its slot.
+- Hooks are reported with their plugin-event mapping, not converted: a hook
+  body is an arbitrary command.
+- Scan walks named roots only, never `/` or the home directory, and a dir
+  holding `.git` is scanned, not descended into.
 
 ### Windows
 

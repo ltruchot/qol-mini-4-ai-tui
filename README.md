@@ -14,6 +14,7 @@ both agents. One package, `qol-mini`.
 | **Tab marker** (VS Code, Cursor, opt-in) | `🟢 my-project` working · `🔴 my-project` blocked on you · `🟡 my-project` idle |
 | **Kaizen** | `/compact` refuses until you run `/kaizen`, a review of what this session got wrong |
 | **Skills, per project** | `qol-mini skills install qa-pr ./my-project` — placeholders filled, local edits merged on update |
+| **Harmonize, per repo** | `qol-mini harmonize /path/to/repo` — one repo, both agents: rules, permissions, commands, agents, MCP |
 | **Opt out, per project** | `touch <project>/.claude/qol-mini-off` — [what it silences](#leave-one-project-alone) |
 
 Linux, macOS, WSL, Windows. Node.js 22.18+. MIT.
@@ -81,6 +82,41 @@ files reload hot, no restart.
 
 Not ported: the context gauge, the sounds, and the tab marker on Windows
 (no `/dev/tty`).
+
+## Harmonize
+
+One repo, both agents: whatever the repo holds for one side gains its
+counterpart on the other, in one run per repo.
+
+```bash
+qol-mini harmonize /path/to/my-project        # plan, show, write
+qol-mini harmonize /path/to/my-project --dry-run
+qol-mini harmonize check /path/to/my-project  # exit 0 in sync, 1 update, 2 drift
+qol-mini harmonize undo /path/to/my-project
+qol-mini harmonize scan ~/workspace          # list repos, write nothing
+```
+
+| Converts | Claude Code | OpenCode |
+|---|---|---|
+| Rules | `CLAUDE.md` | `AGENTS.md` — the canonical file, `--rules bridge\|symlink` for the exceptions |
+| Permissions | `permissions` in settings.json | `permission` array in opencode.json |
+| Commands | `.claude/commands/*.md` | `.opencode/commands/*.md` |
+| Agents | `.claude/agents/*.md` | `.opencode/agents/*.md` |
+| MCP | `.mcp.json` | `mcp` in opencode.json |
+| Skills | `.claude/skills/` | the same files, discovered natively |
+| Hooks | settings.json | reported with their plugin-event mapping |
+
+| | |
+|---|---|
+| `--from claude\|opencode` | the source of truth: auto-detected on the first run, kept after, `--from` overrides |
+| `--rules pure\|bridge\|symlink` | what CLAUDE.md becomes: gone (default), `@AGENTS.md`, or a symlink |
+| `--replace` | overwrite a generated file edited by hand |
+| Re-run | idempotent: a repo in sync writes nothing |
+| The lock | a `harmonize` section in `.claude/qol-mini.lock.json`, commit it |
+| Backups | `~/.cache/qol-mini/harmony/<repo>/`, used by `undo` |
+| Reads | `--json`, `--dry-run`, `-y`, `--cwd` |
+
+Details: [docs/harmonize.md](docs/harmonize.md).
 
 ### Options
 
@@ -340,6 +376,7 @@ asks the same file the same questions: one opt-out covers both agents.
 └── qol-mini.local.json         secret answers, mode 0600
 
 ~/.cache/qol-mini/              templates for merges, one backup per skill
+~/.cache/qol-mini/harmony/      harmonize backups, one slot per replaced file
 ```
 
 ## Develop
