@@ -5,7 +5,7 @@ import { wav } from "./wav.ts";
 // Two rising notes: you are waited on. One lower, quieter note: a turn ended.
 // OpenCode's attention plays its own sound for events the kit is silent on:
 // silent.wav holds those, and the installer maps them to it.
-const TONES: Record<string, Buffer> = {
+export const TONES: Record<string, Buffer> = {
   "needs-you.wav": wav(
     [
       [660, 0.11],

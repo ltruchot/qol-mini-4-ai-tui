@@ -26,8 +26,14 @@ function sounds(claude: string): Record<string, string> {
 
 // The cli.json this install wants, merged onto what is already there. Only the
 // keys the kit manages are touched: a user's theme, keybinds and notifications
-// survive. `terminal.title` is ours only while the marker paints the title.
-export function cliFor(chosen: Chosen, claude: string, current: Settings): Settings {
+// survive. `terminal.title` is ours only while the marker paints the title:
+// never on Windows, which has no /dev/tty for the plugin to write it to.
+export function cliFor(
+  chosen: Chosen,
+  claude: string,
+  current: Settings,
+  platform: NodeJS.Platform = process.platform,
+): Settings {
   const data = structuredClone(current);
   const attention = block(data, "attention");
   if (chosen.sounds) Object.assign(attention, { sound: true, sounds: sounds(claude) });
@@ -37,7 +43,7 @@ export function cliFor(chosen: Chosen, claude: string, current: Settings): Setti
   }
   put(data, "attention", attention);
   const terminal = block(data, "terminal");
-  if (chosen.tabs) terminal["title"] = false;
+  if (chosen.tabs && platform !== "win32") terminal["title"] = false;
   else delete terminal["title"];
   put(data, "terminal", terminal);
   return data;

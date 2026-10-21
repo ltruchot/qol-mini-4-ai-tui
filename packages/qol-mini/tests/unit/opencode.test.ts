@@ -19,7 +19,7 @@ test("the config dir follows XDG_CONFIG_HOME as OpenCode does, else ~/.config", 
 });
 
 test("sounds on: attention names the kit's wavs, the title is released to OpenCode when off", () => {
-  const merged = cliFor(on, "/c", user);
+  const merged = cliFor(on, "/c", user, "linux");
   const attention = merged["attention"] as Record<string, unknown>;
   expect(attention["sound"]).toBe(true);
   expect(attention["notifications"]).toBe(true);
@@ -35,6 +35,8 @@ test("sounds on: attention names the kit's wavs, the title is released to OpenCo
   const off = cliFor({ ...on, sounds: false, tabs: false }, "/c", merged);
   expect(off["attention"]).toStrictEqual({ notifications: true, volume: 0.4 });
   expect(off["terminal"]).toStrictEqual({ copy: "manual" });
+  // No /dev/tty on Windows: no marker, so OpenCode keeps its own title
+  expect(cliFor(on, "/c", user, "win32")["terminal"]).toStrictEqual({ copy: "manual" });
 });
 
 test("uninstall leaves in cli.json nothing of ours: the title we own goes with it", () => {

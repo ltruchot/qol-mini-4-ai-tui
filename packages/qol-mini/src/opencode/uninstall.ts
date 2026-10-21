@@ -8,9 +8,11 @@ import { DIRS, KAIZEN_COMMAND, PLUGIN_FILES } from "./files.ts";
 
 const FILES = [...PLUGIN_FILES, KAIZEN_COMMAND];
 
-// Remove what install added to the OpenCode config dir
+// Remove what install added to the OpenCode config dir. cli.json first: one
+// that fails to parse stops the run before any file goes.
 export function uninstallOpen(): boolean {
   const target = opencodeDir();
+  const cleaned = cleanConfig(target, "cli.json", cliWithout);
   const removed = FILES.filter((r) => existsSync(join(target, r)));
   for (const relative of removed) {
     unlinkSync(join(target, relative));
@@ -23,6 +25,5 @@ export function uninstallOpen(): boolean {
       // not empty, or not there
     }
   }
-  const cleaned = cleanConfig(target, "cli.json", cliWithout);
   return removed.length > 0 || cleaned;
 }

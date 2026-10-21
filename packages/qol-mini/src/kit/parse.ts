@@ -3,6 +3,10 @@ import { type Chosen, checkThresholds, DEFAULTS, flag, tokens } from "./options.
 
 const THRESHOLD = /^--(warn|alert)(?:=(.*))?$/;
 
+// With no option and a real console, ask. Any option, `--replace` included,
+// or a stdin that is not a console: ask nothing.
+export const asks = (argv: string[], console: boolean): boolean => argv.length === 0 && console;
+
 // Options over `base`, the installed state: `--replace` alone is an update,
 // not a reset. `--defaults` is the only reset, whatever its position.
 export function parse(argv: string[], base: Chosen): Chosen {

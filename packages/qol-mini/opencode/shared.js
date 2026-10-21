@@ -16,7 +16,7 @@ import {
   writeSync,
 } from "node:fs";
 import { homedir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, join, normalize, resolve } from "node:path";
 
 export const OPTOUT_FILE = join(".claude", "qol-mini-off");
 
@@ -85,12 +85,30 @@ export function tokenFor(cwd) {
   return join(claudeDir(), "state", `kaizen-${slug === "" ? "root" : slug}-${digest}.done`);
 }
 
+const STALE_MS = 7 * 24 * 3600 * 1000;
+// Current tokens, and names from past releases: swept, never honored
+const TOKENS = /^(kaizen-.*\.done|friction-.*\.(done|guard))$/;
+
+// Drop tokens left behind by sessions that ended mid-review
+export function sweepStale(now) {
+  const dir = join(claudeDir(), "state");
+  for (const name of readdirSync(dir).filter((n) => TOKENS.test(n))) {
+    const file = join(dir, name);
+    if (now - statSync(file).mtimeMs > STALE_MS) unlinkSync(file);
+  }
+}
+
 // True when the compaction goes through. A recorded review is honored and its
 // token consumed, so the next /compact here is reviewed too. A state directory
 // that cannot be managed must not make /compact unusable.
 export function compactionPasses(cwd) {
   try {
     mkdirSync(join(claudeDir(), "state"), { recursive: true });
+    try {
+      sweepStale(Date.now());
+    } catch {
+      // A failed sweep leaves old tokens; it never opens the gate
+    }
     const token = tokenFor(cwd);
     if (!existsSync(token)) return false;
     unlinkSync(token);
@@ -135,18 +153,25 @@ function markers() {
   };
 }
 
-// The tab title the editor reads through ${sequence}. Control characters are
-// stripped: a byte outside the title breaks the sequence. The TUI owns the
-// screen; /dev/tty is the only way out to the terminal's title. The title
-// ends in ST, not BEL: the raw write races the TUI's redraw, and a BEL met
-// outside a parsed title rings — ST never does.
+// The title sequence for `state`: the folder name, or the whole path at the
+// root. Control characters are stripped from the label and the overrides: a
+// byte outside the title breaks the sequence. The title ends in ST, not BEL:
+// the raw write races the TUI's redraw, and a BEL met outside a parsed title
+// rings — ST never does.
+export function titleSequence(state, cwd) {
+  const dir = cwd === "" ? process.cwd() : cwd;
+  const name = basename(normalize(dir));
+  const label = name === "" ? dir : name;
+  const title = `${markers()[state]} ${label}`.replaceAll(/\p{Cc}/gu, "").trim();
+  return `\u001B]0;${title}\u001B\\`;
+}
+
+// The TUI owns the screen; /dev/tty is the only way out to the terminal's title.
 export function writeMarker(state, cwd) {
   try {
-    const dir = cwd === "" ? process.cwd() : cwd;
-    const label = basename(dir).replaceAll(/\p{Cc}/gu, "");
-    const title = `${markers()[state]} ${label}`.trim();
+    const sequence = titleSequence(state, cwd);
     const tty = openSync("/dev/tty", "w");
-    writeSync(tty, `\u001B]0;${title}\u001B\\`);
+    writeSync(tty, sequence);
     closeSync(tty);
   } catch {
     // no /dev/tty (Windows), or a directory that no longer resolves

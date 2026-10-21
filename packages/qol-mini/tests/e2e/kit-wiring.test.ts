@@ -17,7 +17,8 @@ test("one marker per event, exec form, and the delivered hooks run alone", async
   const data = await settings(target);
   expect(data.hooks).not.toHaveProperty("SessionEnd");
   expect(wired(data, "PreCompact")).toStrictEqual([" --marker"]);
-  expect(wired(data, "SessionStart")).toStrictEqual([" idle", "compact --after-compact"]);
+  const start = ["startup|resume|clear idle", "compact --after-compact"];
+  expect(wired(data, "SessionStart")).toStrictEqual(start);
   expect(wired(data, "PostCompact")).toStrictEqual(["manual done", "manual idle"]);
   expect(wired(data, "PermissionRequest")).toStrictEqual([" blocked"]);
   for (const event of ["UserPromptSubmit", "PostToolBatch", "SubagentStop"])

@@ -19,7 +19,7 @@ async function bundle(relative: string): Promise<Buffer> {
 
 // The skill names the release command exactly: only the installer knows the
 // interpreter and the absolute path the hook will have.
-async function kaizenSkill(target: string, node: string): Promise<Buffer> {
+export async function kaizenSkill(target: string, node: string): Promise<Buffer> {
   const skill = await readSkill(join(bankDir(), "kaizen"), "kaizen");
   const answers = { RELEASE_COMMAND: releaseCommand(node, target) };
   const rendered = renderTree(skill.files, skill.manifest, answers).get("SKILL.md");

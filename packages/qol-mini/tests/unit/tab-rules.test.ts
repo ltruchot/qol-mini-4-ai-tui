@@ -36,6 +36,8 @@ test("only the main thread paints green, red from a subagent stays", () => {
   expect(resolveState("working", { agent_type: "Explore" })).toBeNull();
   expect(resolveState("blocked", { agent_id: "a1" })).toBe("blocked");
   expect(resolveState("working", {})).toBe("working");
+  const ended = { hook_event_name: "SubagentStop", agent_id: "a1", agent_type: "Explore" };
+  expect(resolveState("working", ended)).toBe("working");
 });
 
 test("only the last non-empty line counts, dressing stripped", () => {

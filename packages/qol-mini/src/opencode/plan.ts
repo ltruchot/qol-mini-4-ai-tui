@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { readConfig } from "../io/config-file.ts";
 import type { Chosen } from "../kit/options.ts";
-import { diff, sameSettings, type Diff } from "../kit/plan.ts";
+import { diff, sameSettings, type Diff } from "../kit/diff.ts";
 import type { Settings } from "../kit/state.ts";
 import { cliFor } from "./cli-settings.ts";
 import { opencodeDir } from "./config-dir.ts";

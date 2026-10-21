@@ -1,5 +1,6 @@
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { writeFileAtomic } from "../io/atomic.ts";
 import type { Settings } from "./state.ts";
 
 const two = (value: number): string => String(value).padStart(2, "0");
@@ -23,7 +24,7 @@ export function saveNamed(target: string, name: string, data: Settings): string 
   const file = join(target, name);
   mkdirSync(dirname(file), { recursive: true });
   const copy = backup(file);
-  writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`);
+  writeFileAtomic(file, `${JSON.stringify(data, null, 2)}\n`);
   return copy;
 }
 

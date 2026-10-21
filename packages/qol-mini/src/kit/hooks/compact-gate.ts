@@ -13,7 +13,11 @@ export function compactionPasses(data: Payload, cwd: string): boolean {
   if (text(data, "trigger") === "auto") return true;
   try {
     mkdirSync(stateDir(), { recursive: true });
-    sweepStale(Date.now());
+    try {
+      sweepStale(Date.now());
+    } catch {
+      // A failed sweep leaves old tokens; it never opens the gate
+    }
     const token = tokenFor(cwd);
     if (!existsSync(token)) return false;
     unlinkSync(token);

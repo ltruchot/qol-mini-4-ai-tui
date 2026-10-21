@@ -33,7 +33,8 @@ export function wire(chosen: Chosen, target: string, node: string, hooks: Hooks)
   add("Notification", tab("working"), "quota_auto_resume_fired");
   add("StopFailure", tab("blocked"));
   add("Stop", [...play("done"), ...tab("idle")]);
-  add("SessionStart", tab("idle"));
+  // Not `compact`: an automatic compaction happens mid-turn
+  add("SessionStart", tab("idle"), "startup|resume|clear");
   // No event fires when the model starts thinking: these three are the last
   // moments before work resumes.
   for (const event of ["UserPromptSubmit", "PostToolBatch", "SubagentStop"])

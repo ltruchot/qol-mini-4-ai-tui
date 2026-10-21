@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname } from "node:path";
+import { writeFileAtomic } from "../io/atomic.ts";
 import { row } from "./report.ts";
 import { backup } from "./save-settings.ts";
 import { parses, patched, present, reverted } from "./vscode-patch.ts";
@@ -17,7 +18,7 @@ function save(path: string, updated: string, verb: string, dryRun: boolean): voi
   }
   mkdirSync(dirname(path), { recursive: true });
   backup(path);
-  writeFileSync(path, updated);
+  writeFileAtomic(path, updated);
   row(verb, path);
 }
 

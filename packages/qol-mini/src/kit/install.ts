@@ -8,9 +8,10 @@ import { openIdle, planOpen } from "../opencode/plan.ts";
 import { apply } from "./apply.ts";
 import { hints } from "./hints.ts";
 import { interview } from "./interview.ts";
-import { parse } from "./parse.ts";
+import { asks, parse } from "./parse.ts";
 import { payloads } from "./payloads.ts";
-import { idle, plan, sameSettings } from "./plan.ts";
+import { sameSettings } from "./diff.ts";
+import { idle, plan } from "./plan.ts";
 import { printClash, printOptout } from "./report.ts";
 import { settingsFor } from "./settings.ts";
 import { installedState, type Settings } from "./state.ts";
@@ -21,12 +22,12 @@ export async function runInstall(argv: string[]): Promise<number> {
   const decisive = argv.filter((arg) => arg !== "--replace");
   const target = configDir();
   const installed = installedState(target);
-  const asking = decisive.length === 0 && stdinIsConsole();
+  const asking = asks(argv, stdinIsConsole());
   const chosen = asking ? await interview(installed) : parse(decisive, installed);
   const before = readConfig(join(target, "settings.json")) as Settings;
   const wanted = await payloads(chosen, target, process.execPath);
   const merged = settingsFor(chosen, target, process.execPath, before);
-  const p = plan(chosen, target, wanted, !sameSettings(merged, before));
+  const p = plan(chosen, target, wanted, !sameSettings(merged, before), process.execPath);
   const o = await planOpen(chosen, target);
   // A clash in either target refuses the run: both are named, nothing is written
   const blocks = [

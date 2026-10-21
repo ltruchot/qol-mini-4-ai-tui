@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { readConfig } from "../io/config-file.ts";
-import { sameSettings } from "./plan.ts";
+import { sameSettings } from "./diff.ts";
 import { row } from "./report.ts";
 import { saveNamed } from "./save-settings.ts";
 import type { Settings } from "./state.ts";

@@ -21,10 +21,10 @@ export function apply(
   const newSkillsDir = p.create.includes(KAIZEN_SKILL) && !existsSync(join(target, "skills"));
   print([`Installing into ${target}`]);
   mkdirSync(target, { recursive: true });
-  for (const relative of [...p.create, ...p.clash].toSorted()) {
+  for (const relative of [...p.create, ...p.clash, ...p.refresh].toSorted()) {
     mkdirSync(dirname(join(target, relative)), { recursive: true });
     writeFileSync(join(target, relative), wanted.get(relative) ?? "");
-    row(p.clash.includes(relative) ? "replaced" : "created", relative);
+    row(p.create.includes(relative) ? "created" : "replaced", relative);
   }
   for (const relative of p.same) row("unchanged", relative);
   if (p.sounds.length > 0)
