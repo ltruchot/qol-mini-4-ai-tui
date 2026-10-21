@@ -7,11 +7,11 @@ The converters target OpenCode 2.1 native shapes, checked by
 - [x] commit, by concern: converters + contract tests, undo and options,
       kit fixes, CI and docs
 - [x] `packages/qol-mini/package.json` at 0.5.0
-- [ ] push `main`; CI green; the new jobs (Node 22.18, Windows tests,
-      concurrency) run for the first time there
-- [ ] CI green on the branch; the Windows test job is non-blocking
-      (`continue-on-error`) until the suite's POSIX paths are ported
-- [ ] tag `v0.5.0`, push it, approve
+- [x] push `main`; CI green; Node 22.18 passes, `test-windows` fails as
+      expected and does not block
+- [ ] port the suite's POSIX paths, then drop `continue-on-error` from
+      `test-windows`
+- [x] tag `v0.5.0`, push it, approve
       the run in the `release` environment, `+ qol-mini@0.5.0` in the log
 - [ ] dry-runs again on the four real repos, read every named loss
 - [ ] the first live write: `harmonize <repo> --only rules`, then a full

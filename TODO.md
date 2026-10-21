@@ -2,13 +2,10 @@
 
 ## Where we stopped
 
-A full review against OpenCode 2.1.2 (its code) and Claude Code 2.1.306
-(its docs) rewrote the converters; the work is in the tree, not committed,
-`vp run ready` green. `qol-mini@0.4.0` on npm writes OpenCode output that
-OpenCode 2.1 drops (a `permission` array, commands with an alias model):
-run no `harmonize` from 0.4.0 on a real repo.
-
-- Commit, release 0.5.0 → todo/release-0.5.0.md
+`qol-mini@0.5.0` is on npm (`+ qol-mini@0.5.0` in the run log): its
+converters write OpenCode 2.1's native shapes, checked by
+`@opencode/schema`. `qol-mini@0.4.0` writes output OpenCode 2.1 drops:
+run no `harmonize` from 0.4.0 on a real repo. → todo/release-0.5.0.md
 - Then, per repo: `harmonize <repo> --dry-run`, read the named losses, then
   `--only rules` first, then a full run; a Claude Code session and an
   OpenCode session in it, both reading AGENTS.md. Commit the lock.
