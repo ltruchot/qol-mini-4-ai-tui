@@ -1,6 +1,6 @@
 {
   "name": "qol-mini",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Kit for Claude Code and OpenCode: hooks and a status line for every project, skills per project, one repo harmonized for both agents",
   "homepage": "https://github.com/ltruchot/qol-mini-4-ai-tui#readme",
   "bugs": "https://github.com/ltruchot/qol-mini-4-ai-tui/issues",
