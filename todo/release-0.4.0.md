@@ -15,8 +15,9 @@ the converters, the command family, the lock section, the docs.
 - [x] scan over a 24-repo workspace, every rules state read correctly
 - [x] ADR 0003, docs/harmonize.md, the README tables, the CLAUDE.md
       constraints, the install hint pointing at scan
-- [ ] tag `v0.4.0`, push it, approve the run in the GitHub environment
-      `release`
+- [x] tag `v0.4.0`, push it, approve the run in the GitHub environment
+      `release` — `+ qol-mini@0.4.0` in the run log, provenance signed,
+      the registry serves 0.4.0
 - [ ] after npm: the other machines move — `pnpm dlx qol-mini@latest
       install --replace`; each repo: `pnpm dlx qol-mini@latest harmonize
       <repo>`, then commit the lock and the generated files
