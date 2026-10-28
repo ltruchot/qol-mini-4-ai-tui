@@ -12,7 +12,7 @@ you, or idle.
 
 | | |
 |---|---|
-| **Context gauge** | `Opus 5 (1M context) ▓▓▓▓░░░░░░ 88/200k · my-project` — green, orange at 100k, red at 200k |
+| **Context gauge** | `Opus 5 (1M context) high ▓▓▓▓░░░░░░ 88/200k · my-project` — green, orange at 100k, red at 200k; the config dir appended when `CLAUDE_CONFIG_DIR` is not `~/.claude` |
 | **Sounds** | two rising notes: the agent waits on you · one low note: turn over |
 | **Tab marker** (VS Code, Cursor, opt-in) | `🟢 my-project` working · `🔴 my-project` blocked on you · `🟡 my-project` idle |
 | **Kaizen** | `/compact` refuses until you run `/kaizen`, a review of what this session got wrong |

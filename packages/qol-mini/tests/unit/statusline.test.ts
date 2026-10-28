@@ -1,4 +1,5 @@
 import { expect, test } from "vite-plus/test";
+import { customConfigDir } from "../../src/io/config-dir.ts";
 import { human, roundHalfEven, threshold } from "../../src/kit/hooks/statusline-format.ts";
 import { statusLine } from "../../src/kit/hooks/statusline-line.ts";
 
@@ -20,6 +21,23 @@ test("the unit sits on the denominator only", () => {
   expect(line(1_200_000)).toContain("1.2M");
   expect(statusLine({}, LIMITS)).toContain("?");
   expect(statusLine({ model, cost: { total_cost_usd: 9.99 } }, LIMITS)).not.toContain("9.99");
+});
+
+test("the effort level follows the model, absent when the payload has none", () => {
+  const withEffort = statusLine({ model, effort: { level: "xhigh" } }, LIMITS);
+  expect(withEffort).toContain("Opus\u001B[0m \u001B[2mxhigh\u001B[0m ");
+  expect(line(88_000)).toContain("Opus\u001B[0m \u001B[32m");
+  expect(statusLine({ model, effort: { level: "\u001B[31m" } }, LIMITS)).not.toContain("[31m");
+});
+
+test("the config dir shows only when it is not ~/.claude", () => {
+  const home = "/home/u";
+  const dir = (set?: string): string => customConfigDir({ CLAUDE_CONFIG_DIR: set }, home);
+  expect([dir(), dir(""), dir("/home/u/.claude/")]).toStrictEqual(["", "", ""]);
+  expect(dir("/home/u/.config/acti/claude")).toBe("~/.config/acti/claude");
+  expect(dir("/opt/cc\u001B]0;x")).toBe("/opt/cc]0;x");
+  expect(statusLine({ model }, LIMITS, "~/acti")).toContain("· ~/acti\u001B[0m");
+  expect(line(88_000)).not.toContain("~");
 });
 
 test("arguments win over the environment, garbage falls through", () => {

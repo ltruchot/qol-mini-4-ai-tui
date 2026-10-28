@@ -19,7 +19,7 @@ function usedTokens(data: Payload): number {
 
 // The gauge and the fraction share one denominator, the alert threshold, not
 // the window: on a 1M model a window-relative bar is near empty when it matters.
-export function statusLine(data: Payload, { warn, alert }: Limits): string {
+export function statusLine(data: Payload, { warn, alert }: Limits, configDir = ""): string {
   const used = usedTokens(data);
   let color = GREEN;
   if (used >= alert) color = RED;
@@ -32,7 +32,11 @@ export function statusLine(data: Payload, { warn, alert }: Limits): string {
   const bang = used >= alert ? "! " : "";
   const count = `${color}${BOLD}${bang}${human(used, !shared)}${RESET}${DIM}/${limit}${RESET}`;
   const model = text(record(data, "model"), "display_name") || "?";
+  // Absent when the model takes no effort parameter; a word only, nothing else printed
+  const level = text(record(data, "effort"), "level");
+  const effort = /^[a-z]+$/.test(level) ? ` ${DIM}${level}${RESET}` : "";
   const cwd = text(record(data, "workspace"), "current_dir") || text(data, "cwd");
   const where = cwd === "" ? "" : ` ${DIM}· ${basename(cwd)}${RESET}`;
-  return `${BOLD}${WHITE}${model}${RESET} ${gauge} ${count}${where}`;
+  const dir = configDir === "" ? "" : ` ${DIM}· ${configDir}${RESET}`;
+  return `${BOLD}${WHITE}${model}${RESET}${effort} ${gauge} ${count}${where}${dir}`;
 }

@@ -39,7 +39,7 @@ Sources are under `packages/qol-mini/src/`.
 
 | Feature | Source | What you see |
 |---|---|---|
-| Context status line | `kit/hooks/statusline*.ts` | `Opus 5 (1M context) ▓▓▓▓░░░░░░ 88/200k · my-project` |
+| Context status line | `kit/hooks/statusline*.ts` | `Opus 5 (1M context) high ▓▓▓▓░░░░░░ 88/200k · my-project` |
 | Notification sounds | `kit/hooks/play.ts`, `kit/sounds.ts` | two rising notes when the agent wants you, one low note when a turn or a manual `/compact` ends |
 | Tab marker | `kit/hooks/tab-state.ts` | 🟢 working (subagents, background tasks, compaction) · 🔴 blocked on you · 🟡 idle |
 | Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction the agent is told to read `TODO.md` |
@@ -362,6 +362,10 @@ A prompt that blocks a script or CI is a bug.
 - The gauge and the fraction share one denominator, the **alert threshold**, not the
   window: on a 1M model a window-relative bar is near empty when the alert matters.
 - The unit sits on the denominator only: `0k/200k` reads as "Ok".
+- `effort.level` follows the model, absent when the model takes no effort.
+- The config dir closes the line only when `CLAUDE_CONFIG_DIR` is not
+  `~/.claude`: a wrapper that relocates it runs its own install, and the line
+  names which one is live. The status line inherits Claude Code's environment.
 
 ## Method
 
