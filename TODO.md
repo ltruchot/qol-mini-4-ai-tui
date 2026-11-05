@@ -3,11 +3,11 @@
 ## Where we stopped
 
 The bank `vp` skill is written against Vite+ 1.5 and has Vite+ own Node and pnpm; this repo
-runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320. Version 0.6.0,
-not published; `vp run ready` green, 156 tests. Twelve repos carry the same setup; the
-exclusions to drop on 2026-11-07 and the two repos left → todo/vite-plus-fleet.md
+runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320. `qol-mini@0.6.0`
+is the published version; `vp run ready` green, 156 tests. Twelve repos carry the same setup;
+the exclusions to drop on 2026-11-07 → todo/vite-plus-fleet.md
 
-`qol-mini@0.5.3` is the published version. Rollout of the harmonizer on real repos and the
+Rollout of the harmonizer on real repos and the
 first live sessions in both agents → todo/harmonize-rollout.md
 
 ## Later
