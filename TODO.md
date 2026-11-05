@@ -2,16 +2,20 @@
 
 ## Where we stopped
 
-The bank `vp` skill is written against Vite+ 1.5 and has Vite+ own Node and pnpm; this repo
-runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320. `qol-mini@0.6.0`
-is the published version; `vp run ready` green, 156 tests. Twelve repos carry the same setup;
-the exclusions to drop on 2026-11-07 → todo/vite-plus-fleet.md
+Nothing in progress. `qol-mini@0.6.0` is published (bank `vp` skill written against Vite+ 1.5,
+Vite+ owning Node and pnpm); this repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1,
+`minimumReleaseAge` 4320; `vp run ready` green, 156 tests. The twelve repos of
+`.local/repos.json` carry the same setup, committed and pushed where they have a remote.
 
-Rollout of the harmonizer on real repos and the
-first live sessions in both agents → todo/harmonize-rollout.md
+The removal of their temporary release-age exclusions is scheduled for 2026-11-07 06:13
+local time, as a job of the session that set it up: it does not survive that session.
 
 ## Later
 
+- From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of
+  `.local/repos.json` (done? check `minimumReleaseAgeExclude` in qol-mini) → todo/vite-plus-fleet.md
+- Rollout of the harmonizer on real repos and the first live sessions in both agents →
+  todo/harmonize-rollout.md
 - Port the test suite's POSIX paths and file modes to Windows, then drop
   `continue-on-error` from the `test-windows` job in `.github/workflows/test.yml`
 - Harmonizer follow-ups: hooks compiled to OpenCode plugin shims, the home

@@ -18,11 +18,13 @@ facts. unary-js has no mise left.
    lockfile against the policy. Other exclusions stay (`@opencode/schema@2.1.2` here, the
    name-wide toolchain list of the Elm monorepo, which documents its own reason).
    boardgame-helper also lists `@anthropic-ai/sdk@1.4.0`, three days old on 2026-11-05 19:20 UTC.
-2. Seen, not ours to fix: in tcg-look, `apps/viewer` misses `DOM.Iterable` (5 × TS2488 at build)
+2. unary-js: `feat/maieutics` (the maieutics package and the upgrade) is pushed; its PR into
+   `main` is not opened, and its CI runs on `main` and pull requests only.
+3. Seen, not ours to fix: in tcg-look, `apps/viewer` misses `DOM.Iterable` (5 × TS2488 at build)
    and `apps/animator` has 7 TypeScript errors; in both Three.js repos, `ng test` finds no test
    in `apps/animator`; sone-anniv's `engines.node` (`>=22.12.0`) admits runtimes Vitest 5 does
    not support.
-3. This machine: `~/.config/mise/config.toml` lists no tool; the inactive mise Node installs
+4. This machine: `~/.config/mise/config.toml` lists no tool; the inactive mise Node installs
    still put `node` and `pnpm` shims ahead of `~/.vite-plus/bin`. They fall through to Vite+,
    and `vp env doctor` flags them. `mise uninstall node --all` clears them, if no other
    project needs a mise Node.
