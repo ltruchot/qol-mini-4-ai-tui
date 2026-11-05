@@ -103,6 +103,9 @@ back end: remove `index.html`, `public/` and the DOM code.
   `minimumReleaseAgeExclude` by exact version (`"@voidzero-dev/vite-plus-core@1.5.0"`, one
   line per platform package) when the reason is known. A bare name exempts every future
   release.
+- pnpm 12 checks the lockfile against the policy on every install, `--frozen-lockfile`
+  included: an exclusion stays until its version is that old. The error lists 20 entries
+  then `…and N more`; the full set is every lockfile entry published after the cutoff.
 - Exact versions: `vp add -E`, or `savePrefix: ""`.
 
 ## Upgrading Vite+
