@@ -8,7 +8,7 @@ catalog:
   "@clack/prompts": 1.7.0
   "@opencode/schema": 2.1.2
   "@types/node": 26.2.0
-  "@vitest/coverage-v8": 5.0.1
+  "@vitest/coverage-v8": 5.1.0
   cac: 7.0.0
   effect: 4.0.1
   execa: 10.0.1
@@ -16,26 +16,30 @@ catalog:
   node-diff3: 3.2.1
   picocolors: 1.1.1
   typescript: 7.0.2
-  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
-  vite-plus: 1.0.0
+  vite: npm:@voidzero-dev/vite-plus-core@1.5.0
+  vite-plus: 1.5.0
   yaml: 2.9.0
   zod: 4.4.3
+  vitest: 5.1.0
 overrides:
   vite@*: "catalog:"
+  vitest@*: "catalog:"
 peerDependencyRules:
   allowAny:
     - vite
+    - vitest
   allowedVersions:
     vite: "*"
+    vitest: "*"
 minimumReleaseAgeExclude:
-  - "@voidzero-dev/vite-plus-core@1.0.0"
-  - "@voidzero-dev/vite-plus-darwin-arm64@1.0.0"
-  - "@voidzero-dev/vite-plus-darwin-x64@1.0.0"
-  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.0.0"
-  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.0.0"
-  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.0.0"
-  - "@voidzero-dev/vite-plus-linux-x64-musl@1.0.0"
-  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.0.0"
-  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.0.0"
-  - vite-plus@1.0.0
+  - "@voidzero-dev/vite-plus-core@1.5.0"
+  - "@voidzero-dev/vite-plus-darwin-arm64@1.5.0"
+  - "@voidzero-dev/vite-plus-darwin-x64@1.5.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-gnu@1.5.0"
+  - "@voidzero-dev/vite-plus-linux-arm64-musl@1.5.0"
+  - "@voidzero-dev/vite-plus-linux-x64-gnu@1.5.0"
+  - "@voidzero-dev/vite-plus-linux-x64-musl@1.5.0"
+  - "@voidzero-dev/vite-plus-win32-arm64-msvc@1.5.0"
+  - "@voidzero-dev/vite-plus-win32-x64-msvc@1.5.0"
+  - vite-plus@1.5.0
   - "@opencode/schema@2.1.2"
