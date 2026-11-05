@@ -14,6 +14,9 @@ local time, as a job of the session that set it up: it does not survive that ses
 
 - From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of
   `.local/repos.json` (done? check `minimumReleaseAgeExclude` in qol-mini) → todo/vite-plus-fleet.md
+- `harmonize run` inside a repo misreads it: with no project it reports "no rules file" next to a
+  CLAUDE.md and an AGENTS.md, and `harmonize run .` fails with `Unused args: .`;
+  `qol-mini harmonize ./<repo>` and `harmonize check ./` work
 - Rollout of the harmonizer on real repos and the first live sessions in both agents →
   todo/harmonize-rollout.md
 - Port the test suite's POSIX paths and file modes to Windows, then drop
