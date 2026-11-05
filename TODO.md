@@ -2,18 +2,20 @@
 
 ## Where we stopped
 
-Nothing in progress. `qol-mini@0.6.1` is committed and installed on this machine, not tagged:
-npm serves 0.6.0; `git tag v0.6.1 && git push origin v0.6.1` publishes it (bank `vp` skill
-written against Vite+ 1.5,
-Vite+ owning Node and pnpm); this repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1,
-`minimumReleaseAge` 4320; `vp run ready` green, 156 tests. The twelve repos of
-`.local/repos.json` carry the same setup, committed and pushed where they have a remote.
+Nothing in progress. `qol-mini@0.6.1` is committed, pushed and installed on this machine
+(`./install.sh --replace`: hooks on Node 26.13.0, the status line with `effort`, kaizen reading
+AGENTS.md, the OpenCode plugin); npm serves 0.6.0. This repo runs Vite+ 1.5.0, Node 26.13.0,
+pnpm 12.16.1, `minimumReleaseAge` 4320; `vp run ready` green, 156 tests.
 
-The removal of their temporary release-age exclusions is scheduled for 2026-11-07 06:13
-local time, as a job of the session that set it up: it does not survive that session.
+The twelve repos of `.local/repos.json` carry the same setup and are harmonized: AGENTS.md is
+the rules file (the harness keeps `CLAUDE.md` as a symlink to it), committed and pushed where
+they have a remote. Their temporary release-age exclusions are dropped by a job scheduled for
+2026-11-07 06:13 local time in the session that set them up; it does not outlive that session.
 
 ## Later
 
+- Publish 0.6.1: `git tag v0.6.1 && git push origin v0.6.1`, approve the run (`docs/release.md`),
+  then `qol-mini skills install vp <repo>` in the fleet: 0.6.1 adds the lockfile line to `vp`
 - From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of
   `.local/repos.json` (done? check `minimumReleaseAgeExclude` in qol-mini) → todo/vite-plus-fleet.md
 - `harmonize run` inside a repo misreads it: with no project it reports "no rules file" next to a

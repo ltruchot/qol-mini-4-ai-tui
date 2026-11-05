@@ -1,6 +1,6 @@
 # Harmonize rollout
 
-`qol-mini@0.5.3` on npm: OpenCode 2.1 native output checked by
+`qol-mini@0.6.0` on npm: OpenCode 2.1 native output checked by
 `@opencode/schema`, rules files that import each other merged, kept files
 git ignores named after every run. Run no `harmonize` from 0.4.0.
 
@@ -19,12 +19,16 @@ session in it; commit AGENTS.md, the generated files and
 
 ## State
 
+- The twelve repos of `.local/repos.json` are harmonized from this clone: rules in
+  AGENTS.md (pure; the harness in symlink mode), `opencode.json` where the repo has
+  permissions, committed and pushed where they have a remote.
 - gen-models-on-network: rules merged (AGENTS.md imported CLAUDE.md), its
   `.gitignore` line for AGENTS.md removed by the owner; the commit and the
   two live sessions are the owner's, unverified here.
-- The other real repos: not run with 0.5.x. Reading or running in them
-  needs the owner's per-path permission.
+- The other real repos: not run. Reading or running in them needs the owner's
+  per-path permission.
 - Other machines: `pnpm dlx qol-mini@latest install --replace`, restart the
   TUIs after.
 - Never verified: a harmonized repo in a live session of either agent. The
-  first one closes the "Never" row of the CLAUDE.md verification table.
+  first one closes the "Never" row of the AGENTS.md verification table: a new
+  Claude Code session in this repo now loads AGENTS.md, not CLAUDE.md.
