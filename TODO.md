@@ -2,7 +2,7 @@
 
 ## Where we stopped
 
-Nothing in progress. `qol-mini@0.6.0` is published (bank `vp` skill written against Vite+ 1.5,
+Nothing in progress. `qol-mini@0.6.1` is published (bank `vp` skill written against Vite+ 1.5,
 Vite+ owning Node and pnpm); this repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1,
 `minimumReleaseAge` 4320; `vp run ready` green, 156 tests. The twelve repos of
 `.local/repos.json` carry the same setup, committed and pushed where they have a remote.
