@@ -2,12 +2,13 @@
 
 ## Where we stopped
 
-Tab marker fixed and verified live (red kept on a question, yellow on a
-plain end): an internal agent's `SubagentStop` paints nothing, `idle_prompt`
-reads the question from the transcript. Released in 0.5.3.
+The bank `vp` skill is written against Vite+ 1.5 and has Vite+ own Node and pnpm; this repo
+runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320. Version 0.6.0,
+not published; `vp run ready` green, 156 tests. Twelve repos carry the same setup; the
+exclusions to drop on 2026-11-07 and the two repos left → todo/vite-plus-fleet.md
 
-`qol-mini@0.5.3` is the published version; `vp run ready` green, 154 tests. Rollout on real repos and the first live sessions in both
-agents → todo/harmonize-rollout.md
+`qol-mini@0.5.3` is the published version. Rollout of the harmonizer on real repos and the
+first live sessions in both agents → todo/harmonize-rollout.md
 
 ## Later
 
@@ -21,8 +22,8 @@ agents → todo/harmonize-rollout.md
   and `todo/` stay in git tracking: default yes — they are committed. A machine
   that wants them out names the repos, and only those repos' `.gitignore`
   gains the entries. The kaizen skill neither knows nor decides this.
-- Commit the 0.2.0 skills in the nine rollout repos, each in that repo's own
-  flow → todo/skills-rollout.md
+- Commit the 0.2.0 skills in the rollout repos left, each in that repo's own flow →
+  todo/skills-rollout.md
 - A shared core for `qodo-pr-review` (finding anatomy, the GraphQL thread queries, the shell
   traps): a monorepo and a WordPress theme hold two forks with opposite merge policies,
   which stay local.
