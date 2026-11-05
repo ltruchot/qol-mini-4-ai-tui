@@ -25,8 +25,8 @@ test("validate by type", () => {
   expect(validateAnswer(decl({ type: "url" }), "https://x.dev")).toBeNull();
   expect(validateAnswer(decl({ type: "boolean" }), "yes")).toMatch(/true/);
   expect(validateAnswer(decl({ type: "enum", options: ["a", "b"] }), "c")).toMatch(/one of/);
-  expect(validateAnswer(decl({ pattern: "^v\\d+$" }), "v1")).toBeNull();
-  expect(validateAnswer(decl({ pattern: "^v\\d+$" }), "x")).toMatch(/match/);
+  expect(validateAnswer(decl({ pattern: String.raw`^v\d+$` }), "v1")).toBeNull();
+  expect(validateAnswer(decl({ pattern: String.raw`^v\d+$` }), "x")).toMatch(/match/);
   expect(validateAnswer(decl({}), "${CLAUDE_PROJECT_DIR}")).toMatch(/reserved/);
 });
 

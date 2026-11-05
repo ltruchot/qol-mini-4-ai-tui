@@ -5,7 +5,7 @@ const CC_REF = /\$\{([A-Za-z_][A-Za-z0-9_]*)(:-[^}]*)?\}/g;
 const OC_REF = /\{env:([^}]+)\}/g;
 
 export function toOcEnv(value: string, lossy: string[]): string {
-  return value.replace(CC_REF, (_, name: string, fallback: string | undefined) => {
+  return value.replaceAll(CC_REF, (_, name: string, fallback: string | undefined) => {
     if (fallback !== undefined) lossy.push(`\${${name}${fallback}}: OpenCode has no default`);
     return `{env:${name}}`;
   });
@@ -13,7 +13,7 @@ export function toOcEnv(value: string, lossy: string[]): string {
 
 export function toCcEnv(value: string, lossy: string[]): string {
   if (value.includes("{file:")) lossy.push(`${value}: {file:} has no Claude Code form`);
-  return value.replace(OC_REF, (_, name: string) => `\${${name}}`);
+  return value.replaceAll(OC_REF, (_, name: string) => `\${${name}}`);
 }
 
 // Rewrite every string of a JSON value: strings, arrays, maps
