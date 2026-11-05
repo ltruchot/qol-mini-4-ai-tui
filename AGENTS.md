@@ -312,6 +312,9 @@ A prompt that blocks a script or CI is a bug.
   repo, `bridge` and `symlink` are the named fallbacks. Rules files are never
   lock artifacts: `check` verifies the layout state, not a hash — AGENTS.md is
   the user's file.
+- `pure` moves the rules, not what names them: after a run, `git grep -n
+  'CLAUDE\.md'` finds the repo's own references (docs, skills, code allow
+  lists); `check` does not see them.
 - The first run decides the source of truth; a re-run keeps it, `--from`
   overrides. Auto-detection is not stable once both sides exist: a flip would
   convert the tool's own output back.
