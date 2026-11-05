@@ -1,6 +1,6 @@
 ---
 name: kaizen
-description: Update TODO.md and todo/ with where this session stopped and what is left, clearing what is done, then review the session's friction and turn each real finding into one precise amendment to a CLAUDE.md, a skill, the docs, or a code comment. Use it before compacting, or after a session that taught you something. Also clears the /compact block set by the PreCompact hook.
+description: Update TODO.md and todo/ with where this session stopped and what is left, clearing what is done, then review the session's friction and turn each real finding into one precise amendment to the project's rules file (AGENTS.md or CLAUDE.md), a skill, the docs, or a code comment. Use it before compacting, or after a session that taught you something. Also clears the /compact block set by the PreCompact hook.
 ---
 
 # Kaizen
@@ -10,6 +10,9 @@ hard way into instructions that outlive it.
 
 You're the right reviewer because you still hold the context. Don't hand this to
 a subagent reading the transcript.
+
+The project's rules file is `AGENTS.md` when the repo has one, `CLAUDE.md`
+otherwise. Wherever this skill says the project's `CLAUDE.md`, read that file.
 
 ## 0. Hand off in `TODO.md` — first, always
 
@@ -293,7 +296,8 @@ Same block as step 4, one at a time, counted in the same total.
   > Open a `todo/` file only for the item you work on. An item done → delete its line and its `todo/` file.
   ```
 
-  No `CLAUDE.md` → propose creating one with those lines only.
+  No rules file → propose creating `AGENTS.md` with those lines only. Never a
+  `CLAUDE.md` beside an `AGENTS.md`: Claude Code then skips `AGENTS.md`.
 - `TODO.md` over about 100 lines → propose the split: which items move to which
   `todo/<slug>.md`, and the resulting index. Show the plan, not the files.
 - `TODO.md` under another case (`todo.md`, `Todo.md`) → propose the rename

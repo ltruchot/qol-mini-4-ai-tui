@@ -137,8 +137,8 @@ A prompt that blocks a script or CI is a bug.
 - The release token is keyed on the working **directory**, not the session: the
   skill writes it from a plain shell, a manual `/kaizen` arms the next `/compact`,
   and one project's review does not release another's.
-- A lesson goes to the repo's `CLAUDE.md` or to a named skill. Never to
-  `~/.claude/CLAUDE.md`.
+- A lesson goes to the repo's rules file (`AGENTS.md`, else `CLAUDE.md`) or to a named
+  skill. Never to `~/.claude/CLAUDE.md`.
 
 ### One marker per event
 

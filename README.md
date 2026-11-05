@@ -284,7 +284,7 @@ Run /kaizen to review it, then /compact again.
 |---|---|
 | 1 | updates `TODO.md`, an index under 100 lines: where the session stopped, one line per item left; an item that needs context gets `todo/<slug>.md`; done items and their files are removed, links checked |
 | 2 | proposes at most three items, one message each, in an ASCII block with a one-sentence TLDR: `ADD` a line it had to work around the lack of, `CUT` one that earns nothing, `MOVE` one loaded at the wrong moment, `REWORD` one it misread; you answer yes or no; none is normal |
-| 3 | proposes the handoff lines at the top of `CLAUDE.md`, the split of an oversized `TODO.md`, and a merge of `SESSION_STATE`-style files |
+| 3 | proposes the handoff lines at the top of the rules file (`AGENTS.md`, else `CLAUDE.md`), the split of an oversized `TODO.md`, and a merge of `SESSION_STATE`-style files |
 | 4 | releases the block: `/compact` goes through, once |
 
 After any compaction, the agent is told to read `TODO.md` when it exists: a
