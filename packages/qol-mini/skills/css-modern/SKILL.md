@@ -1,6 +1,6 @@
 ---
 name: css-modern
-description: Modern CSS for evergreen browsers, each feature with its Baseline status - design tokens, OKLCH, grid, container queries, :has(), nesting, cascade layers, transitions. Use when writing or reviewing CSS, or when choosing between a new CSS feature and its fallback.
+description: Modern CSS for evergreen browsers, each feature with its Baseline status: design tokens, layout (flex, grid, container queries), colors and dark mode, spacing, typography, :has(), nesting, cascade layers, transitions and animations. Use it whenever styling comes up, even when nobody says CSS: a misaligned or overflowing element, a color, a font, spacing, a hover or focus state, responsive or mobile layout, z-index, a dark mode, a stylesheet or a style block in .vue, .svelte or .html, or a question about whether a CSS feature is safe to use.
 ---
 
 # Modern CSS Patterns
