@@ -1,7 +1,6 @@
 ---
 name: css-modern
 description: Modern CSS for evergreen browsers, each feature with its Baseline status - design tokens, OKLCH, grid, container queries, :has(), nesting, cascade layers, transitions. Use when writing or reviewing CSS, or when choosing between a new CSS feature and its fallback.
-paths: "{{CSS_PATHS}}"
 ---
 
 # Modern CSS Patterns

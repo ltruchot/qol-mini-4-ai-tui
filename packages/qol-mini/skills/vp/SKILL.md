@@ -1,12 +1,6 @@
 ---
 name: vp
 description: Vite+ (vp) in a pnpm workspace. Run `vp <command>` instead of pnpm, npm, node, vite, vitest, oxlint, oxfmt or tsx directly. Use before touching package.json, vite.config.ts, tsconfig*.json, pnpm-workspace.yaml or .vite-hooks/, and before running install, dev, build, test, lint, a task or a script.
-paths:
-  - "**/package.json"
-  - "**/vite.config.ts"
-  - "**/tsconfig*.json"
-  - "pnpm-workspace.yaml"
-  - ".vite-hooks/*"
 ---
 
 # Vite+ (`vp`)

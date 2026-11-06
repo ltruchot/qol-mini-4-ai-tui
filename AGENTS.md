@@ -300,6 +300,9 @@ A prompt that blocks a script or CI is a bug.
   configs and never writes one: the README holds the prompt that does.
 - The bank's `SKILL.md` frontmatter holds only the fields of the skills reference; a
   field outside the table is ignored by Claude Code with no error.
+- `paths` hides a skill: absent from the listing, `Unknown skill` on invoke, until a
+  matching file inside the working directory is read. A skill needed before a command
+  runs, not before a file is read, carries no `paths`.
   `tests/unit/shipped-skills.test.ts` holds the list.
 
 ### Harmonizer

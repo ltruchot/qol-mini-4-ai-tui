@@ -6,6 +6,3 @@ placeholders:
   - name: TOKENS_FILE
     prompt: Path to the file that defines the design tokens
     type: path
-  - name: CSS_PATHS
-    prompt: Globs that load this skill, comma-separated
-    default: "**/*.css"
