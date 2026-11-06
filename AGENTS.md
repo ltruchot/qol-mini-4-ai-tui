@@ -303,6 +303,11 @@ A prompt that blocks a script or CI is a bug.
 - `paths` hides a skill: absent from the listing, `Unknown skill` on invoke, until a
   matching file inside the working directory is read. A skill needed before a command
   runs, not before a file is read, carries no `paths`.
+- A new or changed bank skill goes through `skill-creator`: trigger evals
+  (`scripts.run_eval`, should and should-not queries) and old-against-new runs. Run
+  `run_eval` with `--num-workers 1`, one scratch project per skill: parallel workers
+  share `.claude/commands/`, the model picks another worker's copy, and every query
+  reads as untriggered.
   `tests/unit/shipped-skills.test.ts` holds the list.
 
 ### Harmonizer
