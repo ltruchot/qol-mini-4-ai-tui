@@ -2,9 +2,9 @@
 
 ## Where we stopped
 
-Nothing in progress. `qol-mini@0.6.2` is published, 0.6.3 committed and not tagged, and installed on this machine
-(`./install.sh --replace`): the bank `vp` and `css-modern` carry no `paths`, kaizen reads
-AGENTS.md. This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
+Nothing in progress. `qol-mini@0.6.3` is published; 0.6.2 is installed on this machine
+(`./install.sh --replace`). Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md,
+`css-modern` loads 85 lines and triggers on styling requests that never say CSS (16/16). This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
 `vp run ready` green, 156 tests.
 
 The twelve repos of `.local/repos.json` carry the same setup and are harmonized: AGENTS.md is
@@ -14,8 +14,6 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
 
 ## Later
 
-- Publish 0.6.3 (css-modern split into references): `git tag v0.6.3 && git push origin v0.6.3`,
-  approve the run (`docs/release.md`)
 - From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of
   `.local/repos.json` (done? check `minimumReleaseAgeExclude` in qol-mini) → todo/vite-plus-fleet.md
 - `harmonize run` inside a repo misreads it: with no project it reports "no rules file" next to a

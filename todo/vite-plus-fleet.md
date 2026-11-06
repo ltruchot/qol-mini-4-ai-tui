@@ -7,7 +7,8 @@ The repos are listed in `.local/repos.json` (machine-local, ignored by git).
 Every repo of `.local/repos.json`: Vite+ 1.5.0, `vp env pin node@26.13.0 pnpm@12.16.1`,
 `pmOnFail: ignore`, `runtimeOnFail: ignore`, `minimumReleaseAge: 4320`, the managed `vp`
 skill of `qol-mini@0.6.2` (no `paths`), and a `vp-local` beside it where the repo has its own
-facts, without `paths` either. unary-js has no mise left.
+facts, without `paths` either. The nine repos with CSS also carry `css-modern`, its tokens
+file and prefix recorded in each lock. unary-js has no mise left.
 
 ## Left
 
