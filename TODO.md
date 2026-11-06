@@ -4,7 +4,8 @@
 
 Nothing in progress. `qol-mini@0.6.3` is published; 0.6.2 is installed on this machine
 (`./install.sh --replace`). Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md,
-`css-modern` loads 85 lines and triggers on styling requests that never say CSS (16/16). This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
+`css-modern` loads 85 lines and triggers on styling requests that never say CSS (16/16).
+This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
 `vp run ready` green, 156 tests.
 
 The twelve repos of `.local/repos.json` carry the same setup and are harmonized: AGENTS.md is
