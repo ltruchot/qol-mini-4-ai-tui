@@ -436,6 +436,9 @@ vp run -r build && vp run packcheck
 ```
 
 - `vp run ready` chains the gates. All of them pass before a change is done.
+- A push is done when its `test` run is green (`gh run watch <id> --exit-status`).
+  A job cancelled with `not acquired by Runner` is GitHub runner capacity, not
+  the change: `gh run rerun <id> --failed`.
 - `ready` calls `vp run check`, a task with `cache: false`: under the task cache
   `tsgolint` fails to spawn with `EBUSY`. Keep it uncached.
 - Sources and tests hold 50 lines per file. Skills, docs and this file do not.
