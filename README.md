@@ -4,8 +4,8 @@
 
 Kit for [Claude Code](https://code.claude.com) and
 [OpenCode](https://opencode.ai): hooks and a status line for every project,
-skills per project, one repo harmonized for both agents. One install wires both
-agents. One package, `qol-mini`.
+skills per project, one repo harmonized for both agents, one repo audited for
+both agents. One install wires both agents. One package, `qol-mini`.
 
 For several sessions at once: each one shows whether it is running, waiting on
 you, or idle.
@@ -18,6 +18,7 @@ you, or idle.
 | **Kaizen** | `/compact` refuses until you run `/kaizen`, a review of what this session got wrong |
 | **Skills, per project** | `qol-mini skills install qa-pr ./my-project` — placeholders filled, local edits merged on update |
 | **Harmonize, per repo** | `qol-mini harmonize /path/to/repo` — one repo, both agents: rules, permissions, commands, agents, MCP |
+| **Vitals, per repo** | `qol-mini vitals /path/to/repo` — read-only audit of the rules file and the skills, as each agent loads them; exit 1 when a probe fails |
 | **Opt out, per project** | `touch <project>/.claude/qol-mini-off` — [what it silences](#leave-one-project-alone) |
 
 | Supported | |
@@ -47,7 +48,7 @@ pnpm dlx qol-mini skills install qa-pr /path/to/my-project  #    or name them
 | 2 | `/path/to/my-project/.claude/skills/` and `.claude/qol-mini.lock.json` | commit both; start a new session in that project |
 
 A skill asks for its values once (`qa-pr`: the GitHub repo, the production URL).
-Shipped skills: `css-modern`, `datastar`, `npm-vulnerability-check`, `qa-pr`, `vp`, `kaizen`.
+Shipped skills: `agents-md-review`, `css-modern`, `datastar`, `npm-vulnerability-check`, `qa-pr`, `skills-review`, `vp`, `kaizen`.
 
 ## Install
 
@@ -205,6 +206,33 @@ qol-mini harmonize scan ~/workspace          # list repos, write nothing
 
 Details: [docs/harmonize.md](docs/harmonize.md).
 
+## Vitals
+
+One repo, audited for both agents. Reads, never writes.
+
+```bash
+qol-mini vitals /path/to/my-project              # every gate
+qol-mini vitals agents-md /path/to/my-project    # one gate
+qol-mini vitals skills /path/to/my-project
+qol-mini vitals /path/to/my-project --repo-only  # CI: skip the parent directories and home
+```
+
+| Gate | Probes | Checks | Review skill |
+|---|---|---|---|
+| `agents-md` | `AM01`–`AM21` | `AGENTS.md` is the rules file and no `CLAUDE.md` hides it; size budgets as each agent loads it; nested and parent instruction files; imports, paths and links resolve; structure and emphasis | `agents-md-review` |
+| `skills` | `SK01`–`SK15` | skills live where both agents load them; one copy per name; frontmatter both agents parse; description and body within length; links resolve | `skills-review` |
+
+| | |
+|---|---|
+| Exit status | 0 no repository probe failed · 1 one failed · 2 the repository cannot be read; with several gates, the highest |
+| Output | one line per probe, `[pass\|warn\|fail\|n/a] ID evidence: message`, a `fix:` line under a `warn` or a `fail`, a summary per gate |
+| Scopes | repository probes set the exit status; user-scope probes (parent directories, home) report only; `--repo-only` skips them |
+| Gate or path | a first word naming a gate picks it: `skills` is the gate, `./skills` the directory |
+| Review | `qol-mini skills install agents-md-review skills-review /path/to/my-project`; at most five `ADD`, `CUT`, `MOVE`, `REWORD` edits, advisory, applied on a yes |
+| Runtime | Rust probes built for `wasm32-wasip1`, run by the CLI: no binary per platform, no dependency |
+
+Details: [docs/vitals.md](docs/vitals.md).
+
 ## Context gauge
 
 Fills toward the **alert threshold**, not the window: on a 1M model, 200k is 20%
@@ -297,7 +325,7 @@ plugin's own entry is the one that holds back.
 
 ## Skills
 
-Shipped in the package: `css-modern`, `datastar`, `npm-vulnerability-check`, `qa-pr`, `vp`, `kaizen`.
+Shipped in the package: `agents-md-review`, `css-modern`, `datastar`, `npm-vulnerability-check`, `qa-pr`, `skills-review`, `vp`, `kaizen`.
 `qol-mini` below is `pnpm dlx qol-mini`, or `./scripts/qol-mini.sh` from a clone.
 
 ```bash
@@ -435,15 +463,20 @@ asks the same file the same questions: one opt-out covers both agents.
 ## Develop
 
 ```bash
+mise install      # Rust, the wasm32-wasip1 target, cargo-deny, cargo-llvm-cov
+cargo xtask setup # the coverage nightly
 vp install
-vp run ready      # format, lint, types, 50-line gate, tests, build, pack check
+vp run ready      # the Rust gates' chain, the WASI build, format, lint, types, 50-line gate, tests, build, pack check
 ```
+
+`cargo xtask check` needs a running docker daemon.
 
 | CI job (`.github/workflows/test.yml`) | Runs on | Checks |
 |---|---|---|
-| `ready` | Linux, macOS; Linux under Node 22.18.0 | the same gates as `vp run ready` |
+| `vitals` | Linux | `cargo xtask check`: format, clippy, tests, docs, cargo-deny, container tests, 90% branch coverage |
+| `ready` | Linux, macOS; Linux under Node 22.18.0 | the WASI build, then the TypeScript gates of `vp run ready` |
 | `test-windows` | Windows | `vp run -r test`; reported, not gating |
-| `install-cycle` | Linux, macOS, Windows | the built CLI on a real runner: install, update with `--replace`, a delivered hook run alone, a skill installed and checked, uninstall leaving `settings.json` empty |
+| `install-cycle` | Linux, macOS, Windows | the built CLI on a real runner: install, update with `--replace`, a delivered hook run alone, a skill installed and checked, `vitals skills` on that project, uninstall leaving `settings.json` empty |
 
 Release: [docs/release.md](docs/release.md).
 
@@ -453,12 +486,15 @@ Release: [docs/release.md](docs/release.md).
 |---|---|
 | WSL2 (terminal and Claude Code), Node 24 | the test suite; install, update, uninstall and skills install against throwaway directories, from a clone and from npm through `pnpm dlx` |
 | CI: Linux, macOS | the test suite |
-| CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
+| CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, `vitals skills` on that project, uninstall |
+| CI: Linux | the Rust gates' own chain: tests, container tests, branch coverage |
+| WSL2 | `qol-mini vitals` against the native binaries: same output and exit status on six trees, both gates, both scopes |
 | WSL2, VS Code, a live session | the tab marker, the sounds, `/compact` held back then released by `/kaizen` |
 | WSL2, the OpenCode service and TUI, live sessions | the install into `~/.config/opencode` with the user's `cli.json` intact, the plugin loaded by the service, `/kaizen` in the command list, the kaizen skill discovered from `~/.claude/skills`, a manual compaction released through the plugin's entry with the token honored, a tokenless `/compact` held back by the plugin's entry, one reminder per compaction after the fix, the tab marker painted red on a paused session and green through the resumed run, the refusal's modal and toast on a tokenless gated `/compact` |
 | WSL2, Node 24 | `harmonize --dry-run` on four real repos (this kit and three legacy-layout repos, one of them a monorepo) and `harmonize scan` over a 24-repo workspace |
 | WSL2, OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads in OpenCode: the `permissions` and `mcp.servers` in `debug config`, the agent and its allowlist in `debug agents`, the command in `GET /api/command` |
-| Nowhere yet | sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; a `harmonize` write followed by live sessions in both agents — the dry-runs and the suite are the proof so far |
+| CI: Windows | the `vitals` tests: both gates, the `agents-md` output equal to the native one |
+| Nowhere yet | a repository and a home directory on two Windows drives; the review skills run from an installed copy; sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; a `harmonize` write followed by live sessions in both agents — the dry-runs and the suite are the proof so far |
 
 ## Related
 

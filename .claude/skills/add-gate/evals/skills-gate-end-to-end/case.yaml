@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: skills-gate-end-to-end
+expected_outcome: |
+  A branch gate/skills off main with one commit per layer (ADR 0008 spec, shared code if any,
+  probes app, review skill, docs), in that order. ADR 0008 specifies the skills gate with a
+  sourced facts table (Claude Code docs, OpenCode V2 commit) covering where skills load from
+  for both agents. crates/skills-chkr follows the agents-md-chkr shape, reuses vitals-utils,
+  has unit, real-tree, and (where / or $HOME matter) container tests wired into xtask e2e,
+  and cargo xtask check passes. A skills-review skill exists. README, ADR 0005, AGENTS.md and
+  TODO.md are updated. Nothing is pushed; a PR body is ready.

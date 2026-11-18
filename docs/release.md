@@ -15,6 +15,7 @@ git tag v<version> && git push origin v<version>
 | the tagged commit is an ancestor of `origin/main` | a tag on a commit outside `main` publishes nothing; checked before anything installs |
 | setup with `cache: false` | a restored cache can hold what an untrusted run wrote; this job holds the right to publish |
 | tag must equal the version in `packages/qol-mini/package.json` | a tag cannot publish another version |
+| the Rust toolchain of `mise.toml`, `cargo xtask check`, `vp run wasm` | the gates shipped in `wasm/` are built from the tagged commit, after their own chain passed |
 | the gates of `ready` | nothing unchecked reaches npm |
 | `vp pm pack`, then `npm publish` of the tarball | pnpm resolves the `catalog:` versions when it packs; `npm publish` of the directory would ship them unresolved |
 | trusted publishing | no npm token stored in the repository; configure it once: `npm trust github qol-mini --file release.yml --repo ltruchot/qol-mini-4-ai-tui --env release --allow-publish` |

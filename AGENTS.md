@@ -7,8 +7,8 @@ A minimal kit for Claude Code and OpenCode, in one npm package, `qol-mini`,
 developed at `ltruchot/qol-mini-4-ai-tui`. Two scopes: **global** (hooks, status
 line, sounds, the kaizen review, in the Claude Code config dir; the OpenCode plugin,
 command and `cli.json` merge, in the OpenCode config dir) and **project**
-(skills, in `<project>/.claude`, read by both agents). It works on **Linux,
-macOS, WSL and Windows**, in **VS Code and Cursor**.
+(skills, in `<project>/.claude`, read by both agents; `harmonize` and `vitals`, on one
+repo). It works on **Linux, macOS, WSL and Windows**, in **VS Code and Cursor**.
 
 **Purpose, which settles the trade-offs**: a model that is not working is a model you
 could hand something to. Every signal answers *is it running* first: green is
@@ -45,6 +45,7 @@ Sources are under `packages/qol-mini/src/`.
 | Kaizen review | `kit/hooks/precompact-kaizen.ts`, `skills/kaizen/SKILL.md` | `/compact` stops until `/kaizen` has run; `/kaizen` first updates `TODO.md` (index) and `todo/` (one file per item needing context), then proposes at most three `ADD`/`CUT`/`MOVE`/`REWORD` items, one ASCII block each; after a compaction the agent is told to read `TODO.md` |
 | Skills per project | `commands/`, `core/`, `io/`, `packages/qol-mini/skills/` | `qol-mini skills install qa-pr ./my-project` renders a shipped skill into `.claude/skills/`, records it in `.claude/qol-mini.lock.json`, and merges local edits on update |
 | Harmonize per repo | `commands/harmonize-*.ts`, `harmonize/`, `core/harmonize/` | `qol-mini harmonize <project>` makes a repo run under both agents: AGENTS.md canonical, permissions, commands, agents and MCP converted each way, hooks and skills reported; `check` and `undo` run off the lock's `harmonize` section |
+| Vitals per repo | `commands/vitals-*.ts`, `vitals/`, `crates/` | `qol-mini vitals <project>` audits a repo for both agents, read-only: Rust probes on the rules file (`AM01`–`AM21`) and the skills (`SK01`–`SK15`), run as WebAssembly; the `agents-md-review` and `skills-review` bank skills judge what a probe cannot |
 | OpenCode target | `packages/qol-mini/opencode/`, `src/opencode/` | the same features in the OpenCode TUI: tab marker, `/compact` gate, post-compaction reminder, `/kaizen` command |
 
 | Command | Does |
@@ -54,6 +55,7 @@ Sources are under `packages/qol-mini/src/`.
 | `qol-mini vscode` | sets the editor (`kit/vscode.ts`) |
 | `qol-mini skills install\|update\|list\|check\|remove` | project scope, or `--global` |
 | `qol-mini harmonize <project>\|check\|undo\|scan` | repo scope, both agents: one command converts, `check` exits for CI, `undo` restores, `scan` lists repos under named roots |
+| `qol-mini vitals [agents-md\|skills] [project] [--repo-only]` | repo scope, both agents, read-only: every gate or the named one; exit 0, 1 a probe failed, 2 unreadable |
 
 `install.sh`, `uninstall.sh`, `install-vscode.sh`, `install-skills.sh` and their
 `.ps1` twins run the same commands from a clone, through `scripts/qol-mini.sh`.
@@ -359,6 +361,62 @@ A prompt that blocks a script or CI is a bug.
 - Scan walks named roots only, never `/` or the home directory, and a dir
   holding `.git` is scanned, not descended into.
 
+### Vitals
+
+- Every check is a gate: deterministic Rust probes set the exit status, an advisory
+  review skill in the bank judges content. Read `docs/adr/0008-a-gate-is-probes-plus-a-review-skill.md`
+  before adding a probe or a gate, `docs/adr/0005-vitals-audits-a-repository-for-coding-agents.md`
+  before proposing a feature. `docs/vitals.md` holds the probe tables.
+- Rust judges, TypeScript launches. No probe, parser or verdict is written in
+  TypeScript. Why: `docs/adr/0009-the-gates-ship-as-webassembly.md`.
+- The gates read and never write. The WASI host (`src/vitals/wasi/`) refuses an open
+  that would create or truncate and holds no write call for a file.
+- The host implements the preview1 calls the modules import, and no other. A new
+  import fails at instantiation: list them with `WebAssembly.Module.imports` and add
+  the call. `node:wasi` is not used: on Windows its `fd_readdir` is not implemented.
+- WASI has no working directory, no drive letter, no home directory. The host
+  preopens the root of the repository's drive as `/`, passes absolute guest paths
+  (`vitals/guest.ts`), and names the home directory through `HOME`, which
+  `vitals-utils` reads under `cfg(target_os = "wasi")`. A home directory on another
+  drive is not named: the user-scope probes run without it.
+- A probe's output never depends on listing order: `vitals-utils` sorts the walk.
+- The modules in `packages/qol-mini/wasm/` are built by `vp run wasm`, not by the test
+  setup: a cached `vp run` task filters the environment, `RUSTUP_TOOLCHAIN` included,
+  and cargo falls back to another toolchain. Run `vp run wasm` after a Rust change,
+  before `vp run -r test`.
+- A change to the host is checked against the native binaries: same stdout and exit
+  status on the same trees, both gates, with and without `--repo-only`. An OS error
+  differs by its number only (`os error 44` under WASI, `2` native).
+- User-scope probes read the parent directories and the home directory of the
+  machine: tests assert on `--repo-only` output, or on paths they built.
+- The gate's own messages name the binary (`agents-md-chkr: cannot read …`).
+
+### Rust
+
+- Sources: `crates/agents-md-chkr`, `crates/skills-chkr` (one binary per gate),
+  `crates/vitals-utils` (what two gates need), `crates/xtask` (automation). Lints,
+  versions and metadata are inherited from the root `Cargo.toml`. Details:
+  `docs/adr/0007-the-gates-are-strict-rust.md`.
+- `mise.toml` is the only place for Rust and cargo tool versions. No
+  `rust-toolchain.toml`, no `.tool-versions`, no `cargo install` step.
+- Side effects only in boundary modules, which open with
+  `#![expect(clippy::disallowed_methods, reason = "boundary: …")]`; the rest is pure.
+- An exemption is `#[expect(lint, reason = "…")]`, scoped narrowly, never `allow`.
+  `Cargo.toml` and `clippy.toml` are not relaxed to make a gate pass.
+- Test modules carry `#[cfg_attr(coverage_nightly, coverage(off))]`; integration test
+  files start with `#![cfg(test)]`.
+- Doc comments write CamelCase names in backticks (`` `OpenCode` ``): clippy
+  `doc_markdown` rejects them bare.
+- Before writing a function or adding a crate, search `crates/vitals-utils/` and the
+  crate's own modules. A helper a second gate needs moves to `vitals-utils`.
+- A new crate or a bump meets the admission criteria of ADR 0007 and is pinned
+  `=x.y.z` in `[workspace.dependencies]`. The 3-day cooldown in `.cargo/config.toml`
+  stays; stable toolchains are exempt, nightlies are date-pinned.
+- OpenCode behavior: the opencode.ai/docs pages describe V1. Read the V2 source
+  (`anomalyco/opencode`, `packages/core/src`) and cite the commit.
+- The pre-commit hook rejects email-like text on an added line, a test string with
+  `\n` then `@a.md` included: put a space or `- ` before the `@`, or split the literal.
+
 ### Windows
 
 - Hook paths are written with backslashes: `isOurs()` normalizes separators before
@@ -407,10 +465,13 @@ A prompt that blocks a script or CI is a bug.
 |---|---|
 | This machine: WSL2, Node 24 | the test suite; install, update, uninstall and skills install against throwaway directories, from a clone and from npm through `pnpm dlx`; the update of a real config that held `.py` handlers |
 | CI: Linux, macOS | the test suite |
-| CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, uninstall |
+| CI: Linux, macOS, Windows | install, update, a delivered hook run alone, a skill installed and checked, `vitals skills` on that project with and without `--repo-only`, uninstall |
+| CI: Linux | `cargo xtask check`: the Rust tests, the container tests, branch coverage |
+| This machine: WSL2 | `qol-mini vitals` against the native binaries: same stdout and exit status on six trees, both gates, both scopes |
 | This machine: WSL2, VS Code, a live session | the tab marker on screen, the sounds heard, `/compact` held back then released by `/kaizen`; the marker back in a project whose opt-out file names `kaizen` |
 | This machine: OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads: `opencode debug config` shows the `permissions` and `mcp.servers`, `debug agents` the agent with its allowlist, `GET /api/command` the command |
-| Never | `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL; a harmonized repo in a live session of either agent |
+| CI: Windows, `test-windows` | the `vitals` tests: the `agents-md` output equal to the native one byte for byte, both gates, the exit statuses, the user scope |
+| Never | a repository and a home directory on two Windows drives; either review skill run from an installed copy; `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL; a harmonized repo in a live session of either agent |
 
 The README states this. Do not claim more.
 
@@ -426,7 +487,10 @@ The README states this. Do not claim more.
 ## Testing
 
 ```bash
+mise install && cargo xtask setup   # once: Rust, its targets, the coverage nightly
 vp install                 # once
+cargo xtask check          # the Rust chain: fmt, clippy, test, doc, deny, e2e, 90% branch coverage
+vp run wasm                # the gates for WASI, into packages/qol-mini/wasm/
 vp check --fix             # format, lint, types
 vp run lines               # 50 lines per source and test file
 vp run -r test             # builds the bundles first
@@ -435,19 +499,25 @@ vp run -r build && vp run packcheck
 ./uninstall.sh             # removes what was installed, nothing else
 ```
 
-- `vp run ready` chains the gates. All of them pass before a change is done.
+- `vp run ready` chains the gates, `cargo xtask check` and `vp run wasm` first. All of
+  them pass before a change is done. `cargo xtask check` needs a running docker daemon;
+  `cargo xtask e2e` and `cargo xtask cov` run its two slow parts alone.
+- `cargo agents-md-chkr [--repo-only] [PATH]` and `cargo skills-chkr` run a gate
+  natively, without the CLI.
 - A push is done when its `test` run is green (`gh run watch <id> --exit-status`).
   A job cancelled with `not acquired by Runner` is GitHub runner capacity, not
   the change: `gh run rerun <id> --failed`.
 - `ready` calls `vp run check`, a task with `cache: false`: under the task cache
   `tsgolint` fails to spawn with `EBUSY`. Keep it uncached.
-- Sources and tests hold 50 lines per file. Skills, docs and this file do not.
+- TypeScript sources and tests hold 50 lines per file. Skills, docs and this file do
+  not. Rust holds 40 lines per function (`clippy.toml`).
 - Lint runs every oxlint category as an error. An exception is one line in
   `lint/off-*.ts`, with its reason.
 - The root `package.json` names pnpm twice: `packageManager` is what Vite+ reads
   to pick the version, `devEngines` is what makes `npm` refuse the root. Without
   `packageManager`, `vp install` runs an older pnpm that rejects the lockfile.
-- No dependency at runtime: everything is bundled. A new dev dependency gets an
+- No dependency at runtime: everything is bundled, and the gates ship as two `.wasm`
+  files that packcheck requires in the tarball. A new dev dependency gets an
   exact pin in the `pnpm-workspace.yaml` catalog.
 - Hooks are tested as real processes with the event JSON on stdin; the installer
   and the skills commands run in-process against `CLAUDE_CONFIG_DIR` and
@@ -472,6 +542,9 @@ A tag `v<version>` matching `packages/qol-mini/package.json` publishes to npm fr
   fields fail on the id, it goes as a JSON integer array.
 - Actions are pinned by commit SHA and npm by version: the job holds the right
   to publish.
+- The job installs the Rust toolchain of `mise.toml`, runs `cargo xtask check` and
+  builds the WASI modules from the tagged commit: a tarball never ships modules built
+  elsewhere.
 - The job restores no cache (`cache: false`), keeps no git token
   (`persist-credentials: false`), and fails unless the tagged commit is an
   ancestor of `origin/main`, checked before anything installs.
