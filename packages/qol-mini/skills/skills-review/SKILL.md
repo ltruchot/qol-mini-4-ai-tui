@@ -1,11 +1,11 @@
 ---
 name: skills-review
-description: Review a repository's agent skills (SKILL.md files in .claude/skills, .agents/skills, .opencode/skills) for Claude Code and OpenCode — run the skills-chkr deterministic probes, then judge each skill's description, body, scripts, and fit against a rubric and propose at most five advisory ADD, CUT, MOVE, or REWORD edits, one block at a time. Use when asked to audit, review, or improve skills or slash commands, when a skill does not trigger or triggers too often, or after the skills gate reports findings.
+description: Review a repository's agent skills (SKILL.md files in .claude/skills, .agents/skills, .opencode/skills) for Claude Code and OpenCode — run the deterministic probes of `qol-mini vitals skills`, then judge each skill's description, body, scripts, and fit against a rubric and propose at most five advisory ADD, CUT, MOVE, or REWORD edits, one block at a time. Use when asked to audit, review, or improve skills or slash commands, when a skill does not trigger or triggers too often, or after the skills gate reports findings.
 ---
 
 # Skills review
 
-The non-deterministic half of the `skills` gate (ADR 4). The probes decide what a pure
+The non-deterministic half of the `skills` gate ([the gate model](https://github.com/ltruchot/qol-mini-4-ai-tui/blob/main/docs/adr/0008-a-gate-is-probes-plus-a-review-skill.md)). The probes decide what a pure
 function can: where each skill lives, which agent loads it, its frontmatter, sizes, and
 links. This review judges what only reading can: whether a description triggers, whether
 two skills overlap, whether a script is safe, whether the body is worth its context.
@@ -14,8 +14,7 @@ Findings are **advisory**: they never change the gate's exit code or score.
 ## 1. Run the probes first
 
 ```sh
-skills-chkr <repo>          # installed binary
-cargo skills-chkr <repo>    # from a code-harness-vitals clone
+npx qol-mini vitals skills <repo>         # or: pnpm dlx qol-mini vitals skills <repo>
 ```
 
 Run it without `--repo-only`: the user-scope probes (`SK14`, `SK15`) find skill roots above
@@ -103,7 +102,7 @@ TRIGGER: "cut a release" now matches the description in both agents.
 
 ## 5. Apply only what is accepted
 
-Edit nothing without a yes. After the accepted edits, re-run `skills-chkr`: a description
+Edit nothing without a yes. After the accepted edits, re-run the probes: a description
 that grew past 1,024 chars, a new unquoted `: `, or a link to a file that was not created
 shows up there.
 

@@ -1,4 +1,4 @@
-//! The `skills` gate (ADR 4): deterministic probes on a repository's `SKILL.md` files.
+//! The `skills` gate (ADR 0008): deterministic probes on a repository's `SKILL.md` files.
 //!
 //! - [`audit`] reads the repository once (the `snapshot` boundary), then runs every probe as
 //!   a pure function of that snapshot: where skills live and which agent loads them

@@ -1,11 +1,11 @@
 ---
 name: agents-md-review
-description: Review a repository's AGENTS.md (or CLAUDE.md) and the whole cascade of nested and parent instruction files for Claude Code and OpenCode — run the agents-md-chkr deterministic probes, then judge the content against a rubric and propose at most five advisory ADD, CUT, MOVE, or REWORD edits, one block at a time. Use when asked to audit, review, grade, or improve AGENTS.md, CLAUDE.md, or a repo's agent instructions, or after the agents-md gate reports findings.
+description: Review a repository's AGENTS.md (or CLAUDE.md) and the whole cascade of nested and parent instruction files for Claude Code and OpenCode — run the deterministic probes of `qol-mini vitals agents-md`, then judge the content against a rubric and propose at most five advisory ADD, CUT, MOVE, or REWORD edits, one block at a time. Use when asked to audit, review, grade, or improve AGENTS.md, CLAUDE.md, or a repo's agent instructions, or after the agents-md gate reports findings.
 ---
 
 # AGENTS.md review
 
-The non-deterministic half of the `agents-md` gate (ADR 4). The probes decide what a
+The non-deterministic half of the `agents-md` gate ([the gate model](https://github.com/ltruchot/qol-mini-4-ai-tui/blob/main/docs/adr/0008-a-gate-is-probes-plus-a-review-skill.md)). The probes decide what a
 pure function can; this review judges what only reading can: what is missing, what
 belongs elsewhere, what is noise. Findings are **advisory**: they never change the
 gate's exit code or score.
@@ -13,8 +13,7 @@ gate's exit code or score.
 ## 1. Run the probes first
 
 ```sh
-agents-md-chkr <repo>          # installed binary
-cargo agents-md-chkr <repo>    # from a code-harness-vitals clone
+npx qol-mini vitals agents-md <repo>         # or: pnpm dlx qol-mini vitals agents-md <repo>
 ```
 
 Run it without `--repo-only`: the user-scope probes (`AM14`, `AM15`, `AM21`) find
@@ -126,9 +125,9 @@ TRIGGER: a session that releases loads the skill; every other session saves
 
 ## 5. Apply only what is accepted
 
-Edit nothing without a yes. After the accepted edits, re-run `agents-md-chkr`: a line
+Edit nothing without a yes. After the accepted edits, re-run the probes: a line
 or char budget crossed by an `ADD` means that something has to be cut in the same
 change.
 
 Rubric sources: [references/sources.md](references/sources.md). `A1`–`A15` are the sourced
-facts in ADR 4, "Sourced facts (content)".
+facts in [the gate model](https://github.com/ltruchot/qol-mini-4-ai-tui/blob/main/docs/adr/0008-a-gate-is-probes-plus-a-review-skill.md), "Sourced facts (content)".

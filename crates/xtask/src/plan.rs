@@ -1,7 +1,7 @@
 //! Pure task planning: which commands each task runs, in order. Nothing here spawns a process.
 
 /// Nightly toolchain used only for branch coverage (`--branch` is nightly-only).
-/// Pinned to a dated build: nightlies skip the beta and pre-release soak (ADR 3).
+/// Pinned to a dated build: nightlies skip the beta and pre-release soak (ADR 0007).
 pub(crate) const NIGHTLY: &str = "nightly-2026-11-09";
 
 /// Target of the static binary that the container end-to-end tests run on an empty root.

@@ -1,4 +1,4 @@
-# Every tool version for this repository lives here (ADR 3). Install with: mise install
+# Every tool version for this repository lives here (ADR 0007). Install with: mise install
 [tools]
 rust = { version = "1.100.0", profile = "minimal", components = "clippy,rustfmt", targets = "x86_64-unknown-linux-musl,wasm32-wasip1" }
 cargo-deny = "0.20.2"

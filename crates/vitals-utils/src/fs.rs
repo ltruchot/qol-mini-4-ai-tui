@@ -179,12 +179,16 @@ pub fn tree_files(dir: &Path) -> Result<Vec<PathBuf>, Error> {
     walk(dir, WalkBuilder::new(dir).standard_filters(false))
 }
 
+/// Sorted: a directory lists its entries in an order that depends on the filesystem and
+/// on the platform, and a gate's output must not.
 fn walk(root: &Path, builder: &mut WalkBuilder) -> Result<Vec<PathBuf>, Error> {
-    builder
+    let mut files = builder
         .filter_entry(|entry| !skipped(entry.path()))
         .build()
         .filter_map(|entry| relative_file(root, entry).transpose())
-        .collect()
+        .collect::<Result<Vec<_>, _>>()?;
+    files.sort();
+    Ok(files)
 }
 
 fn skipped(path: &Path) -> bool {

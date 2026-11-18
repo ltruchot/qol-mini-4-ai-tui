@@ -37,7 +37,7 @@ pub const ON_DEMAND_CHARS: Budget = Budget::hard(40_000);
 /// Size budget of a subdirectory `AGENTS.md`, in chars: warn above 70,000.
 ///
 /// Claude Code attaches a subdirectory `AGENTS.md` to the Read result through a hook. In
-/// runs of Claude Code 2.1.325 (ADR 4, "Empirical checks"), one of 69,996 chars arrived
+/// runs of Claude Code 2.1.325 (ADR 0008, "Empirical checks"), one of 69,996 chars arrived
 /// whole and one of 99,948 only as a preview; the docs give no limit, so this warns.
 pub const ATTACHED_CHARS: Budget = Budget::soft(70_000);
 

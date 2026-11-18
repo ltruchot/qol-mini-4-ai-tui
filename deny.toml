@@ -1,4 +1,4 @@
-# Supply-chain gate, run by `cargo xtask check`. See ADR 3 for the crate admission criteria.
+# Supply-chain gate, run by `cargo xtask check`. See ADR 0007 for the crate admission criteria.
 
 [graph]
 all-features = true

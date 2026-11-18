@@ -1,4 +1,4 @@
-//! Building blocks shared by every qol-mini vitals gate (ADR 4).
+//! Building blocks shared by every qol-mini vitals gate (ADR 0008).
 //!
 //! Only code that two or more gates need lives here. Everything is pure except [`fs`],
 //! the filesystem boundary.

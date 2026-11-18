@@ -1,7 +1,7 @@
 //! The YAML frontmatter of a Markdown file (`SKILL.md`, a `.claude/rules` file), read by a
 //! line scanner: pure, no I/O.
 //!
-//! This is not a YAML parser (ADR 4, "The skills gate"). It finds the top-level keys of the
+//! This is not a YAML parser (ADR 0008, "The skills gate"). It finds the top-level keys of the
 //! block between the opening `---` (first line) and the closing `---`, reads each key's
 //! scalar value (plain, quoted, or block) or sequence of scalars, and flags the plain-value
 //! mistakes that YAML rejects: a `: ` on any line of the value, and a value that opens with

@@ -1,4 +1,4 @@
-//! The `agents-md` gate (ADR 4): deterministic probes on a repository's rules file.
+//! The `agents-md` gate (ADR 0008): deterministic probes on a repository's rules file.
 //!
 //! - [`audit`] reads the repository once (the `snapshot` boundary), then runs every probe as
 //!   a pure function of that snapshot: the root files (`AM01`–`AM08`), the nested cascade

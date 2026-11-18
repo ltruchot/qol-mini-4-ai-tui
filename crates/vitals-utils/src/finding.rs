@@ -9,11 +9,11 @@ use std::process::ExitCode;
 pub enum Verdict {
     /// The probe does not apply to this repository.
     NotApplicable,
-    /// The harness meets the probe.
+    /// The repository meets the probe.
     Pass,
-    /// The harness falls short of the probe; the gate still passes.
+    /// The repository falls short of the probe; the gate still passes.
     Warn,
-    /// The harness breaks the probe; the gate fails.
+    /// The repository breaks the probe; the gate fails.
     Fail,
 }
 
@@ -28,7 +28,7 @@ impl fmt::Display for Verdict {
     }
 }
 
-/// Where a finding's evidence lives (ADR 1, "Two scopes").
+/// Where a finding's evidence lives (ADR 0005, "Two scopes").
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Scope {
     /// Inside the repository: reproducible, and the only scope that sets the exit status.
@@ -39,7 +39,7 @@ pub enum Scope {
     User,
 }
 
-/// How far a gate run looks (ADR 1, "Two scopes").
+/// How far a gate run looks (ADR 0005, "Two scopes").
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Reach {
     /// The repository and the user scope: every parent directory up to the filesystem
@@ -187,7 +187,7 @@ impl fmt::Display for Finding {
     }
 }
 
-/// How a gate binary exits (ADR 4).
+/// How a gate binary exits (ADR 0008).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Outcome {
     /// No probe failed: exit status 0.

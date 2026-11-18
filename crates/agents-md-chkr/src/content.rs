@@ -1,4 +1,4 @@
-//! Probes `AM16`–`AM19`: what the instruction files say, by syntax alone (ADR 4, "Content
+//! Probes `AM16`–`AM19`: what the instruction files say, by syntax alone (ADR 0008, "Content
 //! probes"). Pure functions of a [`Snapshot`].
 //!
 //! They judge every file an agent reads as instructions: the root rules file, the nested
@@ -746,7 +746,7 @@ mod tests {
     #[test]
     fn references_judge_repository_paths_and_relative_links() {
         let text = "See `docs/guide.md`, `docs/gone.md`, `docs/`, `/etc/fstab`, `ansible/site.yml`,\n\
-                    `src/*.rs`, `a b/c`, `apps/<gate>-chkr/`, `~/x/y`, `../up/x`.\n\
+                    `src/*.rs`, `a b/c`, `crates/<gate>-chkr/`, `~/x/y`, `../up/x`.\n\
                     [guide](docs/guide.md) [lost](docs/lost.md) [web](https://x.y/z)\n";
         let snapshot = Snapshot {
             files: paths(&["docs/guide.md", "src/main.rs", "pkg/web/notes.md"]),

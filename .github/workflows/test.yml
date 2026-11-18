@@ -68,6 +68,7 @@ jobs:
       # Rust and the wasm32-wasip1 target, pinned in mise.toml: the gates are built here
       - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - run: vp install --frozen-lockfile
+      - run: vp run wasm
       - run: vp run -r test
   install-cycle:
     strategy:

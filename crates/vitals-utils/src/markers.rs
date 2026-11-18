@@ -1,4 +1,4 @@
-//! Paths that Claude Code and `OpenCode` read, shared across gates (ADR 1, ADR 4).
+//! Paths that Claude Code and `OpenCode` read, shared across gates (ADR 0005, ADR 0008).
 
 use std::path::PathBuf;
 
@@ -6,7 +6,7 @@ use std::path::PathBuf;
 pub const AGENTS_MD: &str = "AGENTS.md";
 
 /// Directories that hold project skills, one subdirectory per skill. Claude Code reads only
-/// the first; `OpenCode` 2 reads all four (ADR 4, "The skills gate").
+/// the first; `OpenCode` 2 reads all four (ADR 0008, "The skills gate").
 pub const SKILL_ROOTS: [&str; 4] = [
     ".claude/skills",
     ".opencode/skills",
