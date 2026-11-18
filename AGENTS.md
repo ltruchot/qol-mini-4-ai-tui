@@ -302,6 +302,9 @@ A prompt that blocks a script or CI is a bug.
   configs and never writes one: the README holds the prompt that does.
 - The bank's `SKILL.md` frontmatter holds only the fields of the skills reference; a
   field outside the table is ignored by Claude Code with no error.
+- A `SKILL.md` never holds an exclamation mark before a backquoted command, in
+  prose or in a table: Claude Code runs it when the skill loads, and the skill
+  fails with `Shell command permission check failed`. Name the syntax in words.
 - `paths` hides a skill: absent from the listing, `Unknown skill` on invoke, until a
   matching file inside the working directory is read. A skill needed before a command
   runs, not before a file is read, carries no `paths`.
@@ -457,7 +460,8 @@ A prompt that blocks a script or CI is a bug.
 | This machine: WSL2, VS Code, a live session | the tab marker on screen, the sounds heard, `/compact` held back then released by `/kaizen`; the marker back in a project whose opt-out file names `kaizen` |
 | This machine: OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads: `opencode debug config` shows the `permissions` and `mcp.servers`, `debug agents` the agent with its allowlist, `GET /api/command` the command |
 | CI: Windows, `test-windows` | the `vitals` tests: the `agents-md` output equal to the native one byte for byte, both gates, the exit statuses, the user scope |
-| Never | a repository and a home directory on two Windows drives; either review skill run from an installed copy; `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL; a harmonized repo in a live session of either agent |
+| This machine: WSL2, Claude Code, `claude -p` in a scratch project | each review skill from an installed copy: it loads, runs `npx qol-mini vitals <gate>` and returns its first block; the OpenCode side is not run |
+| Never | a repository and a home directory on two Windows drives; `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL; a harmonized repo in a live session of either agent |
 
 The README states this. Do not claim more.
 

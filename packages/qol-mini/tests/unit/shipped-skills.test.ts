@@ -35,3 +35,10 @@ test.each(bank)("$name: SKILL.md stays short and names every other file", ({ fil
   const others = [...files.keys()].filter((rel) => rel !== SKILL_FILE && rel !== MANIFEST_FILE);
   expect(others.filter((rel) => !skillMd.includes(rel))).toStrictEqual([]);
 });
+
+// Claude Code runs an exclamation mark before a backquoted command when the skill
+// loads, in prose and in a table too: a skill that only cites the syntax fails to load
+test.each(bank)("$name: SKILL.md runs no command at load", ({ files }) => {
+  const skillMd = files.get(SKILL_FILE)?.bytes.toString("utf8") ?? "";
+  expect(skillMd).not.toContain("!`");
+});

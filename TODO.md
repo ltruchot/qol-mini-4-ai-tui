@@ -2,21 +2,17 @@
 
 ## Where we stopped
 
-Branch `feat/vitals`, pushed, not merged: the gates of `code-harness-vitals` (commit
-`9f7085d`) live in `crates/`, `qol-mini vitals` runs them as WebAssembly on the CLI's own
-WASI host, the review skills are in the bank, ADR 0005 to 0009 hold the decisions. Its
-`test` run is green (`test-windows` red and not gating, as on `main`: none of its
-failures is a `vitals` test). `vp run ready` passes locally as one command, and the packed
-tarball runs `vitals` through `npx --package` and `pnpm dlx`. Not done: the trigger evals of the two bank
-skills, a review skill run from an installed copy, the release job with the Rust chain.
-Next: merge into `main`, then the list in the file below.
+`qol-mini@0.7.1` is published from `main`: `qol-mini vitals` runs the gates of
+`code-harness-vitals` as WebAssembly, the two review skills are in the bank (trigger
+evals 16/16 each) and each ran once from an installed copy under `claude -p`.
+0.7.0 ships a `skills-review` that fails to load; 0.7.1 fixes it. Nothing in progress.
+Left from the merge: archive the old repository, on a yes.
 Context: todo/vitals-merge.md
 
-`qol-mini@0.6.3` is published; 0.6.2 is installed on this machine
-(`./install.sh --replace`). Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md,
-`css-modern` loads 85 lines and triggers on styling requests that never say CSS (16/16).
+0.6.2 is what `./install.sh --replace` delivered on this machine; the global files did
+not change since. Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md.
 This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
-171 tests on `feat/vitals`. `mise.toml` at the root is trusted on this machine (`mise trust`).
+179 tests. `mise.toml` at the root is trusted on this machine (`mise trust`).
 
 The twelve repos of `.local/repos.json` carry the same setup and are harmonized: AGENTS.md is
 the rules file (the harness keeps `CLAUDE.md` as a symlink to it), committed and pushed where
@@ -35,6 +31,8 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
 - Vitals, `skills`: SkillSpector or agnix when installed (amends ADR 0008);
   `.claude/commands/` files, `opencode.json` `skills` entries, `--add-dir`, enterprise and
   plugin skills, `XDG_CONFIG_HOME`; the order between OpenCode's sources for one id
+- Vitals, `skills`: a probe for a command-injection line in a `SKILL.md` that only cites
+  the syntax (the skill fails to load)
 - Vitals on Windows: a home directory on another drive than the repository is
   unmeasured
 - From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of

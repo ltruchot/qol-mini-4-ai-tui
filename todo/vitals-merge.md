@@ -9,13 +9,10 @@ green: the Rust chain, the TypeScript gates on Linux, macOS and the Node floor, 
 `vitals` tests pass; the thirteen failures there are the POSIX assumptions that job
 already reports.
 
-## Left, in order
+## Left
 
-1. Run each review skill once from an installed copy
-   (`qol-mini skills install agents-md-review skills-review <repo>`): never done. The
-   skills call `npx qol-mini vitals`, which needs 0.7.0 on npm.
-2. In `code-harness-vitals`, a README that points to `qol-mini vitals`, then
-   `gh repo archive ltruchot/code-harness-vitals`. Both need a yes at that moment.
+In `code-harness-vitals`, a README that points to `qol-mini vitals`, then
+`gh repo archive ltruchot/code-harness-vitals`. Both need a yes at that moment.
 
 ## Known
 

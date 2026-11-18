@@ -32,7 +32,8 @@ read. User-scope findings never change it.
 ## 2. Read everything that is loaded
 
 Read every `SKILL.md` that `SK13` lists, in full, then every file it links to or tells the
-agent to run (`references/`, `scripts/`, `` !`command` `` lines). Read the paths `SK14` and
+agent to run (`references/`, `scripts/`, command-injection lines: an exclamation mark before a
+backquoted command). Read the paths `SK14` and
 `SK15` report outside the repository only after asking. Read `AGENTS.md` (and any
 `CLAUDE.md`) to know what every session already gets, and skim the manifest, scripts, and
 CI to check the commands and paths the skills name.
@@ -54,7 +55,7 @@ criterion that does not apply here is not missing.
 | 7 | Standing instructions | phrases guidance to hold for the whole task ("run the tests after every edit"), not as one-time steps |
 | 8 | Hooks for invariants | leaves a rule that must hold every time to a hook, not to prose |
 | 9 | Safe scripts | runs nothing that injects instructions, sends repository content or secrets over the network, downloads and executes code (`curl … \| sh`, decode-and-exec), or deletes without confirmation; `allowed-tools` grants no blanket `Bash` |
-| 10 | Works in both agents | puts behavior both agents need in fields both read (`name`, `description`, `disable-model-invocation`); a body that relies on Claude Code-only fields (`context: fork`, `paths`, `allowed-tools`, `hooks`, `` !`command` ``) still works when they are ignored |
+| 10 | Works in both agents | puts behavior both agents need in fields both read (`name`, `description`, `disable-model-invocation`); a body that relies on Claude Code-only fields (`context: fork`, `paths`, `allowed-tools`, `hooks`, command injection) still works when they are ignored |
 | 11 | Belongs in a skill | is not a rule every session needs (that belongs in `AGENTS.md`) and not a one-line command |
 | 12 | Up to date | names commands, paths, and tools that exist in this repository |
 
