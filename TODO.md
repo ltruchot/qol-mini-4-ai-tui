@@ -6,8 +6,8 @@ Branch `feat/vitals`, pushed, not merged: the gates of `code-harness-vitals` (co
 `9f7085d`) live in `crates/`, `qol-mini vitals` runs them as WebAssembly on the CLI's own
 WASI host, the review skills are in the bank, ADR 0005 to 0009 hold the decisions. Its
 `test` run is green (`test-windows` red and not gating, as on `main`: none of its
-failures is a `vitals` test). `cargo xtask check` and the TypeScript gates pass locally;
-`vp run ready` as one command was not run. Not done: the trigger evals of the two bank
+failures is a `vitals` test). `vp run ready` passes locally as one command, and the packed
+tarball runs `vitals` through `npx --package` and `pnpm dlx`. Not done: the trigger evals of the two bank
 skills, a review skill run from an installed copy, the release job with the Rust chain.
 Next: merge into `main`, then the list in the file below.
 Context: todo/vitals-merge.md

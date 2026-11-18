@@ -21,6 +21,8 @@ export default defineConfig({
     tasks: {
       // Uncached: under the task cache tsgolint fails to spawn with EBUSY
       check: { command: "vp check", cache: false },
+      // The Rust chain. Uncached for the same reason: cargo-deny fails to spawn
+      rust: { command: "cargo xtask check", cache: false },
       // Style law: every source and test file under 50 lines
       lines: { command: "node scripts/lines.ts", cache: false },
       // The gates, built for WASI and copied into the package

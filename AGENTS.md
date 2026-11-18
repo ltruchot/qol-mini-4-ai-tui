@@ -497,8 +497,8 @@ vp run -r build && vp run packcheck
   nothing until the run ends. Read it with `gh api
   repos/ltruchot/qol-mini-4-ai-tui/actions/jobs/<job>/logs --allow-escape-sequences`;
   the job id comes from `gh run view <id> --json jobs`.
-- `ready` calls `vp run check`, a task with `cache: false`: under the task cache
-  `tsgolint` fails to spawn with `EBUSY`. Keep it uncached.
+- `ready` calls `vp run check` and `vp run rust`, tasks with `cache: false`: under the
+  task cache `tsgolint` and `cargo-deny` fail to spawn with `EBUSY`. Keep them uncached.
 - TypeScript sources and tests hold 50 lines per file. Skills, docs and this file do
   not. Rust holds 40 lines per function (`clippy.toml`).
 - Lint runs every oxlint category as an error. An exception is one line in
