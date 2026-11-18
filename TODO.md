@@ -5,14 +5,18 @@
 Branch `feat/vitals`, pushed, not merged: the gates of `code-harness-vitals` (commit
 `9f7085d`) live in `crates/`, `qol-mini vitals` runs them as WebAssembly on the CLI's own
 WASI host, the review skills are in the bank, ADR 0005 to 0009 hold the decisions. Its
-`test` run is green on Linux, macOS and Windows. Next: merge, bump to `0.7.0`, tag →
-todo/vitals-merge.md
+`test` run is green (`test-windows` red and not gating, as on `main`: none of its
+failures is a `vitals` test). `cargo xtask check` and the TypeScript gates pass locally;
+`vp run ready` as one command was not run. Not done: the trigger evals of the two bank
+skills, a review skill run from an installed copy, the release job with the Rust chain.
+Next: merge into `main`, then the list in the file below.
+Context: todo/vitals-merge.md
 
 `qol-mini@0.6.3` is published; 0.6.2 is installed on this machine
 (`./install.sh --replace`). Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md,
 `css-modern` loads 85 lines and triggers on styling requests that never say CSS (16/16).
 This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
-`vp run ready` green, 156 tests.
+171 tests on `feat/vitals`. `mise.toml` at the root is trusted on this machine (`mise trust`).
 
 The twelve repos of `.local/repos.json` carry the same setup and are harmonized: AGENTS.md is
 the rules file (the harness keeps `CLAUDE.md` as a symlink to it), committed and pushed where
@@ -21,9 +25,6 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
 
 ## Later
 
-- Vitals, after the merge: the trigger evals of `agents-md-review` and `skills-review`
-  (`skill-creator`, `--num-workers 1`), the old repository archived with a pointer →
-  todo/vitals-merge.md
 - Vitals: JSON and SARIF output for every gate (`vitals-utils::Report`); a scoring
   engine, 0–10 per gate with risk weights and per-pillar levels (ADR 0005 open question)
 - Vitals, next gate: `codebase-memory` (pillar 3), per the ADR 0008 catalog; use the
@@ -36,7 +37,6 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
   plugin skills, `XDG_CONFIG_HOME`; the order between OpenCode's sources for one id
 - Vitals on Windows: a home directory on another drive than the repository is
   unmeasured
-
 - From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of
   `.local/repos.json` (done? check `minimumReleaseAgeExclude` in qol-mini) → todo/vite-plus-fleet.md
 - `harmonize run` inside a repo misreads it: with no project it reports "no rules file" next to a

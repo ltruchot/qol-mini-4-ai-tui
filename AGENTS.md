@@ -393,25 +393,8 @@ A prompt that blocks a script or CI is a bug.
 
 ### Rust
 
-- Sources: `crates/agents-md-chkr`, `crates/skills-chkr` (one binary per gate),
-  `crates/vitals-utils` (what two gates need), `crates/xtask` (automation). Lints,
-  versions and metadata are inherited from the root `Cargo.toml`. Details:
-  `docs/adr/0007-the-gates-are-strict-rust.md`.
-- `mise.toml` is the only place for Rust and cargo tool versions. No
-  `rust-toolchain.toml`, no `.tool-versions`, no `cargo install` step.
-- Side effects only in boundary modules, which open with
-  `#![expect(clippy::disallowed_methods, reason = "boundary: …")]`; the rest is pure.
-- An exemption is `#[expect(lint, reason = "…")]`, scoped narrowly, never `allow`.
-  `Cargo.toml` and `clippy.toml` are not relaxed to make a gate pass.
-- Test modules carry `#[cfg_attr(coverage_nightly, coverage(off))]`; integration test
-  files start with `#![cfg(test)]`.
-- Doc comments write CamelCase names in backticks (`` `OpenCode` ``): clippy
-  `doc_markdown` rejects them bare.
-- Before writing a function or adding a crate, search `crates/vitals-utils/` and the
-  crate's own modules. A helper a second gate needs moves to `vitals-utils`.
-- A new crate or a bump meets the admission criteria of ADR 0007 and is pinned
-  `=x.y.z` in `[workspace.dependencies]`. The 3-day cooldown in `.cargo/config.toml`
-  stays; stable toolchains are exempt, nightlies are date-pinned.
+- The rules for the Rust sources are in `crates/AGENTS.md`, loaded when a file
+  under `crates/` is read.
 - OpenCode behavior: the opencode.ai/docs pages describe V1. Read the V2 source
   (`anomalyco/opencode`, `packages/core/src`) and cite the commit.
 - The pre-commit hook rejects email-like text on an added line, a test string with
@@ -453,6 +436,9 @@ A prompt that blocks a script or CI is a bug.
 - The shell is zsh: quote a word that starts with `=` and any glob passed as an
   argument, and wrap a command in a function, not in a variable: `$CMD args` is
   one word there. Never name a variable `path`: zsh ties it to `$PATH`.
+- `node`, `python3` and `cargo` are mise shims: in a copy of the repo (a
+  worktree, an export) they fail with `mise.toml are not trusted`. Set
+  `MISE_TRUSTED_CONFIG_PATHS=<copy>` on the command; `mise trust` is for a clone.
 - To interrupt a running tool, accept its permission prompt first: Esc on the dialog
   is a rejection and the tool never runs.
 - Verify a negative result before concluding.
@@ -507,6 +493,10 @@ vp run -r build && vp run packcheck
 - A push is done when its `test` run is green (`gh run watch <id> --exit-status`).
   A job cancelled with `not acquired by Runner` is GitHub runner capacity, not
   the change: `gh run rerun <id> --failed`.
+- A job that failed while the run still goes: `gh run view --log-failed` prints
+  nothing until the run ends. Read it with `gh api
+  repos/ltruchot/qol-mini-4-ai-tui/actions/jobs/<job>/logs --allow-escape-sequences`;
+  the job id comes from `gh run view <id> --json jobs`.
 - `ready` calls `vp run check`, a task with `cache: false`: under the task cache
   `tsgolint` fails to spawn with `EBUSY`. Keep it uncached.
 - TypeScript sources and tests hold 50 lines per file. Skills, docs and this file do
