@@ -1,5 +1,5 @@
-# The gates on Linux and macOS, and on Linux under the Node floor of `engines`;
-# the test suite on Windows; the install/uninstall cycle on all three. This is
+# The Rust gates' own chain on Linux; the kit's gates on Linux and macOS, and on
+# Linux under the Node floor of `engines`; the test suite on Windows; the install/uninstall cycle on all three. This is
 # the only place the macOS and Windows paths run. Audio and the editor are not
 # exercised: nothing plays a sound on a runner.
 name: test
@@ -10,6 +10,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 jobs:
+  # Format, lints, tests, docs, cargo-deny, container tests, branch coverage
+  vitals:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      - run: cargo xtask setup # the coverage nightly
+      - run: cargo xtask check
   ready:
     strategy:
       fail-fast: false
@@ -28,10 +40,13 @@ jobs:
         with:
           cache: true
           node-version: ${{ matrix.node }}
+      # Rust and the wasm32-wasip1 target, pinned in mise.toml: the gates are built here
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - name: "node is the requested version"
         if: matrix.node != ''
         run: test "$(node --version)" = "v${{ matrix.node }}"
       - run: vp install --frozen-lockfile
+      - run: vp run wasm
       - run: vp check
       - run: vp run lines
       - run: vp run -r test
@@ -50,6 +65,8 @@ jobs:
       - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
           cache: true
+      # Rust and the wasm32-wasip1 target, pinned in mise.toml: the gates are built here
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - run: vp install --frozen-lockfile
       - run: vp run -r test
   install-cycle:
@@ -68,12 +85,18 @@ jobs:
       - uses: voidzero-dev/setup-vp@cab1ab9eaff52d4857875f4f2c016e36af8f2c76 # v1.22.0
         with:
           cache: true
+      # Rust and the wasm32-wasip1 target, pinned in mise.toml: the gates are built here
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
       - run: vp install --frozen-lockfile
+      - run: vp run wasm
       - run: vp run -r build
       - run: node packages/qol-mini/dist/cli.js install --tab-state --warn 120000
       - run: node packages/qol-mini/dist/cli.js install --replace # keeps what is installed
       - run: node scripts/cycle.ts
       - run: node packages/qol-mini/dist/cli.js skills install npm-vulnerability-check ./project
       - run: node packages/qol-mini/dist/cli.js skills check ./project
+      # The same modules on every OS: repository scope, then with the home directory
+      - run: node packages/qol-mini/dist/cli.js vitals skills ./project --repo-only
+      - run: node packages/qol-mini/dist/cli.js vitals skills ./project
       - run: node packages/qol-mini/dist/cli.js uninstall
       - run: node scripts/cycle.ts --uninstalled

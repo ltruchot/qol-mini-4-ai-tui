@@ -27,7 +27,13 @@ jobs:
           cache: false # a restored cache can hold what an untrusted run wrote
       - name: "tag must match packages/qol-mini/package.json version"
         run: test "v$(node -p "require('./packages/qol-mini/package.json').version")" = "$GITHUB_REF_NAME"
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          cache: false # same rule as above
+      - run: cargo xtask setup # the coverage nightly
+      - run: cargo xtask check
       - run: vp install --frozen-lockfile
+      - run: vp run wasm # the gates the tarball ships, built from the tagged commit
       - run: vp check
       - run: vp run lines
       - run: vp run -r test

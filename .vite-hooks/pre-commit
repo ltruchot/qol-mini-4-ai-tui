@@ -1,2 +1,9 @@
+# The repository is public and holds no personal data: reject a staged email address.
+if git diff --cached --no-color -U0 | grep -E '^\+[^+]' |
+    grep -Eiq '[a-z0-9._%+-]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}'; then
+    echo "pre-commit: the staged diff adds an email address; remove it." >&2
+    exit 1
+fi
+
 vp staged
 vp run lines

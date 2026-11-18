@@ -1,0 +1,9 @@
+version: 2
+updates:
+  # Cooldown: a release is at least 3 days old before Dependabot proposes it
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3
