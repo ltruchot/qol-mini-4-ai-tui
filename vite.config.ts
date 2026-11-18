@@ -23,6 +23,8 @@ export default defineConfig({
       check: { command: "vp check", cache: false },
       // Style law: every source and test file under 50 lines
       lines: { command: "node scripts/lines.ts", cache: false },
+      // The gates, built for WASI and copied into the package
+      wasm: { command: "node scripts/wasm.ts", cache: false },
       // Publish safety: pnpm pack must resolve catalog: and keep bin
       packcheck: { command: "node scripts/packcheck.ts", cache: false },
     },

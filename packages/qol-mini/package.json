@@ -16,7 +16,8 @@
   "files": [
     "dist",
     "opencode",
-    "skills"
+    "skills",
+    "wasm"
   ],
   "type": "module",
   "publishConfig": {

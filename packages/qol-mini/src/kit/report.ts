@@ -46,4 +46,5 @@ export const USAGE = [
   "",
   "       qol-mini uninstall | vscode | skills --help",
   "       qol-mini harmonize <project>|check|undo|scan  one repo, both agents",
+  "       qol-mini vitals [agents-md|skills] [path]     audit one repo, read-only",
 ];

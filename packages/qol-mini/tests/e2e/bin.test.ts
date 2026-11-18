@@ -10,6 +10,7 @@ test("real process: version, help, unknown command exit code", async () => {
   expect(version.stdout).toContain(VERSION);
   const help = await execa("node", [CLI, "--help"]);
   expect(help.stdout).toContain("qol-mini install [options]");
+  expect(help.stdout).toContain("qol-mini vitals [agents-md|skills] [path]");
   const skills = await execa("node", [CLI, "skills", "--help"]);
   expect(skills.stdout).toContain("install [...args]");
   const missing = await execa("node", [CLI, "nope"], { reject: false });

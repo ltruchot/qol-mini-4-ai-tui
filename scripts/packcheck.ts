@@ -26,7 +26,11 @@ try {
   const bins = Object.values(pkg.bin ?? {});
   if (bins.length !== 1 || bins[0] !== "dist/cli.js")
     throw new Error(`bin missing or wrong: ${JSON.stringify(pkg.bin)}`);
-  console.log("packcheck: ok (zero runtime deps, bin present)");
+  const listing = execFileSync("tar", ["-tf", join(out, tgz)], { encoding: "utf8" });
+  for (const gate of ["agents-md-chkr", "skills-chkr"])
+    if (!listing.includes(`package/wasm/${gate}.wasm`))
+      throw new Error(`${gate}.wasm is not in the tarball: run vp run wasm before packing`);
+  console.log("packcheck: ok (zero runtime deps, bin present, gates shipped)");
 } finally {
   rmSync(out, { recursive: true, force: true });
 }
