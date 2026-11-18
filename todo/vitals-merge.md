@@ -11,8 +11,14 @@ already reports.
 
 ## Left
 
-In `code-harness-vitals`, a README that points to `qol-mini vitals`, then
-`gh repo archive ltruchot/code-harness-vitals`. Both need a yes at that moment.
+1. In `code-harness-vitals`, a README that points to `qol-mini vitals`, then
+   `gh repo archive ltruchot/code-harness-vitals`. Both need a yes at that moment, and
+   the repository is outside this one: the path has to be granted.
+2. `qol-mini@0.7.0` stays on npm with a `skills-review` that fails to load. On a yes,
+   from `packages/qol-mini`: `npm deprecate qol-mini@0.7.0 "skills-review fails to load, use 0.7.1"`.
+3. The review skills under OpenCode: never run. Under `claude -p`, one run of
+   `skills-review` installed from npm 0.7.1 loaded and was refused its probe command by
+   the allowlist (`Bash(npx qol-mini:*)`); the same text installed from the clone ran it.
 
 ## Known
 

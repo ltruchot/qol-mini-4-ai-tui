@@ -6,7 +6,8 @@
 `code-harness-vitals` as WebAssembly, the two review skills are in the bank (trigger
 evals 16/16 each) and each ran once from an installed copy under `claude -p`.
 0.7.0 ships a `skills-review` that fails to load; 0.7.1 fixes it. Nothing in progress.
-Left from the merge: archive the old repository, on a yes.
+Left from the merge: archive the old repository and deprecate 0.7.0, each on a yes;
+the review skills under OpenCode.
 Context: todo/vitals-merge.md
 
 0.6.2 is what `./install.sh --replace` delivered on this machine; the global files did

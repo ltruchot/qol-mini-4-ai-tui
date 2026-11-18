@@ -271,6 +271,8 @@ A prompt that blocks a script or CI is a bug.
   server-face fixes in place; a live TUI may hold the old command bytes,
   so restart it before retesting the gate. `install` names `opencode service
   restart` when they moved. `cli.json` and `commands/` reload hot.
+- OpenCode behavior: the opencode.ai/docs pages describe V1. Read the V2 source
+  (`anomalyco/opencode`, `packages/core/src`) and cite the commit.
 
 ### Skills
 
@@ -314,6 +316,9 @@ A prompt that blocks a script or CI is a bug.
   share `.claude/commands/`, the model picks another worker's copy, and every query
   reads as untriggered.
   `tests/unit/shipped-skills.test.ts` holds the list.
+- Trigger evals read the description, never the body. Before a release, install
+  the skill in a scratch project and run `claude -p "/<name>" --output-format
+  stream-json --verbose`: a body that fails to load shows only there.
 
 ### Harmonizer
 
@@ -393,15 +398,8 @@ A prompt that blocks a script or CI is a bug.
 - User-scope probes read the parent directories and the home directory of the
   machine: tests assert on `--repo-only` output, or on paths they built.
 - The gate's own messages name the binary (`agents-md-chkr: cannot read …`).
-
-### Rust
-
 - The rules for the Rust sources are in `crates/AGENTS.md`, loaded when a file
   under `crates/` is read.
-- OpenCode behavior: the opencode.ai/docs pages describe V1. Read the V2 source
-  (`anomalyco/opencode`, `packages/core/src`) and cite the commit.
-- The pre-commit hook rejects email-like text on an added line, a test string with
-  `\n` then `@a.md` included: put a space or `- ` before the `@`, or split the literal.
 
 ### Windows
 
@@ -507,6 +505,8 @@ vp run -r build && vp run packcheck
   not. Rust holds 40 lines per function (`clippy.toml`).
 - Lint runs every oxlint category as an error. An exception is one line in
   `lint/off-*.ts`, with its reason.
+- The pre-commit hook rejects email-like text on an added line, a test string with
+  `\n` then `@a.md` included: put a space or `- ` before the `@`, or split the literal.
 - The root `package.json` names pnpm twice: `packageManager` is what Vite+ reads
   to pick the version, `devEngines` is what makes `npm` refuse the root. Without
   `packageManager`, `vp install` runs an older pnpm that rejects the lockfile.
