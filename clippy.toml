@@ -1,0 +1,49 @@
+# Complexity budget. Clippy has no cyclomatic lint; cognitive complexity is the proxy.
+cognitive-complexity-threshold = 7
+excessive-nesting-threshold = 3
+too-many-lines-threshold = 40
+too-many-arguments-threshold = 4
+max-fn-params-bools = 1
+
+avoid-breaking-exported-api = false
+
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+allow-indexing-slicing-in-tests = true
+allow-print-in-tests = true
+
+# Side effects live at the boundaries only. A boundary module opts out with
+# `#![expect(clippy::disallowed_methods, reason = "boundary: ...")]`.
+disallowed-methods = [
+  { path = "std::fs::read", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::read_to_string", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::read_dir", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::metadata", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::write", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::create_dir_all", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::remove_file", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::File::open", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::fs::File::create", reason = "filesystem I/O belongs in a boundary module" },
+  { path = "std::env::var", reason = "environment access belongs in a boundary module" },
+  { path = "std::env::var_os", reason = "environment access belongs in a boundary module" },
+  { path = "std::env::args", reason = "environment access belongs in a boundary module" },
+  { path = "std::env::args_os", reason = "environment access belongs in a boundary module" },
+  { path = "std::env::current_dir", reason = "environment access belongs in a boundary module" },
+  { path = "std::io::stdin", reason = "terminal I/O belongs in a boundary module" },
+  { path = "std::io::stdout", reason = "terminal I/O belongs in a boundary module" },
+  { path = "std::io::stderr", reason = "terminal I/O belongs in a boundary module" },
+  { path = "std::process::Command::new", reason = "process spawning belongs in a boundary module" },
+  { path = "std::process::exit", reason = "return an ExitCode from main instead" },
+  { path = "std::time::SystemTime::now", reason = "clock reads break referential transparency" },
+  { path = "std::time::Instant::now", reason = "clock reads break referential transparency" },
+  { path = "ignore::WalkBuilder::new", reason = "directory walks belong in a boundary module" },
+]
+
+# No interior mutability: state flows through values, not shared cells.
+disallowed-types = [
+  { path = "std::cell::Cell", reason = "interior mutability; pass values instead" },
+  { path = "std::cell::RefCell", reason = "interior mutability; pass values instead" },
+  { path = "std::sync::Mutex", reason = "interior mutability; pass values instead" },
+  { path = "std::sync::RwLock", reason = "interior mutability; pass values instead" },
+]

@@ -34,3 +34,12 @@ dist-ssr
 
 # Pack output, packcheck and release build tarballs in tmp dirs
 *.tgz
+
+# Rust build output and coverage reports
+/target
+lcov.info
+/coverage
+mise.local.toml
+
+# The gates built for WASI, copied in by scripts/wasm.ts
+packages/qol-mini/wasm/

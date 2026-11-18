@@ -1,0 +1,22 @@
+# Rubric sources
+
+Where each criterion of the `agents-md-review` rubric comes from. Every source that is
+written for `CLAUDE.md` applies to `AGENTS.md`: Claude Code 2.1.277 and later reads
+`AGENTS.md` natively, and OpenCode reads it first.
+
+| Source | Criteria | What it contributes |
+|---|---|---|
+| [Claude Code — memory docs](https://code.claude.com/docs/en/memory) | 1, 2, 3, 15, 16, 17, 18; probes `AM01`–`AM21` | target under 200 lines; files loaded at launch load whole up to 4 MiB; headers and bullets over dense paragraphs; imports four hops deep that do not reduce context; block HTML comments stripped; `paths` rules; the managed `CLAUDE.md`; files in every parent directory load at launch, subdirectory files on demand; AGENTS.md read only when no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` exists in the working directory or above it; conflicting files: "Claude may pick one arbitrarily"; 40,000-char limit per file loaded on demand |
+| [OpenCode source](https://github.com/anomalyco/opencode/tree/024a1462f5/packages/core/src) (`config/plugin/instruction.ts`, `tool/plugin/read.ts`) | 17, 18; probes `AM09`, `AM11`, `AM15` | OpenCode 2 loads every `AGENTS.md` from the working directory up to `$HOME` or the project root, a subdirectory's on read, and configured `instructions`; never `CLAUDE.md` or `.claude/rules` |
+| [Claude Code — best practices](https://code.claude.com/docs/en/best-practices) | 1, 15, 19, 20; probes `AM17`, `AM18` | keep `CLAUDE.md` to what Claude cannot work out from the code; "adding IMPORTANT probably won't fix it"; a rule with zero exceptions belongs in a hook or a deny rule; `/doctor prompt-audit` |
+| [Claude Code in Action, "Configure Claude"](https://campus.datacamp.com/courses/claude-code-in-action/configure-claude?ex=1) | 19, 20, 21; probe `AM18` | Anthropic's course: hard rules in hooks, imports that do not reduce context, rules specific and checkable, name the replacement, emphasis as a budget for two or three rules |
+| [Gloaguen et al., *Evaluating AGENTS.md*](https://arxiv.org/abs/2602.11988) (ICLR 2026) | 1, 15, 16 | context files raise inference cost by over 20% and do not generally improve success; repository overviews do not help; agents follow the instructions they get |
+| [Jaroslawicz et al., IFScale](https://arxiv.org/abs/2507.11538) (NeurIPS 2025) | 16, 22 | instruction following degrades as instructions accumulate; earlier instructions are followed better |
+| [OpenCode source](https://github.com/anomalyco/opencode/tree/d759c548aa/packages/core/src) (`instruction-discovery.ts`) | 18; probes `AM05`, `AM16` | an `AGENTS.md` is injected verbatim: `@path` imports and HTML comments reach the model as text |
+| [AGENTS.md, the open format](https://agents.md/) (Agentic AI Foundation, Linux Foundation) | 1, 2, 3, 14, 17 | standard Markdown, no required fields, at the root; suggested sections: project overview, build and test commands, code style, testing instructions, security considerations, commit and PR rules; nested files for subprojects, where "the closest AGENTS.md to the edited file wins" (Claude Code and OpenCode load both, so a contradiction is left to the model) |
+| [Claude Code 101 — the CLAUDE.md file](https://academy.claude.com/courses/claude-code-101/the-claude-md-file) | 1, 2, 3 | project summary, commands, code style: the minimal shape |
+| [Using CLAUDE.md files](https://claude.com/resources/articles/using-claude-md-files) | 1, 2, 3, 9, 14, 15, 16 | directory map, guardrails, workflows; no secrets; add instructions in response to real friction, not in advance; split detail into referenced files |
+| [Karpathy-inspired guidelines](https://github.com/multica-ai/andrej-karpathy-skills/blob/main/CLAUDE.md) | 4, 5, 7 | think before coding, simplicity first, surgical changes, goal-driven execution |
+| [AI Hero — plans you actually read](https://www.aihero.dev/my-agents-md-file-for-building-plans-you-actually-read) | 11 | concise plans that end with the unresolved questions |
+| [qol-mini](https://github.com/ltruchot/qol-mini-4-ai-tui) (this project's convention) | 12, 13; probes `AM07`, `AM08` | `TODO.md` handoff read first, `todo/` per item, a `/kaizen` review before `/compact`; `AGENTS.md` as the single canonical rules file (its ADR 0003) |
+| Field-tested project rules (this project's convention, no study behind them) | 6, 7, 8, 9, 10 | reuse before create; small increments with lint and tests; artifact language fixed; ADR index read before architecture; current truth only, no version noise, dated rulings |

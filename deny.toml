@@ -1,0 +1,23 @@
+# Supply-chain gate, run by `cargo xtask check`. See ADR 3 for the crate admission criteria.
+
+[graph]
+all-features = true
+
+[advisories]
+# Every advisory kind fails the gate: vulnerabilities, unmaintained, unsound, yanked.
+unmaintained = "all"
+yanked = "deny"
+
+[licenses]
+confidence-threshold = 0.93
+allow = ["Apache-2.0", "MIT", "Unicode-3.0", "Unlicense"]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

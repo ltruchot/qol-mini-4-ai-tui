@@ -1,0 +1,92 @@
+[workspace]
+members = ["crates/*"]
+resolver = "3"
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.100"
+license = "MIT"
+repository = "https://github.com/ltruchot/qol-mini-4-ai-tui"
+readme = "README.md"
+keywords = ["agents", "claude-code", "opencode", "audit"]
+categories = ["development-tools"]
+publish = false
+
+# Exact versions only. A new crate or a bump must meet the admission criteria in ADR 3;
+# the 3-day cooldown is enforced by `.cargo/config.toml`.
+[workspace.dependencies]
+clap = { version = "=4.6.7", features = ["derive"] }
+globset = "=0.4.21"
+ignore = "=0.4.34"
+serde_json = "=1.0.154"
+thiserror = "=2.0.21"
+# Dev dependencies
+assert_cmd = "=2.2.2"
+predicates = "=3.1.4"
+proptest = "=1.12.0"
+tempfile = "=3.27.0"
+# Workspace crates
+vitals-utils = { path = "crates/vitals-utils" }
+
+# Every lint is `warn` so editors surface all of them; the gates run with `-D warnings`.
+[workspace.lints.rust]
+unsafe_code = "forbid"
+rust_2018_idioms = { level = "warn", priority = -1 }
+rust_2024_compatibility = { level = "warn", priority = -1 }
+elided_lifetimes_in_paths = "warn"
+explicit_outlives_requirements = "warn"
+let_underscore_drop = "warn"
+missing_debug_implementations = "warn"
+missing_docs = "warn"
+single_use_lifetimes = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+# cargo-llvm-cov sets `coverage_nightly` to exclude test modules from coverage.
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(coverage_nightly)"] }
+unreachable_pub = "warn"
+unused_lifetimes = "warn"
+unused_qualifications = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+# Restriction group: opt-in picks
+allow_attributes = "warn"
+allow_attributes_without_reason = "warn"
+arithmetic_side_effects = "warn"
+as_conversions = "warn"
+clone_on_ref_ptr = "warn"
+dbg_macro = "warn"
+exit = "warn"
+expect_used = "warn"
+if_then_some_else_none = "warn"
+indexing_slicing = "warn"
+mod_module_files = "warn"
+panic = "warn"
+print_stderr = "warn"
+print_stdout = "warn"
+shadow_unrelated = "warn"
+tests_outside_test_module = "warn"
+todo = "warn"
+unimplemented = "warn"
+unwrap_in_result = "warn"
+unwrap_used = "warn"
+wildcard_enum_match_arm = "warn"
+# Contradicts rustc `unreachable_pub`, which wins: `pub(crate)` inside private modules.
+redundant_pub_crate = "allow"
+
+[workspace.lints.cargo]
+unused_dependencies = "warn"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "warn"
+missing_crate_level_docs = "warn"
+private_intra_doc_links = "warn"
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"

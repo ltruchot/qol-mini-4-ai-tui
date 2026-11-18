@@ -1,0 +1,23 @@
+[package]
+name = "vitals-utils"
+description = "Building blocks shared by the qol-mini vitals gates: findings, reports, text budgets, markers, file reads."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme.workspace = true
+keywords.workspace = true
+categories.workspace = true
+publish.workspace = true
+
+[dependencies]
+ignore.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
