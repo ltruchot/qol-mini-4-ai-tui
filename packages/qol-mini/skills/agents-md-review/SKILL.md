@@ -1,6 +1,6 @@
 ---
 name: agents-md-review
-description: Review a repository's AGENTS.md (or CLAUDE.md) and the whole cascade of nested and parent instruction files for Claude Code and OpenCode — run the deterministic probes of `qol-mini vitals agents-md`, then judge the content against a rubric and propose at most five advisory ADD, CUT, MOVE, or REWORD edits, one block at a time. Use when asked to audit, review, grade, or improve AGENTS.md, CLAUDE.md, or a repo's agent instructions, or after the agents-md gate reports findings.
+description: Review a repository's AGENTS.md (or CLAUDE.md) and the whole cascade of nested and parent instruction files for Claude Code and OpenCode — run the deterministic probes of `qol-mini vitals agents-md`, then judge the content against a rubric and propose at most five advisory ADD, CUT, MOVE, or REWORD edits, one block at a time. Use when asked to audit, review, grade, or improve AGENTS.md, CLAUDE.md, or a repo's agent instructions, when an agent ignores or misapplies the rules written there, or after the agents-md gate reports findings.
 ---
 
 # AGENTS.md review
