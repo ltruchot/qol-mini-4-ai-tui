@@ -4,8 +4,7 @@
 
 `main` holds the merge of `code-harness-vitals` (its branch
 `fix/agents-md-sources`, commit `9f7085d`; history not imported). That repository is archived on
-GitHub and its README points here. Its `test` run is
-green: the Rust chain, the TypeScript gates on Linux, macOS and the Node floor, and
+GitHub and its README points here. The `test` run of `main` is green: the Rust chain, the TypeScript gates on Linux, macOS and the Node floor, and
 `vitals skills` in `install-cycle` on Linux, macOS and Windows. In `test-windows` the
 `vitals` tests pass; the thirteen failures there are the POSIX assumptions that job
 already reports.
