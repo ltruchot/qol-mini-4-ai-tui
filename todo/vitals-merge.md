@@ -3,7 +3,8 @@
 ## State
 
 `main` holds the merge of `code-harness-vitals` (its branch
-`fix/agents-md-sources`, commit `9f7085d`; history not imported). Its `test` run is
+`fix/agents-md-sources`, commit `9f7085d`; history not imported). That repository is archived on
+GitHub and its README points here. Its `test` run is
 green: the Rust chain, the TypeScript gates on Linux, macOS and the Node floor, and
 `vitals skills` in `install-cycle` on Linux, macOS and Windows. In `test-windows` the
 `vitals` tests pass; the thirteen failures there are the POSIX assumptions that job
@@ -11,12 +12,9 @@ already reports.
 
 ## Left
 
-1. In `code-harness-vitals`, a README that points to `qol-mini vitals`, then
-   `gh repo archive ltruchot/code-harness-vitals`. Both need a yes at that moment, and
-   the repository is outside this one: the path has to be granted.
-2. `qol-mini@0.7.0` stays on npm with a `skills-review` that fails to load. On a yes,
+1. `qol-mini@0.7.0` stays on npm with a `skills-review` that fails to load. On a yes,
    from `packages/qol-mini`: `npm deprecate qol-mini@0.7.0 "skills-review fails to load, use 0.7.1"`.
-3. The review skills under OpenCode: never run. Under `claude -p`, one run of
+2. The review skills under OpenCode: never run. Under `claude -p`, one run of
    `skills-review` installed from npm 0.7.1 loaded and was refused its probe command by
    the allowlist (`Bash(npx qol-mini:*)`); the same text installed from the clone ran it.
 
