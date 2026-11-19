@@ -494,8 +494,8 @@ Release: [docs/release.md](docs/release.md).
 | WSL2, Node 24 | `harmonize --dry-run` on four real repos (this kit and three legacy-layout repos, one of them a monorepo) and `harmonize scan` over a 24-repo workspace |
 | WSL2, OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads in OpenCode: the `permissions` and `mcp.servers` in `debug config`, the agent and its allowlist in `debug agents`, the command in `GET /api/command` |
 | CI: Windows | the `vitals` tests: both gates, the `agents-md` output equal to the native one |
-| WSL2, Claude Code, headless | each review skill from an installed copy: it loads, runs `npx qol-mini vitals <gate>`, returns its first block |
-| Nowhere yet | a repository and a home directory on two Windows drives; the review skills under OpenCode; sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; a `harmonize` write followed by live sessions in both agents — the dry-runs and the suite are the proof so far |
+| WSL2, Claude Code and OpenCode 2.3.0, headless | each review skill from an installed copy: it loads, runs `npx qol-mini vitals <gate>`, returns its first block |
+| Nowhere yet | a repository and a home directory on two Windows drives; sounds on macOS and native Windows; editor settings on native Linux, macOS, Windows; a `harmonize` write followed by live sessions in both agents — the dry-runs and the suite are the proof so far |
 
 ## Related
 

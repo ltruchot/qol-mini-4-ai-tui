@@ -458,7 +458,7 @@ A prompt that blocks a script or CI is a bug.
 | This machine: WSL2, VS Code, a live session | the tab marker on screen, the sounds heard, `/compact` held back then released by `/kaizen`; the marker back in a project whose opt-out file names `kaizen` |
 | This machine: OpenCode 2.1.2, isolated `HOME` and `XDG_*` | a harmonized Claude Code repo loads: `opencode debug config` shows the `permissions` and `mcp.servers`, `debug agents` the agent with its allowlist, `GET /api/command` the command |
 | CI: Windows, `test-windows` | the `vitals` tests: the `agents-md` output equal to the native one byte for byte, both gates, the exit statuses, the user scope |
-| This machine: WSL2, Claude Code, `claude -p` in a scratch project | each review skill from an installed copy: it loads, runs `npx qol-mini vitals <gate>` and returns its first block; the OpenCode side is not run |
+| This machine: WSL2, `claude -p` and `opencode run --standalone` (OpenCode 2.3.0) in a scratch project | each review skill from an installed copy: it loads, runs `npx qol-mini vitals <gate>` and returns its first block |
 | Never | a repository and a home directory on two Windows drives; `afplay`, PowerShell `SoundPlayer`; the editor paths outside WSL; a harmonized repo in a live session of either agent |
 
 The README states this. Do not claim more.

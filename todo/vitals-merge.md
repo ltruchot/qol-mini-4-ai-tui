@@ -11,14 +11,15 @@ already reports.
 
 ## Left
 
-1. `qol-mini@0.7.0` stays on npm with a `skills-review` that fails to load. On a yes,
-   from `packages/qol-mini`: `npm deprecate qol-mini@0.7.0 "skills-review fails to load, use 0.7.1"`.
-2. The review skills under OpenCode: never run. Under `claude -p`, one run of
-   `skills-review` installed from npm 0.7.1 loaded and was refused its probe command by
-   the allowlist (`Bash(npx qol-mini:*)`); the same text installed from the clone ran it.
+1. `qol-mini@0.7.0` stays on npm with a `skills-review` that fails to load. The yes is given;
+   `npm whoami` answers 401 on this machine. After `npm login`, from `packages/qol-mini`: `npm deprecate qol-mini@0.7.0 "skills-review fails to load, use 0.7.1"`.
 
 ## Known
 
+- Under `claude -p`, an allowlist `Bash(npx qol-mini:*)` refused the probe command of
+  `skills-review` installed from npm 0.7.1; the same text installed from the clone ran it.
+- Run on the two review skills themselves under OpenCode, `skills-review` reports their
+  closing `Rubric sources` link as naming no moment to read it (its rubric 5).
 - Tarball size: the two modules weigh 1.6 MB each, unoptimized for size. `wasm-opt` or
   `opt-level = "z"` is unmeasured.
 - A gate run costs about 0.15 s, against 2 ms native.
