@@ -2,12 +2,20 @@
 
 ## Where we stopped
 
-`qol-mini@0.7.1` is published from `main` and `latest` on npm; 0.7.0 is deprecated
-there (its `skills-review` fails to load). `qol-mini vitals` runs the Rust gates as
-WebAssembly; the two review skills are in the bank (trigger evals 16/16 each) and each
-ran from an installed copy under `claude -p` and `opencode run`. The repository the
-gates came from, `ltruchot/code-harness-vitals`, is archived on GitHub with a README
-that points here. Nothing in progress.
+`qol-mini@0.7.1` is published and `latest` on npm; 0.7.0 is deprecated there. `main` is
+at that release. Two branches wait, stacked, nothing released from them:
+
+- `feat/vitals-fix`, PR #2, ready, CI green: a finding names the `qol-mini` command that
+  fixes it (`run:` line), each gate takes `--json`, `qol-mini vitals --fix [--dry-run]`
+  runs the named commands and audits again (ADR 0010). To do: merge it into `main`.
+- `gate/skills-standard`, on top of it: probes `SK16`–`SK20` (fields no agent reads,
+  `compatibility`, scripts `SKILL.md` never names, package commands without a version,
+  injected commands nothing pre-approves) and criteria 13–15 of `skills-review` (what
+  belongs in a script, how a script behaves). To do: rebase on `main` once PR #2 is in,
+  open its PR, run `skills-review` from an installed copy under `claude -p` and
+  `opencode run`, and its trigger evals (the description did not change).
+
+The next version is not chosen and no tag is pushed.
 
 0.6.2 is what `./install.sh --replace` delivered on this machine; the global files did
 not change since. Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md.
@@ -21,8 +29,8 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
 
 ## Later
 
-- Vitals: JSON and SARIF output for every gate (`vitals-utils::Report`); a scoring
-  engine, 0–10 per gate with risk weights and per-pillar levels (ADR 0005 open question)
+- Vitals: a scoring engine, 0–10 per gate with risk weights and per-pillar levels (ADR
+  0005 open question), in the JSON report and the summary line
 - Vitals, next gate: `codebase-memory` (pillar 3), per the ADR 0008 catalog; use the
   `add-gate` skill
 - Vitals, `agents-md`: commands that do not exist, imports outside the repository, the
@@ -31,8 +39,20 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
 - Vitals, `skills`: SkillSpector or agnix when installed (amends ADR 0008);
   `.claude/commands/` files, `opencode.json` `skills` entries, `--add-dir`, enterprise and
   plugin skills, `XDG_CONFIG_HOME`; the order between OpenCode's sources for one id
-- Vitals, `skills`: a probe for a command-injection line in a `SKILL.md` that only cites
-  the syntax (the skill fails to load)
+- Vitals, `skills`: launch an external validator from the CLI, never from a gate:
+  `qol-mini vitals skills --with claude` runs `claude plugin validate <root> --json`
+  (Claude Code 2.1.233 or later), `--with skills-ref` the reference validator of
+  agentskills.io (source checkout only, "not meant to be used in production"); amends
+  ADR 0008
+- Vitals, `skills`, not probed: the 5,000-token body target (no char count stands for a
+  token), reference chains deeper than one level, whether `allowed-tools` covers each
+  injected command
+- Bank: `SK19` warns on `agents-md-review` and `skills-review`, which name `npx qol-mini`
+  with no version. Pinning freezes the gates a skill calls; decide, then pin or exempt
+- Vitals, commands that are missing for a `run:` line: moving a skill into
+  `.claude/skills/` (`SK02`–`SK05`), a `.claude/CLAUDE.md` or a nested `CLAUDE.md`
+  (`AM03`, `AM09`)
+- Vitals, SARIF from the same `Report`; `--min-score`
 - Vitals, tarball: the two modules weigh 1.6 MB each, unoptimized for size; `wasm-opt` or
   `opt-level = "z"` is unmeasured. A gate run costs about 0.15 s, against 2 ms native
 - Bank, the two review skills: `skills-review` run on them reports their closing

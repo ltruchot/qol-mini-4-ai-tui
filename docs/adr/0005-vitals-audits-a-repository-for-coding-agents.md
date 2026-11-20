@@ -19,7 +19,8 @@ model in ADR 0008.
 | Pillar 2: `skills` gate                 | ✅ Done    | `crates/skills-chkr/`                     |
 | Gates for pillars 3–6                   | ⏳ Planned | -                                       |
 | CLI: `qol-mini vitals`                  | ✅ Done    | `0009-the-gates-ship-as-webassembly.md` |
-| JSON/SARIF output, CI action            | ⏳ Planned | -                                       |
+| JSON output (`--json`)                  | ✅ Done    | `crates/vitals-utils/src/finding.rs`    |
+| SARIF output, CI action                 | ⏳ Planned | -                                       |
 
 ---
 

@@ -74,7 +74,7 @@ with per-pillar levels, stable exit codes and JSON/SARIF output for CI.
 | Gate | Pillar | Deterministic probes (Rust) | Agent review (skill, advisory) | Status |
 | ---- | ------ | --------------------------- | ------------------------------ | ------ |
 | [`agents-md`](../crates/agents-md-chkr/) | 1 | `AM01`–`AM21`, below | [`agents-md-review`](../packages/qol-mini/skills/agents-md-review/SKILL.md): 22-criterion rubric | ✅ |
-| [`skills`](../crates/skills-chkr/) | 2 | `SK01`–`SK15`, below | [`skills-review`](../packages/qol-mini/skills/skills-review/SKILL.md): 12-criterion rubric | ✅ |
+| [`skills`](../crates/skills-chkr/) | 2 | `SK01`–`SK20`, below | [`skills-review`](../packages/qol-mini/skills/skills-review/SKILL.md): 15-criterion rubric | ✅ |
 | `codebase-memory` | 3 | a code-intelligence MCP server or plugin, wired in for both agents | - | ⏳ |
 | `context-limiting` | 4 | an output-capping tool or hook, wired in for both agents | - | ⏳ |
 | `commit-gates` | 5 | an active hook runner calling lint, format, types, tests, vulnerability and secret scans; CI runs the same | fit of the gate list to the stack | ⏳ |
@@ -185,9 +185,14 @@ qol-mini vitals skills /path/to/repo --repo-only  # CI: skip the parent director
   name (`SK06`–`SK10`)
 - [x] Body under 500 lines, and every relative link resolves (`SK11`, `SK12`)
 - [x] User scope: skill roots above the repository that only OpenCode reads (`SK14`)
+- [x] Fields an agent reads, `compatibility` within 500 chars (`SK16`, `SK17`)
+- [x] Scripts named in `SKILL.md`, package commands pinned, injected commands
+  pre-approved (`SK18`–`SK20`)
 - [ ] Descriptions that trigger, overlapping skills, invocation control, body cost and
-  order, script safety, Claude Code-only fields: the review
-- [ ] Not probed yet: script safety by an external scanner, `.claude/commands/`, skills
+  order, script safety, what belongs in a script and how it behaves, Claude Code-only
+  fields: the review
+- [ ] Not probed yet: the 5,000-token body target, reference chains, an external
+  validator (`claude plugin validate`, `skills-ref`), script safety by an external scanner, `.claude/commands/`, skills
   added by `opencode.json` or `--add-dir`, enterprise and plugin skills
 
 **How the gate reads a repository.** Both agents read `SKILL.md`, but not from the same
@@ -217,6 +222,11 @@ whose facts `C`, `S`, and `O` the Source column cites).
 | `SK13` | skill inventory | lists every skill | - |
 | `SK14` | user scope: skill roots only OpenCode reads | warn: in a parent directory, or `~/.agents/skills`, `~/.config/opencode/skill(s)` | C3, O1, O3 |
 | `SK15` | user scope: personal skills that shadow project ones | warn: Claude Code runs the personal copy, OpenCode the project one | C5, O10 |
+| `SK16` | fields an agent reads | warn: a frontmatter key outside the Claude Code reference, which both agents ignore without an error | C19 |
+| `SK17` | `compatibility` | warn above 500 chars, or a list or a map | S5, C22 |
+| `SK18` | scripts are named | warn: a file under `scripts/` whose name `SKILL.md` never holds | S6 |
+| `SK19` | package commands are pinned | warn: `npx`, `bunx`, `uvx`, `pnpm dlx`, `yarn dlx` or `pipx run` in code, with no version | S7 |
+| `SK20` | injected commands are pre-approved | warn: a command-injection line and no `allowed-tools` | C20, C21 |
 
 The review skill checks what probes cannot: descriptions that trigger, overlapping
 skills, invocation control, body cost and order, script safety, and behavior that relies

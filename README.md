@@ -223,7 +223,7 @@ qol-mini vitals /path/to/my-project --fix        # run them, audit again
 | Gate | Probes | Checks | Review skill |
 |---|---|---|---|
 | `agents-md` | `AM01`–`AM21` | `AGENTS.md` is the rules file and no `CLAUDE.md` hides it; size budgets as each agent loads it; nested and parent instruction files; imports, paths and links resolve; structure and emphasis | `agents-md-review` |
-| `skills` | `SK01`–`SK15` | skills live where both agents load them; one copy per name; frontmatter both agents parse; description and body within length; links resolve | `skills-review` |
+| `skills` | `SK01`–`SK20` | skills live where both agents load them; one copy per name; frontmatter both agents parse, no field an agent ignores; description and body within length; links resolve; scripts named, package commands pinned, injected commands pre-approved | `skills-review` |
 
 | | |
 |---|---|
