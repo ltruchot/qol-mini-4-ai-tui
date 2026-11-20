@@ -3,8 +3,9 @@
 //! - [`audit`] reads the repository once (the `snapshot` boundary), then runs every probe as
 //!   a pure function of that snapshot: where skills live and which agent loads them
 //!   (`SK01`–`SK05`), each skill's frontmatter, size, and links (`SK06`–`SK12`), the
-//!   inventory (`SK13`), and, in user scope, the skill roots outside the repository
-//!   (`SK14`–`SK15`).
+//!   inventory (`SK13`), in user scope the skill roots outside the repository
+//!   (`SK14`–`SK15`), and each skill against the frontmatter reference, the Agent Skills
+//!   spec and its guidance on scripts (`SK16`–`SK20`).
 //! - The non-deterministic half of the gate is the `skills-review` skill shipped in
 //!   `skills/`: it runs this binary first, then reviews the content.
 #![cfg_attr(all(coverage_nightly, test), feature(coverage_attribute))]
@@ -13,6 +14,7 @@ mod content;
 mod layout;
 mod probes;
 mod snapshot;
+mod standard;
 mod tree;
 mod user;
 
@@ -20,7 +22,7 @@ use std::path::Path;
 
 use vitals_utils::{Error, Report};
 
-pub use probes::{DESCRIPTION, GATE, LINE_LIMIT};
+pub use probes::{COMPATIBILITY, DESCRIPTION, GATE, LINE_LIMIT};
 pub use vitals_utils::Reach;
 
 /// Runs every probe of the `skills` gate on the repository at `root`, as far as `reach`.

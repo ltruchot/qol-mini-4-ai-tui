@@ -11,18 +11,18 @@ use crate::probes::{DESCRIPTION, LINE_LIMIT, no_skill};
 use crate::snapshot::{Link, Skill, Snapshot};
 
 /// A skill with its frontmatter read.
-struct Judged<'a> {
-    skill: &'a Skill,
-    front: Frontmatter,
+pub(crate) struct Judged<'a> {
+    pub(crate) skill: &'a Skill,
+    pub(crate) front: Frontmatter,
     path: PathBuf,
 }
 
 impl Judged<'_> {
-    const fn has_fields(&self) -> bool {
+    pub(crate) const fn has_fields(&self) -> bool {
         matches!(self.front, Frontmatter::Fields(_))
     }
 
-    fn finding(
+    pub(crate) fn finding(
         &self,
         probe: &'static str,
         verdict: Verdict,
@@ -82,8 +82,9 @@ const ONE_PER_SKILL: [(&str, Judges, Check, &str); 6] = [
     ),
 ];
 
-pub(crate) fn findings(snapshot: &Snapshot) -> Vec<Finding> {
-    let judged: Vec<Judged<'_>> = snapshot
+/// Every skill of `snapshot` with its frontmatter read.
+pub(crate) fn judge(snapshot: &Snapshot) -> Vec<Judged<'_>> {
+    snapshot
         .skills
         .iter()
         .map(|skill| Judged {
@@ -91,7 +92,11 @@ pub(crate) fn findings(snapshot: &Snapshot) -> Vec<Finding> {
             front: frontmatter::read(&skill.text),
             path: skill.place.skill_md(),
         })
-        .collect();
+        .collect()
+}
+
+pub(crate) fn findings(snapshot: &Snapshot) -> Vec<Finding> {
+    let judged = judge(snapshot);
     let all: Vec<&Judged<'_>> = judged.iter().collect();
     let fielded: Vec<&Judged<'_>> = judged.iter().filter(|one| one.has_fields()).collect();
     let pick = |judges| match judges {
@@ -112,7 +117,7 @@ pub(crate) fn findings(snapshot: &Snapshot) -> Vec<Finding> {
 
 /// Runs a per-skill probe: its findings, a pass when there are none, or `n/a` when there is
 /// no skill to judge.
-fn each<I>(
+pub(crate) fn each<I>(
     probe: &'static str,
     skills: &[&Judged<'_>],
     check: impl Fn(&Judged<'_>) -> I,

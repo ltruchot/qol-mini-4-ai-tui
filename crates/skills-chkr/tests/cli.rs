@@ -73,7 +73,12 @@ fn a_healthy_repository_prints_every_probe_and_exits_zero() {
          [pass] SK13 .: 1 skill: .claude/skills/deploy/SKILL.md\n\
          [n/a] SK14 (user scope) ..: skipped: --repo-only\n\
          [n/a] SK15 (user scope) ..: skipped: --repo-only\n\
-         skills gate passed: 0 fail, 0 warn, 13 pass, 2 n/a\n",
+         [pass] SK16 .: every frontmatter field is one an agent reads\n\
+         [pass] SK17 .: every `compatibility` is a string within budget\n\
+         [pass] SK18 .: every file in scripts/ is named in its SKILL.md\n\
+         [pass] SK19 .: every package command names a version\n\
+         [pass] SK20 .: no command-injection line without `allowed-tools`\n\
+         skills gate passed: 0 fail, 0 warn, 18 pass, 2 n/a\n",
     );
 }
 
@@ -88,7 +93,7 @@ fn a_repository_without_skills_warns_and_passes() {
         .stdout(contains("[warn] SK01 .claude/skills: no project skill"))
         .stdout(contains("[n/a] SK06 .: no skill to judge"))
         .stdout(contains(
-            "skills gate passed: 0 fail, 1 warn, 0 pass, 14 n/a",
+            "skills gate passed: 0 fail, 1 warn, 0 pass, 19 n/a",
         ));
 }
 
@@ -549,4 +554,34 @@ fn json_prints_the_report_as_one_object() {
             contains(r#"{"findings":[{"command":null,"#)
                 .and(contains(r#""gate":"skills","passed":true}"#)),
         );
+}
+
+#[test]
+fn the_standard_probes_warn_on_a_real_tree_and_never_fail_the_gate() {
+    let body = "---\nname: lint\ndescription: Lint the code. Use before a commit.\n\
+                disable_model_invocation: true\ncompatibility: [node]\n---\n\
+                Branch: !`git branch --show-current`\n\n```sh\nnpx eslint .\n```\n";
+    let dir = repo(&[
+        (".claude/skills/lint/SKILL.md", body),
+        (".claude/skills/lint/scripts/fix.sh", "#!/bin/sh\n"),
+    ]);
+    let path = ".claude/skills/lint/SKILL.md";
+    gate(&dir).code(0).stdout(
+        contains(format!(
+            "[warn] SK16 {path}: `disable_model_invocation` (line 4): not a frontmatter field"
+        ))
+        .and(contains(format!(
+            "[warn] SK17 {path}: `compatibility` is a list or a map, not a string"
+        )))
+        .and(contains(format!(
+            "[warn] SK18 {path}: `scripts/fix.sh`: in scripts/ and never named in SKILL.md"
+        )))
+        .and(contains(format!(
+            "[warn] SK19 {path}: `npx eslint` (line 10):"
+        )))
+        .and(contains(format!(
+            "[warn] SK20 {path}: command injection at line 7 and no `allowed-tools`"
+        )))
+        .and(contains("skills gate passed: 0 fail, 5 warn")),
+    );
 }

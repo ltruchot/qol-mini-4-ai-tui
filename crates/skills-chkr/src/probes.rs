@@ -3,7 +3,7 @@
 use vitals_utils::{Budget, Finding, Report, Verdict};
 
 use crate::snapshot::Snapshot;
-use crate::{content, tree, user};
+use crate::{content, standard, tree, user};
 
 /// Gate id.
 pub const GATE: &str = "skills";
@@ -19,6 +19,13 @@ pub const DESCRIPTION: Budget = Budget::new(1_024, 1_536);
 /// skills docs and the Agent Skills spec). Neither agent enforces a limit, so it never fails.
 pub const LINE_LIMIT: usize = 500;
 
+/// `compatibility` chars above which `SK17` warns.
+///
+/// The Agent Skills spec says "Must be 1-500 characters if provided", the Claude Code
+/// frontmatter reference "a string of up to 500 characters". Neither agent acts on the
+/// field, so it never fails.
+pub const COMPATIBILITY: Budget = Budget::soft(500);
+
 pub(crate) fn check(snapshot: &Snapshot) -> Report {
     Report::new(
         GATE,
@@ -27,6 +34,7 @@ pub(crate) fn check(snapshot: &Snapshot) -> Report {
             content::findings(snapshot),
             vec![tree::inventory(snapshot)],
             user::findings(snapshot),
+            standard::findings(snapshot),
         ]
         .concat(),
     )
@@ -67,7 +75,7 @@ mod tests {
         };
         let report = check(&snapshot);
         let probes: Vec<&str> = report.findings().iter().map(Finding::probe).collect();
-        let expected: Vec<String> = (1..=15).map(|n| format!("SK{n:02}")).collect();
+        let expected: Vec<String> = (1..=20).map(|n| format!("SK{n:02}")).collect();
         assert_eq!(probes, expected);
         assert!(
             report

@@ -124,7 +124,7 @@ fn a_clean_machine_passes_every_probe_including_user_scope() {
     );
     assert!(
         run.stdout
-            .ends_with("skills gate passed: 0 fail, 0 warn, 15 pass, 0 n/a\n"),
+            .ends_with("skills gate passed: 0 fail, 0 warn, 20 pass, 0 n/a\n"),
         "{}",
         run.stdout
     );
