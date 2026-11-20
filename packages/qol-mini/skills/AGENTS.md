@@ -28,3 +28,7 @@ The CLI that installs them is ruled in the root `AGENTS.md`, section "Skills".
 - Trigger evals read the description, never the body. Before a release, install
   the skill in a scratch project and run `claude -p "/<name>" --output-format
   stream-json --verbose`: a body that fails to load shows only there.
+  A skill that calls `npx qol-mini` runs the published version there: first
+  `vp pm pack`, then `npm i -D <tarball>` in the scratch project.
+  Under OpenCode: `opencode run --standalone --auto "<prompt>"`, in a scratch
+  project only; without `--auto` the session holds no shell tool.

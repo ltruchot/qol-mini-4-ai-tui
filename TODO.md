@@ -7,14 +7,20 @@ at that release. Two branches wait, stacked, nothing released from them:
 
 - `feat/vitals-fix`, PR #2, ready, CI green: a finding names the `qol-mini` command that
   fixes it (`run:` line), each gate takes `--json`, `qol-mini vitals --fix [--dry-run]`
-  runs the named commands and audits again (ADR 0010). To do: merge it into `main`.
-- `gate/skills-standard`, on top of it: probes `SK16`–`SK20` (fields no agent reads,
-  `compatibility`, scripts `SKILL.md` never names, package commands without a version,
-  injected commands nothing pre-approves) and criteria 13–15 of `skills-review` (what
-  belongs in a script, how a script behaves). To do: rebase on `main` once PR #2 is in,
-  open its PR, run `skills-review` from an installed copy under `claude -p` and
-  `opencode run`, and its trigger evals (the description did not change).
+  runs the named commands and audits again (ADR 0010). `agents-md-review` proposes the
+  printed command; run from an installed copy under `claude -p` and `opencode run`.
+  Next action: merge it into `main` (`gh pr merge 2 --rebase`); the session that wrote it
+  was refused the merge.
+- `gate/skills-standard`, PR #3, draft, based on `feat/vitals-fix`, CI green: probes
+  `SK16`–`SK20` (fields no agent reads, `compatibility`, scripts `SKILL.md` never names,
+  package commands without a version, injected commands nothing pre-approves) and
+  criteria 13–15 of `skills-review`; that skill ran from an installed copy under
+  `claude -p` and `opencode run --auto`. Left: rebase on `main` once PR #2 is in and
+  point the PR at `main`; a code review of the branch (`add-gate`, step 8); then
+  `gh pr ready 3`. Not run: the trigger evals of both review skills, their descriptions
+  being unchanged.
 
+Both branches hold this file; `main` holds the one of the 0.7.1 release.
 The next version is not chosen and no tag is pushed.
 
 0.6.2 is what `./install.sh --replace` delivered on this machine; the global files did
