@@ -19,3 +19,13 @@
 - A new crate or a bump meets the admission criteria of ADR 0007 and is pinned
   `=x.y.z` in `[workspace.dependencies]`. The 3-day cooldown in `.cargo/config.toml`
   stays; stable toolchains are exempt, nightlies are date-pinned.
+- A probe whose fix a `qol-mini` command applies names it with `with_command`: the
+  arguments without the repository, set only when the command does what the fix says on
+  every repository the finding fires on. A new command gets a test that runs the gate,
+  the command, the gate again (ADR 0010).
+- A probe's output never depends on listing order: `vitals-utils` sorts the walk.
+- The gate's own messages name the binary (`agents-md-chkr: cannot read …`).
+- The modules in `packages/qol-mini/wasm/` are built by `vp run wasm`, not by the test
+  setup: a cached `vp run` task filters the environment, `RUSTUP_TOOLCHAIN` included,
+  and cargo falls back to another toolchain. Run `vp run wasm` after a Rust change,
+  before `vp run -r test`.

@@ -4,11 +4,13 @@
 > Open a `todo/` file only for the item you work on. An item done → delete its line and its `todo/` file.
 
 A minimal kit for Claude Code and OpenCode, in one npm package, `qol-mini`,
-developed at `ltruchot/qol-mini-4-ai-tui`. Two scopes: **global** (hooks, status
-line, sounds, the kaizen review, in the Claude Code config dir; the OpenCode plugin,
-command and `cli.json` merge, in the OpenCode config dir) and **project**
-(skills, in `<project>/.claude`, read by both agents; `harmonize` and `vitals`, on one
-repo). It works on **Linux, macOS, WSL and Windows**, in **VS Code and Cursor**.
+developed at `ltruchot/qol-mini-4-ai-tui`, for Linux, macOS, WSL and Windows, in VS Code
+and Cursor. Two scopes:
+
+- global: hooks, status line, sounds, the kaizen review, in the Claude Code config dir;
+  the OpenCode plugin, command and `cli.json` merge, in the OpenCode config dir.
+- project: skills, in `<project>/.claude`, read by both agents; `harmonize` and
+  `vitals`, on one repo.
 
 **Purpose, which settles the trade-offs**: a model that is not working is a model you
 could hand something to. Every signal answers *is it running* first: green is
@@ -23,12 +25,15 @@ file, commit messages. The repo is public. The conversation is in the user's lan
 **Commits**: a message states the change and its technical reason. It never names a
 person, never narrates a session, a conversation or a review exchange, never speaks
 in the first person. The only trailer is `Co-Authored-By`; no `Claude-Session`. A
-decision worth keeping is an ADR in `docs/adr/NNNN-title.md`, anonymous: context,
-decision, consequences.
+decision worth keeping is an ADR in `docs/adr/`, named `NNNN-title.md`, anonymous:
+context, decision, consequences.
 
-**Style**: terse. No metaphors, no wind-up. Name the trigger, then the action. Say
-what is measured and what is assumed. The README is tables and commands only: no
-reasoning, no adjectives.
+**Style**:
+
+- Terse. No metaphors, no wind-up. Name the trigger, then the action.
+- Say what is measured and what is assumed.
+- The README is tables and commands only: no reasoning, no adjectives.
+
 **Mandatory**: this file, code comments and the README state what is and what must
 be, never what was. No "an earlier version", "used to", "changed from X to Y", no
 incident dates or counts. History and proof belong to commit messages.
@@ -66,52 +71,19 @@ A prompt that blocks a script or CI is a bug.
 
 ## Constraints
 
-### Hook output
+### Where the subtree rules live
 
-- `terminalSequence` is a **root** field. Inside `hookSpecificOutput` it is ignored
-  with no error. Keep the test that requires it at the root.
-- Only OSC 0/1/2/9/99/777 and BEL pass. One byte outside the allowlist drops the
-  whole field silently: strip control characters from anything interpolated.
-- A sequence ends in BEL or ST — ours ends in ST: some terminals ring on a BEL
-  terminator, one beep per title set.
-- It is applied in interactive sessions only, never under `-p` or the Agent SDK.
-- A hook has no terminal: `/dev/tty` is unreachable. `terminalSequence` is the only
-  way to write to it.
-- Stdout on `UserPromptSubmit` that is not strict JSON is injected into the
-  conversation. Print JSON or nothing.
-- When behavior contradicts the published schema, trust the behavior and read the
-  binary with `grep -a`. Without `-a`, grep reports nothing on a binary.
+A nested `AGENTS.md` loads, in both agents, when a file below it is read. Read the one
+for the code you change before you change it:
 
-### The tab marker needs three things, and none reports its absence
-
-1. `"terminal.integrated.tabs.title": "${sequence}"` in the editor.
-2. `CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1` in the `env` block: Claude Code redraws its
-   own title continuously and wins otherwise.
-3. The root-level `terminalSequence`.
-
-- The marker is a character in the tab **name**. The tab icon and its color cannot be
-  set: only the extension that creates a terminal can, at creation.
-- No animation: hooks fire on events, not on a clock.
-- No "session ended" state: nobody sees it. `SessionEnd` stays in `EVENTS` with no
-  handler, so the purge clears it from any config.
-- `${sequence}` retitles **every** terminal, a shell tab included. Hence
-  `--tab-state` is opt-in, and `qol-mini vscode --revert` exists.
-
-### A project opts out with a file
-
-- Hook entries merge across settings levels and no project file removes one of
-  ours: `disableAllHooks` in a project takes that project's own hooks down too.
-  So each script asks the question itself.
-- `.claude/qol-mini-off` in a project, empty: `precompact-kaizen`, `tab-state` and
-  `play` do nothing there, from any depth below it. The walk up stops
-  below `$HOME`, so a stray file in the home directory silences nothing.
-- The file can name features, split on spaces or commas: `kaizen`, `tab`, `sounds`.
-  Then only those are off. Every hook passes its own feature to `optedOut()`.
-- With `kaizen` off and `tab` on, `precompact-kaizen --marker` still emits green on
-  `PreCompact`: it is the only emitter registered there.
-- Skills are outside the opt-out: nothing of theirs runs in a hook.
-- The status line is not in the opt-out: a project that wants another one sets
-  `statusLine` in its own settings, which outranks ours.
+| Rules | File |
+|---|---|
+| hooks, tab marker, `/compact` gate, installer, status line | `packages/qol-mini/src/kit/AGENTS.md` |
+| the OpenCode plugin and its delivery | `packages/qol-mini/opencode/AGENTS.md` |
+| writing a bank skill | `packages/qol-mini/skills/AGENTS.md` |
+| `qol-mini harmonize` | `packages/qol-mini/src/harmonize/AGENTS.md` |
+| the `vitals` launcher and its WASI host | `packages/qol-mini/src/vitals/AGENTS.md` |
+| the Rust gates | `crates/AGENTS.md` |
 
 ### Reload
 
@@ -120,159 +92,10 @@ A prompt that blocks a script or CI is a bug.
 - Reloading the editor window restarts nothing: it reconnects to the same processes.
 - Do not ask for a restart beyond those two cases.
 
-### PreCompact hands the agent nothing
+### Lessons
 
-- `exit 2` blocks the compaction and shows stderr to the **user** only. It never
-  reaches the conversation.
-- `PreCompact` accepts no `additionalContext`. `PostCompact` has no decision control.
-- So stderr is two lines addressed to a human, naming `/kaizen`. The review lives in
-  the skill, never in the hook.
-- Read the exit-code table by row: stderr goes to the agent on `PreToolUse`, `Stop`,
-  `PostToolUse`, not on `PreCompact`, `SessionStart`, `SubagentStart`,
-  `PostModelSwitch`.
-- Automatic compaction is never blocked, and no review is possible on it.
-- `SessionStart` with matcher `compact` is the only channel to the agent after a
-  compaction, manual or automatic. `precompact-kaizen --after-compact` uses it
-  to name `TODO.md`, and emits no marker: `tab-state` owns `SessionStart`,
-  under matcher `startup|resume|clear` only — an automatic compaction happens
-  mid-turn, and yellow there would hide a working model.
-- The release token is keyed on the working **directory**, not the session: the
-  skill writes it from a plain shell, a manual `/kaizen` arms the next `/compact`,
-  and one project's review does not release another's.
 - A lesson goes to the repo's rules file (`AGENTS.md`, else `CLAUDE.md`) or to a named
   skill. Never to `~/.claude/CLAUDE.md`.
-
-### One marker per event
-
-- Hooks on one event run concurrently and each sequence is applied: two markers on
-  one event race. Register one `terminalSequence` emitter per event.
-- `PreCompact` belongs to `precompact-kaizen`, the only hook that knows whether
-  compaction runs: green if it passes, red if held back. It emits `hookOutput()`
-  under `--marker`. Without kaizen, `tab-state` takes `PreCompact`; without the
-  marker, no `--marker`.
-- On the blocking path the sequence is applied before the exit status is read.
-- `PostCompact` matches `manual` only: an automatic compaction happens mid-turn.
-
-### When green is set
-
-- No event fires when the model starts thinking. Reclaim green on `UserPromptSubmit`,
-  `PostToolBatch` and `SubagentStop`, the last moments before work resumes.
-- Subagents fire `PostToolBatch` on their own loop, after the main thread's `Stop`.
-  Only the main thread paints green: skip `working` when `agent_id` or `agent_type`
-  is present, except on `SubagentStop`, which always carries both: it is the
-  orchestrator resuming. Red from a subagent stays.
-- Internal agents (prompt suggestions, `/btw`) fire `SubagentStop` after the
-  turn's `Stop`, with `agent_type` empty: no green there, or it paints over red.
-- `Stop` with a non-empty `background_tasks` or `session_crons` stays green and
-  silent: the session wakes itself. The registry can lag by one task at the instant
-  it settles; do not treat it as exact.
-
-### When red is set
-
-- `PermissionRequest` fires when the dialog appears; `permission_prompt` fires only
-  after about six seconds without a keystroke. Red rides `PermissionRequest`; the
-  sound keeps `Notification`, so it does not ring at someone already looking.
-- A turn ending on a question is a plain `Stop`. Rule: the last non-empty line of
-  `last_assistant_message`, stripped of markdown emphasis and closing brackets, ends
-  with `?` → red and `needs-you`. Background work outranks it. Keep it that narrow.
-- `idle_prompt` fires a minute after `Stop`, with no `last_assistant_message`:
-  `tab-state` reads the newest main-thread text from the transcript
-  (`kit/hooks/last-text.ts`), or yellow paints over that red.
-- Wired from the reference, **not observed**: `quota_auto_resume_stale` and
-  `quota_auto_resume_disabled` red with sound, `quota_auto_resume_fired` green,
-  `StopFailure` red without sound. If one misbehaves, unwire it in `kit/wire.ts`.
-
-### Nothing fires when a turn is cut short
-
-- Esc, or refusing a permission, emits no hook. The marker holds until the next
-  prompt. This is a known gap.
-- `idle_prompt` does not rescue it: an interrupt leaves the last completion time
-  untouched, and the idle check returns on exactly that.
-- Not usable: `StopFailure` (API errors only), `PermissionDenied` (auto-mode
-  classifier only), the status line (runs on a clock but cannot write to the
-  terminal).
-- Open: `PostToolUseFailure.is_interrupt` may fire when a running tool is aborted.
-  Unmeasured, and it would cover that one case only.
-- A transcript watcher per session would close the gap. It is a process on a clock,
-  which this kit does not carry.
-
-### Installer
-
-- Hooks use exec form: `{"type": "command", "command": <node>, "args": [<script>,
-  <arg>]}`. The interpreter is `process.execPath`. No shell string, no Git Bash.
-  Under a version manager that path is tied to one Node version: running
-  `install` again rewrites it. Why not a bare `node`: `docs/adr/0002-hooks-run-an-absolute-node.md`.
-- A `dlx` run lives in a temporary cache: the hooks are copied into the config dir,
-  never referenced in the package. Each one is a standalone bundle, built from its
-  own `pack` entry so no chunk is shared, and named `.mjs`: a bare `.js` with no
-  `package.json` beside it is not read as an ES module.
-- The installer reads the bundles from `dist/`: build before `install` from a clone.
-- Every delivered file is created if missing, left if identical, and if different
-  **nothing at all is written** and the files are named. `--replace` overwrites.
-  One exception: a file that differs only by the quoted node path (the kaizen
-  `SKILL.md` names `process.execPath`) is rewritten without `--replace`.
-- `settings.json` is written, with a `.bak-` copy, only when the merge changes it.
-  Same for `uninstall`. Every config write is a temp file then a rename
-  (`writeFileAtomic`); a symlinked file is written at its target.
-- `uninstall` cleans `settings.json` and `cli.json` before it removes a file: a
-  config that fails to parse stops it with every hook still pointing at its
-  script. A sound or the kaizen `SKILL.md` that differs from what install
-  delivers is kept and named.
-- Sound files are never regenerated: users drop their own.
-- Options overlay `installedState()`: `--replace` alone keeps the installed options.
-  With nothing of ours in `settings.json`, the base is the defaults. `--defaults` is
-  the only reset. Each feature has both flags.
-- The installer purges its own handlers before adding the enabled ones.
-  `withoutOurs()` is shared with `uninstall`. `OURS` matches a script without its
-  extension, so a handler on a `.py` or `.sh` copy goes too. When a delivered file is
-  renamed, add the old name to `OURS` and `SUPERSEDED`.
-- Superseded files are removed last, after `settings.json` is written. A running
-  session reloads hooks through a file watcher, after a delay: until then it calls
-  the handlers it holds, on files that are gone. `install` says so when it removes one.
-- A restart is named in two cases only: the `env` block changed, or `skills/` did
-  not exist before the run.
-- An editor `settings.json` is JSONC: insert the key textually, never parse and
-  reserialize.
-
-### The OpenCode target
-
-- `packages/qol-mini/opencode/` is plugin code shipped as-is for the OpenCode
-  runtime: OpenCode resolves `@opencode/plugin` at load, so nothing is built
-  and the package gains no dependency. `fmt`, `lint` and the line law skip it;
-  a test runs `node --check` on every face.
-- One feature set for both agents: the plugin reads the Claude Code `settings.json`
-  (`configured()` in `opencode/shared.js`), never its own state. Turning a
-  feature off unwires both. `installedState()` stays the only source.
-- The config dir resolves as OpenCode resolves it: `$XDG_CONFIG_HOME/opencode`
-  else `~/.config/opencode`. The tests isolate it through `XDG_CONFIG_HOME`.
-- `cli.json` accepts documented keys only: `attention.sound`,
-  `attention.sounds`, `terminal.title`. Never write another one.
-- A delivered slash command stays active on disk, unlike an unwired hook:
-  turning kaizen off removes `commands/kaizen.md` (`stale` in the OpenCode
-  plan).
-- The tab marker writes the title sequence to `/dev/tty`: the TUI owns the
-  screen, that is the only way out, and `terminal.title: false` keeps OpenCode
-  from rewriting the title. Windows has no `/dev/tty`: no marker there, and no
-  `terminal.title` in `cli.json`, so OpenCode keeps its own.
-- `/compact` has no PreCompact hook in OpenCode: the TUI plugin registers the
-  command and checks the same token the Claude Code hook consumes. Verified live:
-  the plugin's entry holds back and honors the token; the built-in entry
-  keeps its own palette slot and compacts ungated — no plugin removes it. A
-  live refusal showed the toast alone is easy to miss: the refusal also
-  raises a modal with the same words.
-- Events, not hooks: `session.execution.*` for working and idle,
-  `permission.asked`, `form.created`, `session.status` (a retry with an action
-  is blocked on you, one without resumes alone), `session.compaction.*` for the
-  reminder. A pause does not end the execution: `permission.replied`,
-  `form.replied` and `form.cancelled` repaint working — without them the
-  marker holds its red through the resumed run. `session.execution.interrupted`
-  is not wired: the marker holds on Esc, the same known gap as Claude Code.
-- The service watches the plugin dir: changed files reload hot — retest
-  server-face fixes in place; a live TUI may hold the old command bytes,
-  so restart it before retesting the gate. `install` names `opencode service
-  restart` when they moved. `cli.json` and `commands/` reload hot.
-- OpenCode behavior: the opencode.ai/docs pages describe V1. Read the V2 source
-  (`anomalyco/opencode`, `packages/core/src`) and cite the commit.
 
 ### Skills
 
@@ -289,85 +112,11 @@ A prompt that blocks a script or CI is a bug.
 - An argument holding a path separator, or `.`, is the project; every other
   argument must be a kebab-case skill name.
 - Writes go to `<project>/.claude` and `~/.cache/qol-mini`, nowhere else.
-- The bank grows by review: skills duplicated across local projects are collected and
-  compared at intervals, and one enters when the same need shows in several projects.
-  Its text is rewritten generic, every claim checked against a primary source.
-- A skill enters only if it serves professional work and can be public. Never: a
-  secret or a credential, private or personal data, a host or account name, an insecure
-  practice, copyrighted text without a license that allows it, a third party's skill
-  that has its own installer, anything specific to one project. What is specific to
-  a project is a placeholder, or stays in that project.
 - A managed skill is a vendor file for the project's formatters and linters: one that
-  rewrites it turns it into `drift` and makes its update conflict. `install` names the
-  paths to ignore after it adds a skill, `check` when it finds `drift`; both list the
-  tools configured at the project root (`io/lint-configs.ts`). The kit reads those
-  configs and never writes one: the README holds the prompt that does.
-- The bank's `SKILL.md` frontmatter holds only the fields of the skills reference; a
-  field outside the table is ignored by Claude Code with no error.
-- A `SKILL.md` never holds an exclamation mark before a backquoted command, in
-  prose or in a table: Claude Code runs it when the skill loads, and the skill
-  fails with `Shell command permission check failed`. Name the syntax in words.
-- `paths` hides a skill: absent from the listing, `Unknown skill` on invoke, until a
-  matching file inside the working directory is read. A skill needed before a command
-  runs, not before a file is read, carries no `paths`.
-- A new or changed bank skill goes through `skill-creator`: trigger evals
-  (`scripts.run_eval`, should and should-not queries) and old-against-new runs. Run
-  `run_eval` with `--num-workers 1`, one scratch project per skill: parallel workers
-  share `.claude/commands/`, the model picks another worker's copy, and every query
-  reads as untriggered.
-  `tests/unit/shipped-skills.test.ts` holds the list.
-- Trigger evals read the description, never the body. Before a release, install
-  the skill in a scratch project and run `claude -p "/<name>" --output-format
-  stream-json --verbose`: a body that fails to load shows only there.
-
-### Harmonizer
-
-- `qol-mini harmonize` makes one repo run under both agents. Sources:
-  `src/commands/harmonize-*.ts`, `src/harmonize/`, `src/core/harmonize/`.
-  The design lives in `docs/adr/0003-agents-md-is-the-canonical-rules-file.md`
-  and `docs/harmonize.md`.
-- AGENTS.md is the canonical rules file: `--rules pure` leaves it alone in the
-  repo, `bridge` and `symlink` are the named fallbacks. Rules files are never
-  lock artifacts: `check` verifies the layout state, not a hash — AGENTS.md is
-  the user's file.
-- `pure` moves the rules, not what names them: after a run, `git grep -n
-  'CLAUDE\.md'` finds the repo's own references (docs, skills, code allow
-  lists); `check` does not see them.
-- The first run decides the source of truth; a re-run keeps it, `--from`
-  overrides. Auto-detection is not stable once both sides exist: a flip would
-  convert the tool's own output back.
-- Two rules files where one imports the other merge into AGENTS.md, the
-  import line replaced by the imported file (`core/harmonize/rules-merge.ts`):
-  OpenCode does not expand `@` imports. Two that differ otherwise are a
-  conflict: nothing is written until `--replace` names the winner. A generated markdown file edited by hand
-  is named, not overwritten; one the kit never wrote is never overwritten.
-- A JSON config the user wrote (`opencode.json(c)`, `settings.json`,
-  `.mcp.json`) is patched in place with `jsonc-parser`: only owned keys move,
-  comments and key order stay. Never reserialize it: in OpenCode's legacy
-  `permission` map, key order is precedence.
-- OpenCode output is the 2.1 native form, decoded in the tests by
-  `@opencode/schema` (`tests/helpers/opencode.ts`): `permissions` array,
-  `mcp.servers`, native agent keys. A command whose `model` is not
-  `provider/model` fails that decode and OpenCode drops it without a word.
-  Why: `docs/adr/0004-opencode-output-is-checked-against-its-schema.md`.
-- Precedence: Claude Code applies deny, ask, allow; OpenCode the last
-  matching rule. Converted rules go allow, ask, deny, ahead of the user's
-  own `permissions`. Overriding a stricter legacy rule is a conflict.
-- `settings.local.json` is machine-local: reported, never converted. MCP
-  values that are literal, not `${VAR}` or `{env:VAR}`, are named before they
-  can land in a committed file.
-- The tests run the sources; `tests/e2e/bin-harmonize.test.ts` runs the
-  bundle. The bundler resolves `module` before `main`: a UMD `main` that
-  requires its parts at runtime breaks the bundle only.
-- A kept file git ignores is a warning naming the `.gitignore` line, never a
-  conflict (`harmonize/gitignored.ts`): the run still writes. A tracked file
-  is never reported: git keeps it whatever the ignore rules say.
-- Backups for `undo` live under `~/.cache/qol-mini/harmony/<repo>/`; slot
-  numbers only grow, so an artifact carried between runs keeps its slot.
-- Hooks are reported with the OpenCode event or hook a plugin listens to,
-  not converted: a hook body is an arbitrary command.
-- Scan walks named roots only, never `/` or the home directory, and a dir
-  holding `.git` is scanned, not descended into.
+  rewrites it turns it into `drift` and makes its update conflict.
+- `install` names the paths to ignore after it adds a skill, `check` when it finds
+  `drift`; both list the tools configured at the project root (`io/lint-configs.ts`).
+  The kit reads those configs and never writes one: the README holds the prompt that does.
 
 ### Vitals
 
@@ -377,34 +126,7 @@ A prompt that blocks a script or CI is a bug.
   before proposing a feature. `docs/vitals.md` holds the probe tables.
 - Rust judges, TypeScript launches. No probe, parser or verdict is written in
   TypeScript. Why: `docs/adr/0009-the-gates-ship-as-webassembly.md`.
-- The gates read and never write. The WASI host (`src/vitals/wasi/`) refuses an open
-  that would create or truncate and holds no write call for a file.
-- A probe whose fix a `qol-mini` command applies names it with `with_command`: the
-  arguments without the repository. `vitals --fix` runs it only under `harmonize` or
-  `skills`. A new command gets a test that runs the gate, the command, the gate
-  again. Why: `docs/adr/0010-a-finding-names-the-command-that-fixes-it.md`.
 - The `--json` report is an interface: add a field, never rename one.
-- The host implements the preview1 calls the modules import, and no other. A new
-  import fails at instantiation: list them with `WebAssembly.Module.imports` and add
-  the call. `node:wasi` is not used: on Windows its `fd_readdir` is not implemented.
-- WASI has no working directory, no drive letter, no home directory. The host
-  preopens the root of the repository's drive as `/`, passes absolute guest paths
-  (`vitals/guest.ts`), and names the home directory through `HOME`, which
-  `vitals-utils` reads under `cfg(target_os = "wasi")`. A home directory on another
-  drive is not named: the user-scope probes run without it.
-- A probe's output never depends on listing order: `vitals-utils` sorts the walk.
-- The modules in `packages/qol-mini/wasm/` are built by `vp run wasm`, not by the test
-  setup: a cached `vp run` task filters the environment, `RUSTUP_TOOLCHAIN` included,
-  and cargo falls back to another toolchain. Run `vp run wasm` after a Rust change,
-  before `vp run -r test`.
-- A change to the host is checked against the native binaries: same stdout and exit
-  status on the same trees, both gates, with and without `--repo-only`. An OS error
-  differs by its number only (`os error 44` under WASI, `2` native).
-- User-scope probes read the parent directories and the home directory of the
-  machine: tests assert on `--repo-only` output, or on paths they built.
-- The gate's own messages name the binary (`agents-md-chkr: cannot read …`).
-- The rules for the Rust sources are in `crates/AGENTS.md`, loaded when a file
-  under `crates/` is read.
 
 ### Windows
 
@@ -415,30 +137,8 @@ A prompt that blocks a script or CI is a bug.
 - The `.ps1` wrappers set errors to `Continue` around native commands: under
   PowerShell 5.1 a native command writing to stderr is terminating under `Stop`.
 
-### Status line
-
-- The gauge and the fraction share one denominator, the **alert threshold**, not the
-  window: on a 1M model a window-relative bar is near empty when the alert matters.
-- The unit sits on the denominator only: `0k/200k` reads as "Ok".
-- `effort.level` follows the model, absent when the model takes no effort.
-- The config dir closes the line only when `CLAUDE_CONFIG_DIR` is not
-  `~/.claude`: a wrapper that relocates it runs its own install, and the line
-  names which one is live. The status line inherits Claude Code's environment.
-
 ## Method
 
-- Instrument the installed copy in `~/.claude/hooks/`: scripts are re-read on each
-  call, so a probe works without restart. Reinstall with `--replace` after.
-- A hook that returns `additionalContext` leaves no transcript entry and no
-  terminal output. Running it by hand proves the script, not the wiring: for
-  that, start with `claude --debug` and read `~/.claude/debug/<session-id>.txt`.
-- Check what OpenCode loads in a repo: `HOME` and `XDG_*` on a scratch dir,
-  `opencode service set port <free>` first, or it takes the real service's
-  port; then `opencode api GET /api/agent` or `/api/command` with
-  `-H "x-opencode-directory:<repo>"`, repeated until more than the built-ins
-  show; `opencode service stop` after, same env.
-- Wake another session with `SendMessage` to make its hooks fire.
-- `/proc/PID/environ` cannot show a variable set by `settings.json`.
 - The shell is zsh: quote a word that starts with `=` and any glob passed as an
   argument, and wrap a command in a function, not in a variable: `$CMD args` is
   one word there. Never name a variable `path`: zsh ties it to `$PATH`.
@@ -530,28 +230,7 @@ throwaway directories.
 ## Release
 
 A tag `v<version>` matching `packages/qol-mini/package.json` publishes to npm from
-`.github/workflows/release.yml`, through trusted publishing.
-
-- The job runs in the GitHub environment `release`, which has required reviewers:
-  a pushed tag publishes nothing until the run is approved. The npm trust names
-  that environment. Keep `environment: release` in the workflow.
-- Approve a waiting run with `gh api -X POST
-  repos/ltruchot/qol-mini-4-ai-tui/actions/runs/<run>/pending_deployments
-  --input -` and `{"environment_ids": [<id>], "state": "approved"}`: form
-  fields fail on the id, it goes as a JSON integer array.
-- Actions are pinned by commit SHA and npm by version: the job holds the right
-  to publish.
-- The job installs the Rust toolchain of `mise.toml`, runs `cargo xtask check` and
-  builds the WASI modules from the tagged commit: a tarball never ships modules built
-  elsewhere.
-- The job restores no cache (`cache: false`), keeps no git token
-  (`persist-credentials: false`), and fails unless the tagged commit is an
-  ancestor of `origin/main`, checked before anything installs.
-
-- `npm` refuses to run at the repository root: the root `package.json` pins pnpm
-  through `devEngines`. Run `npm login` and `npm publish` from `packages/qol-mini`.
-- Publish the tarball made by `vp pm pack`, never the directory: pnpm resolves the
-  `catalog:` versions when it packs. `docs/release.md` holds the commands.
-- A publish is verified by the run log, not `npm view`: the `+
-  qol-mini@<version>` line in the job output is the proof, the registry
-  serves a new version minutes later.
+`.github/workflows/release.yml`. `docs/release.md` holds the steps, the approval of a
+waiting run, and the manual path. Keep `environment: release`, the SHA pins,
+`cache: false` and `persist-credentials: false` in that workflow: the job holds the right
+to publish.

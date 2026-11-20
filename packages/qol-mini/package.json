@@ -17,7 +17,9 @@
     "dist",
     "opencode",
     "skills",
-    "wasm"
+    "wasm",
+    "!opencode/AGENTS.md",
+    "!skills/AGENTS.md"
   ],
   "type": "module",
   "publishConfig": {
