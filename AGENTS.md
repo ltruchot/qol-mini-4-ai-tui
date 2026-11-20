@@ -61,6 +61,7 @@ Sources are under `packages/qol-mini/src/`.
 | `qol-mini skills install\|update\|list\|check\|remove` | project scope, or `--global` |
 | `qol-mini harmonize <project>\|check\|undo\|scan` | repo scope, both agents: one command converts, `check` exits for CI, `undo` restores, `scan` lists repos under named roots |
 | `qol-mini vitals [agents-md\|skills] [project] [--repo-only] [--json] [--fix [--dry-run]]` | repo scope, both agents: every gate or the named one; exit 0, 1 a probe failed, 2 unreadable; read-only, except `--fix`, which runs the commands the findings name |
+| `qol-mini kaizen release` | writes the `/compact` release token for the current directory, as the hook's `--release` does (`commands/kaizen-cli.ts`) |
 
 `install.sh`, `uninstall.sh`, `install-vscode.sh`, `install-skills.sh` and their
 `.ps1` twins run the same commands from a clone, through `scripts/qol-mini.sh`.
@@ -107,7 +108,9 @@ points to the file to read.
 - A skill declares its `{{NAME}}` placeholders in `qol-mini.yaml`. Only declared
   names are substituted. `RELEASE_COMMAND` and `QOL_MINI_VERSION` are computed, never
   asked; `skills check --frozen` reads the pin from the lock, so a kit upgrade alone
-  changes no installed copy (`commands/builtins.ts`).
+  changes no installed copy (`commands/builtins.ts`). A skill copy in a project names no
+  machine path: its `RELEASE_COMMAND` is `npx qol-mini@<pin> kaizen release`; only the
+  global copy names the hook by absolute path (ADR 0011).
 - The lock, `.claude/qol-mini.lock.json`, is the managed set: a skill directory
   absent from it is never touched without `--replace`.
 - `install` on a managed skill is an update: three-way merge of the installed

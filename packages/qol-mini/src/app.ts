@@ -3,6 +3,7 @@ import { fail, print, printErr } from "./io/ui.ts";
 import { runKit } from "./kit/index.ts";
 import { VERSION } from "./version.ts";
 import { harmonize, HARMONIZE } from "./commands/harmonize-cli.ts";
+import { kaizen, KAIZEN_CMD } from "./commands/kaizen-cli.ts";
 import { skills, SKILLS } from "./commands/skills-cli.ts";
 import { vitals, VITALS } from "./commands/vitals-cli.ts";
 
@@ -10,6 +11,7 @@ async function dispatch(argv: string[]): Promise<number> {
   if (argv[2] === SKILLS) return skills(argv);
   if (argv[2] === HARMONIZE) return harmonize(argv);
   if (argv[2] === VITALS) return vitals(argv);
+  if (argv[2] === KAIZEN_CMD) return kaizen(argv);
   if (argv[2] === "--version" || argv[2] === "-v") {
     print([VERSION]);
     return 0;

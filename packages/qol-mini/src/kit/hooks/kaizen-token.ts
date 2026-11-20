@@ -36,6 +36,9 @@ export function sweepStale(now: number): void {
   }
 }
 
+// What a release prints, the token path on the next line
+export const RELEASED = "Kaizen recorded. /compact will now go through.";
+
 export function release(cwd: string): string {
   const token = tokenFor(cwd);
   mkdirSync(stateDir(), { recursive: true });

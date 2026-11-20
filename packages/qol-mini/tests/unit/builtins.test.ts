@@ -20,12 +20,22 @@ test("the pin is the kit version on install, the recorded one under check", () =
   });
 });
 
-test("the release command is computed even when the lock records one", () => {
-  const answers = builtinAnswers(manifest("kaizen"), { RELEASE_COMMAND: "elsewhere" });
-  expect(answers["RELEASE_COMMAND"]).not.toBe("elsewhere");
+test("a project release names no machine path, and is computed from the pin", () => {
+  const recorded = { RELEASE_COMMAND: "elsewhere", QOL_MINI_VERSION: "0.1.0" };
+  expect(builtinAnswers(manifest("kaizen"))["RELEASE_COMMAND"]).toBe(
+    `npx qol-mini@${VERSION} kaizen release`,
+  );
+  expect(builtinAnswers(manifest("kaizen"), recorded)["RELEASE_COMMAND"]).toBe(
+    "npx qol-mini@0.1.0 kaizen release",
+  );
 });
 
 test.each(bank)("$name: every qol-mini package command is pinned", ({ files }) => {
   const text = [...files.values()].map((file) => file.bytes.toString("utf8")).join("\n");
   expect(text.match(/\b(?:npx|pnpm dlx) qol-mini(?!@)/gu)).toBeNull();
+});
+
+test.each(bank)("$name: no computed value names a machine path", ({ manifest: m }) => {
+  const values = Object.values(builtinAnswers(m));
+  expect(values.filter((v) => /(^|[\s"'])(\/|[A-Za-z]:\\)/u.test(v))).toStrictEqual([]);
 });
