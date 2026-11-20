@@ -401,7 +401,7 @@ The [Agent Skills spec](https://agentskills.io/specification) adds the portable 
 | `SK18` | scripts are named | warn for a file under the skill's `scripts/` whose file name `SKILL.md` never holds (S6); hidden files and `__*` directories are not judged |
 | `SK19` | package commands are pinned | warn for `npx`, `bunx`, `uvx`, `pnpm dlx`, `yarn dlx`, or `pipx run` in a code span or a fenced block of `SKILL.md` whose package holds no `@version` or `==version` (S7); a path, a variable, or a placeholder is not a package |
 | `SK20` | injected commands are pre-approved | warn for an injection line (C20) in a `SKILL.md` with no `allowed-tools`: outside auto mode Claude Code aborts the skill unless a permission rule allows the command (C21) |
-| `SK15` | user scope: personal skills that shadow project skills | warn for each skill in the repository's `.claude/skills/` whose name is also in `~/.claude/skills/`: Claude Code runs the personal copy, OpenCode the project one |
+| `SK15` | user scope: personal skills that shadow project skills | warn for each skill in the repository's `.claude/skills/` whose name is also in `~/.claude/skills/`: Claude Code runs the personal copy, OpenCode the project one. A pair passes when the repository's `.claude/qol-mini.lock.json` records the skill from the qol-mini bank and both copies carry the same `name` and `description`: the kit's global and project copies of one bank skill, which release the same token |
 
 The tree is the one `agents-md` walks (hidden files, `.gitignore` honored, `.git/` and
 `.claude/worktrees/` skipped), plus every skill root read whole with no ignore rule, as

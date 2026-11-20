@@ -12,6 +12,7 @@ use std::path::{Path, PathBuf};
 
 use vitals_utils::{Finding, Verdict, or_pass};
 
+use crate::kit;
 use crate::layout::SKILL_MD;
 use crate::snapshot::{OutsideRoot, Skill, Snapshot, User};
 
@@ -100,10 +101,22 @@ fn one_sided(user: &User, personal: Option<&Path>) -> Vec<Finding> {
     )
 }
 
+/// Whether `skill` and its personal namesake are the qol-mini kit's two copies of one bank
+/// skill: the repository's lock records it, and both carry the same name and description.
+fn kit_pair(skill: &Skill, user: &User) -> bool {
+    let name = &skill.place.name;
+    user.managed.contains(name)
+        && user
+            .personal
+            .iter()
+            .any(|(other, text)| other == name && kit::same_skill(text, &skill.text))
+}
+
 /// `SK15`: no personal Claude Code skill shares a name with a skill that Claude Code loads
-/// from `.claude/skills` at the repository root, where each name is a single folder.
+/// from `.claude/skills` at the repository root, where each name is a single folder,
+/// unless the two are the kit's copies of one bank skill.
 fn shadowed(skills: &[Skill], user: &User, personal: Option<&Path>) -> Vec<Finding> {
-    let found: Vec<Finding> = personal
+    let shadowing: Vec<&Skill> = personal
         .and_then(|path| user.roots.iter().find(|root| root.path == path))
         .map_or_else(Vec::new, |root| {
             skills
@@ -111,18 +124,28 @@ fn shadowed(skills: &[Skill], user: &User, personal: Option<&Path>) -> Vec<Findi
                 .filter(|skill| skill.place.scope.as_os_str().is_empty())
                 .filter(|skill| skill.place.root.claude_reads())
                 .filter(|skill| root.skills.contains(&skill.place.name))
-                .map(|skill| shadow(&root.path, skill))
                 .collect()
         });
-    or_pass(
-        found,
-        Finding::new(
-            "SK15",
-            Verdict::Pass,
-            "..",
-            "no personal skill shares a name with a project skill",
+    let (pairs, found): (Vec<&Skill>, Vec<&Skill>) = shadowing
+        .into_iter()
+        .partition(|skill| kit_pair(skill, user));
+    let base = personal.unwrap_or_else(|| Path::new(".."));
+    let message = if pairs.is_empty() {
+        "no personal skill shares a name with a project skill".to_owned()
+    } else {
+        let names: Vec<&str> = pairs
+            .iter()
+            .map(|skill| skill.place.name.as_str())
+            .collect();
+        format!(
+            "no personal skill shadows a project skill; {} is the qol-mini kit's personal \
+             and project copy of one bank skill",
+            names.join(", ")
         )
-        .in_user_scope(),
+    };
+    or_pass(
+        found.into_iter().map(|skill| shadow(base, skill)).collect(),
+        Finding::new("SK15", Verdict::Pass, "..", message).in_user_scope(),
     )
 }
 
@@ -178,6 +201,7 @@ mod tests {
             user: Some(User {
                 home: Some(PathBuf::from("/home/dev")),
                 roots,
+                ..User::default()
             }),
         })
     }
@@ -269,6 +293,47 @@ mod tests {
     }
 
     #[test]
+    fn the_kits_two_copies_of_one_bank_skill_pass() {
+        let kaizen = "---\nname: kaizen\ndescription: Review the session.\n---\n";
+        let project = Skill {
+            text: format!("{kaizen}npx qol-mini kaizen release\n"),
+            ..skill("", Root::Claude, "kaizen")
+        };
+        let machine = |managed: &[&str], description: &str| User {
+            home: Some(PathBuf::from("/home/dev")),
+            roots: vec![root("/home/dev/.claude/skills", &["kaizen"])],
+            managed: managed.iter().map(|name| (*name).to_owned()).collect(),
+            personal: vec![(
+                "kaizen".to_owned(),
+                format!("---\nname: kaizen\ndescription: {description}\n---\nnode hook\n"),
+            )],
+        };
+        let sk15 = |user: User| {
+            let found = findings(&Snapshot {
+                skills: vec![project.clone()],
+                files: Vec::new(),
+                user: Some(user),
+            });
+            found.into_iter().find(|f| f.probe() == "SK15").unwrap()
+        };
+        let pair = sk15(machine(&["kaizen"], "Review the session."));
+        assert_eq!(pair.verdict(), Verdict::Pass);
+        assert!(
+            pair.message()
+                .contains("kaizen is the qol-mini kit's personal")
+        );
+        // Not in the lock, or another description: two skills under one name.
+        assert_eq!(
+            sk15(machine(&[], "Review the session.")).verdict(),
+            Verdict::Warn
+        );
+        assert_eq!(
+            sk15(machine(&["kaizen"], "Something else.")).verdict(),
+            Verdict::Warn
+        );
+    }
+
+    #[test]
     fn no_home_means_no_personal_root() {
         let found = findings(&Snapshot {
             skills: vec![skill("", Root::Claude, "deploy")],
@@ -276,6 +341,7 @@ mod tests {
             user: Some(User {
                 home: None,
                 roots: vec![root("/srv/.agents/skills", &["deploy"])],
+                ..User::default()
             }),
         });
         assert_eq!(evidence(&found, "SK14"), ["/srv/.agents/skills"]);

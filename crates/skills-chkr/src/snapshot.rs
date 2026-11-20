@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use vitals_utils::markers::SKILL_ROOTS;
 use vitals_utils::{Error, Reach, fs};
 
+use crate::kit;
 use crate::layout::{Place, Root, SKILL_MD, Shape, locate, place, shape};
 use crate::user::HOME_ROOTS;
 
@@ -46,6 +47,10 @@ pub(crate) struct User {
     pub(crate) home: Option<PathBuf>,
     /// Skill roots in the parent directories and the home directory, nearest first.
     pub(crate) roots: Vec<OutsideRoot>,
+    /// Skills the repository's lock records from the qol-mini bank, sorted.
+    pub(crate) managed: Vec<String>,
+    /// The `SKILL.md` of each personal Claude Code skill, by name.
+    pub(crate) personal: Vec<(String, String)>,
 }
 
 /// What the probes see of a repository.
@@ -195,21 +200,52 @@ fn user(root: &Path) -> Result<User, Error> {
     let parents = fs::parent_dirs(root)?
         .into_iter()
         .flat_map(|dir| SKILL_ROOTS.iter().map(move |name| dir.join(name)));
-    let personal = home
+    let home_roots = home
         .iter()
         .flat_map(|home| HOME_ROOTS.iter().map(move |name| home.join(name)));
-    let candidates = parents.chain(personal).fold(Vec::new(), |mut seen, path| {
-        if !seen.contains(&path) {
-            seen.push(path);
-        }
-        seen
-    });
-    let roots = candidates
+    let candidates = parents
+        .chain(home_roots)
+        .fold(Vec::new(), |mut seen, path| {
+            if !seen.contains(&path) {
+                seen.push(path);
+            }
+            seen
+        });
+    let roots: Vec<OutsideRoot> = candidates
         .into_iter()
         .map(outside_root)
         .filter_map(Result::transpose)
         .collect::<Result<_, _>>()?;
-    Ok(User { home, roots })
+    let managed =
+        fs::read_optional(&root.join(kit::LOCK))?.map_or_else(Vec::new, |lock| kit::managed(&lock));
+    let personal = personal_texts(home.as_deref(), &roots)?;
+    Ok(User {
+        home,
+        roots,
+        managed,
+        personal,
+    })
+}
+
+/// The `SKILL.md` of each skill in the personal Claude Code root, by name.
+fn personal_texts(
+    home: Option<&Path>,
+    roots: &[OutsideRoot],
+) -> Result<Vec<(String, String)>, Error> {
+    let Some(dir) = home.map(|home| home.join(HOME_ROOTS[0])) else {
+        return Ok(Vec::new());
+    };
+    let Some(root) = roots.iter().find(|root| root.path == dir) else {
+        return Ok(Vec::new());
+    };
+    root.skills
+        .iter()
+        .map(|name| {
+            let text = fs::read_optional(&dir.join(name).join(SKILL_MD))?;
+            Ok(text.map(|text| (name.clone(), text)))
+        })
+        .filter_map(Result::transpose)
+        .collect()
 }
 
 fn outside_root(path: PathBuf) -> Result<Option<OutsideRoot>, Error> {

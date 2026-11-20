@@ -221,7 +221,7 @@ whose facts `C`, `S`, and `O` the Source column cites).
 | `SK12` | references | fail: a relative link, outside code, to a file that does not exist | S3 |
 | `SK13` | skill inventory | lists every skill | - |
 | `SK14` | user scope: skill roots only OpenCode reads | warn: in a parent directory, or `~/.agents/skills`, `~/.config/opencode/skill(s)` | C3, O1, O3 |
-| `SK15` | user scope: personal skills that shadow project ones | warn: Claude Code runs the personal copy, OpenCode the project one | C5, O10 |
+| `SK15` | user scope: personal skills that shadow project ones | warn: Claude Code runs the personal copy, OpenCode the project one; pass for the kit's two copies of one bank skill (in the qol-mini lock, same `name` and `description`) | C5, O10 |
 | `SK16` | fields an agent reads | warn: a frontmatter key outside the Claude Code reference, which both agents ignore without an error | C19 |
 | `SK17` | `compatibility` | warn above 500 chars, or a list or a map | S5, C22 |
 | `SK18` | scripts are named | warn: a file under `scripts/` whose name `SKILL.md` never holds | S6 |
