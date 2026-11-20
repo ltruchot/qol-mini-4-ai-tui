@@ -2,14 +2,12 @@
 
 ## Where we stopped
 
-`qol-mini@0.7.1` is published from `main`: `qol-mini vitals` runs the gates of
-`code-harness-vitals` as WebAssembly, the two review skills are in the bank (trigger
-evals 16/16 each) and each ran once from an installed copy under `claude -p` and
-`opencode run`.
-0.7.0 ships a `skills-review` that fails to load; 0.7.1 fixes it. Nothing in progress.
-`code-harness-vitals` is archived on GitHub, its README points here. Left from the
-merge: deprecate 0.7.0, which needs `npm login` on this machine.
-Context: todo/vitals-merge.md
+`qol-mini@0.7.1` is published from `main` and `latest` on npm; 0.7.0 is deprecated
+there (its `skills-review` fails to load). `qol-mini vitals` runs the Rust gates as
+WebAssembly; the two review skills are in the bank (trigger evals 16/16 each) and each
+ran from an installed copy under `claude -p` and `opencode run`. The repository the
+gates came from, `ltruchot/code-harness-vitals`, is archived on GitHub with a README
+that points here. Nothing in progress.
 
 0.6.2 is what `./install.sh --replace` delivered on this machine; the global files did
 not change since. Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md.
@@ -35,6 +33,13 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
   plugin skills, `XDG_CONFIG_HOME`; the order between OpenCode's sources for one id
 - Vitals, `skills`: a probe for a command-injection line in a `SKILL.md` that only cites
   the syntax (the skill fails to load)
+- Vitals, tarball: the two modules weigh 1.6 MB each, unoptimized for size; `wasm-opt` or
+  `opt-level = "z"` is unmeasured. A gate run costs about 0.15 s, against 2 ms native
+- Bank, the two review skills: `skills-review` run on them reports their closing
+  `Rubric sources` link as naming no moment to read it (its rubric 5)
+- `skills-review` installed from npm under `claude -p` with the allowlist
+  `Bash(npx qol-mini:*)`: its probe command was refused once; installed from the clone
+  it ran. Unexplained
 - Vitals on Windows: a home directory on another drive than the repository is
   unmeasured
 - From 2026-11-07 05:00 UTC: drop the Vite+ 1.5.0 release-age exclusions in every repo of
