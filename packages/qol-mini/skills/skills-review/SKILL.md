@@ -25,6 +25,13 @@ Quote the output verbatim, every line. A `fail` comes before any content review:
 `SK06` (frontmatter YAML rejects), `SK07` (no description), `SK10` (a name an agent
 refuses), or `SK12` (a broken link) fail, or `SK02` reports a skill Claude Code never
 loads, propose that fix first, then review the skills as the agents actually load them.
+`SK16`–`SK20` say where to look for criteria 10 and 13–15: a field no agent reads, a
+script `SKILL.md` never names, a package command without a version, an injected command
+nothing pre-approves.
+
+When `claude` is installed (Claude Code 2.1.233 or later), also run
+`claude plugin validate <repo>/.claude/skills` and quote what it reports: it reads the
+frontmatter with Claude Code's own parser.
 
 Exit status: 0 = no repository probe failed, 1 = one failed, 2 = the repository cannot be
 read. User-scope findings never change it.
@@ -58,6 +65,9 @@ criterion that does not apply here is not missing.
 | 10 | Works in both agents | puts behavior both agents need in fields both read (`name`, `description`, `disable-model-invocation`); a body that relies on Claude Code-only fields (`context: fork`, `paths`, `allowed-tools`, `hooks`, command injection) still works when they are ignored |
 | 11 | Belongs in a skill | is not a rule every session needs (that belongs in `AGENTS.md`) and not a one-line command |
 | 12 | Up to date | names commands, paths, and tools that exist in this repository |
+| 13 | Scripts for the deterministic part | bundles a script for an operation that is fragile, repeated, or bound to one sequence, instead of prose the agent re-derives on every run |
+| 14 | Scripts are run, not read | tells the agent to run each script, with the command; only its output enters the context |
+| 15 | Scripts an agent can drive | ships scripts that ask nothing interactively, answer `--help`, print structured data on stdout and diagnostics on stderr, say in an error what to try, and offer `--dry-run` before they destroy |
 
 For 9, quote the exact line and say what it does; when a scanner is wanted, name
 [SkillSpector](https://github.com/NVIDIA/SkillSpector) (`--no-llm` keeps it local) as one
