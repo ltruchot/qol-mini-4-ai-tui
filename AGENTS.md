@@ -79,11 +79,14 @@ for the code you change before you change it:
 | Rules | File |
 |---|---|
 | hooks, tab marker, `/compact` gate, installer, status line | `packages/qol-mini/src/kit/AGENTS.md` |
-| the OpenCode plugin and its delivery | `packages/qol-mini/opencode/AGENTS.md` |
+| the OpenCode plugin and its delivery (`src/opencode/` too) | `packages/qol-mini/opencode/AGENTS.md` |
 | writing a bank skill | `packages/qol-mini/skills/AGENTS.md` |
-| `qol-mini harmonize` | `packages/qol-mini/src/harmonize/AGENTS.md` |
-| the `vitals` launcher and its WASI host | `packages/qol-mini/src/vitals/AGENTS.md` |
+| `qol-mini harmonize` (`src/core/harmonize/`, `src/commands/harmonize-*.ts` too) | `packages/qol-mini/src/harmonize/AGENTS.md` |
+| the `vitals` launcher and its WASI host (`src/commands/vitals-*.ts` too) | `packages/qol-mini/src/vitals/AGENTS.md` |
 | the Rust gates | `crates/AGENTS.md` |
+
+`src/opencode/`, `src/core/harmonize/`, `src/commands/` and `tests/` hold an `AGENTS.md` that
+points to the file to read.
 
 ### Reload
 
