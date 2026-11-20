@@ -31,6 +31,8 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - No animation: hooks fire on events, not on a clock.
 - No "session ended" state: nobody sees it. `SessionEnd` stays in `EVENTS` with no
   handler, so the purge clears it from any config.
+- Colors: green running, red blocking only, yellow idle. Orange reads as red across a
+  tab strip.
 - `${sequence}` retitles every terminal, a shell tab included. Hence
   `--tab-state` is opt-in, and `qol-mini vscode --revert` exists.
 
@@ -126,6 +128,11 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 
 ## Installer
 
+- With no option and a real console, `qol-mini install` asks. With any option, or a
+  stdin that is not a console, it asks nothing, and `skills` commands confirm nothing.
+  A prompt that blocks a script or CI is a bug.
+- The `.ps1` wrappers set errors to `Continue` around native commands: under
+  PowerShell 5.1 a native command writing to stderr is terminating under `Stop`.
 - Hooks use exec form: `{"type": "command", "command": <node>, "args": [<script>,
   <arg>]}`. The interpreter is `process.execPath`. No shell string, no Git Bash.
   Under a version manager that path is tied to one Node version: running
@@ -161,6 +168,10 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
   not exist before the run.
 - An editor `settings.json` is JSONC: insert the key textually, never parse and
   reserialize.
+- The global `install` renders `kaizen` with the same code and delivers it under
+  the installer's file rule, with no lock entry.
+- Hook paths are written with backslashes: `isOurs()` normalizes separators before
+  matching.
 
 ## Status line
 
@@ -180,4 +191,6 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
   terminal output. Running it by hand proves the script, not the wiring: for
   that, start with `claude --debug` and read `~/.claude/debug/<session-id>.txt`.
 - Wake another session with `SendMessage` to make its hooks fire.
+- To interrupt a running tool, accept its permission prompt first: Esc on the dialog
+  is a rejection and the tool never runs.
 - `/proc/PID/environ` cannot show a variable set by `settings.json`.

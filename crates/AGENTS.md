@@ -25,7 +25,9 @@
   the command, the gate again (ADR 0010).
 - A probe's output never depends on listing order: `vitals-utils` sorts the walk.
 - The gate's own messages name the binary (`agents-md-chkr: cannot read …`).
-- The modules in `packages/qol-mini/wasm/` are built by `vp run wasm`, not by the test
-  setup: a cached `vp run` task filters the environment, `RUSTUP_TOOLCHAIN` included,
-  and cargo falls back to another toolchain. Run `vp run wasm` after a Rust change,
-  before `vp run -r test`.
+- `vp run wasm` builds the modules into the package's `wasm/` directory, gitignored and
+  absent from a fresh clone. The test setup does not: a cached `vp run` task filters the
+  environment, `RUSTUP_TOOLCHAIN` included, and cargo falls back to another toolchain.
+  Run `vp run wasm` after a Rust change, before `vp run -r test`.
+- `cargo agents-md-chkr [--repo-only] [PATH]` and `cargo skills-chkr` run a gate
+  natively, without the CLI.

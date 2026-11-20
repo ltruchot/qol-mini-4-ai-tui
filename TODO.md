@@ -2,39 +2,34 @@
 
 ## Where we stopped
 
-`qol-mini@0.7.1` is published and `latest` on npm; 0.7.0 is deprecated there. `main` is
-at that release. Two branches wait, stacked, nothing released from them:
+`qol-mini@0.7.1` is published and `latest` on npm. `main` holds 0.8.0, not published:
+`qol-mini vitals --fix` and `--json` (ADR 0010), probes `SK16`–`SK20`, the review skills
+pinned to the kit version, `qol-mini kaizen release` and project kaizen copies that name
+no machine path (ADR 0011), the rules split into nested `AGENTS.md` files.
 
-- `feat/vitals-fix`, PR #2, ready, CI green: a finding names the `qol-mini` command that
-  fixes it (`run:` line), each gate takes `--json`, `qol-mini vitals --fix [--dry-run]`
-  runs the named commands and audits again (ADR 0010). `agents-md-review` proposes the
-  printed command; run from an installed copy under `claude -p` and `opencode run`.
-  Next action: merge it into `main` (`gh pr merge 2 --rebase`); the session that wrote it
-  was refused the merge.
-- `gate/skills-standard`, PR #3, draft, based on `feat/vitals-fix`, CI green: probes
-  `SK16`–`SK20` (fields no agent reads, `compatibility`, scripts `SKILL.md` never names,
-  package commands without a version, injected commands nothing pre-approves) and
-  criteria 13–15 of `skills-review`; that skill ran from an installed copy under
-  `claude -p` and `opencode run --auto`. Left: rebase on `main` once PR #2 is in and
-  point the PR at `main`; a code review of the branch (`add-gate`, step 8); then
-  `gh pr ready 3`. Not run: the trigger evals of both review skills, their descriptions
-  being unchanged.
+Next action: publish 0.8.0 (`git tag v0.8.0`, push the tag, approve the `release` run,
+`docs/release.md`). This repo's own kaizen copy releases through `npx qol-mini@0.8.0`,
+which works once that version is on npm.
 
-Both branches hold this file; `main` holds the one of the 0.7.1 release.
-The next version is not chosen and no tag is pushed.
+`qol-mini vitals . --repo-only` reports no warning on this repository. Without
+`--repo-only`, the user scope of this machine reports `SK14` (personal skills under
+`~/.agents/skills` and `~/.config/opencode/skills`) and `SK15` (the global kaizen copy
+shadows the project one).
 
-0.6.2 is what `./install.sh --replace` delivered on this machine; the global files did
-not change since. Bank: `vp` and `css-modern` carry no `paths`, kaizen reads AGENTS.md.
-This repo runs Vite+ 1.5.0, Node 26.13.0, pnpm 12.16.1, `minimumReleaseAge` 4320;
-179 tests. `mise.toml` at the root is trusted on this machine (`mise trust`).
+The changed bank skills (`qa-pr`, `npm-vulnerability-check`, `datastar`, `kaizen`, the
+two review skills) load under `claude -p` and `opencode run`; their `skill-creator`
+old-against-new runs are not done. Their descriptions did not change: no trigger eval.
 
-The twelve repos of `.local/repos.json` carry the same setup and are harmonized: AGENTS.md is
-the rules file (the harness keeps `CLAUDE.md` as a symlink to it), committed and pushed where
-they have a remote. Their temporary release-age exclusions are dropped by a job scheduled for
-2026-11-07 06:13 local time in the session that set them up; it does not outlive that session.
+This repo runs Vite+ 1.6.0, Node 26.13.0; 208 tests. `mise.toml` at the root is trusted on
+this machine (`mise trust`).
 
 ## Later
 
+- Tab marker format: settable through `CC_TAB_WORKING`, `CC_TAB_BLOCKED`, `CC_TAB_IDLE`;
+  what reads best is untested
+- A warning triangle shows on every tab in the terminal list. Cause unknown
+- Unchecked on a `/compact` with markers: the dim post-compaction line and the
+  compaction instructions, for our JSON. If dirty, remove the `PreCompact` marker only
 - Vitals: a scoring engine, 0–10 per gate with risk weights and per-pillar levels (ADR
   0005 open question), in the JSON report and the summary line
 - Vitals, next gate: `codebase-memory` (pillar 3), per the ADR 0008 catalog; use the
@@ -53,8 +48,6 @@ they have a remote. Their temporary release-age exclusions are dropped by a job 
 - Vitals, `skills`, not probed: the 5,000-token body target (no char count stands for a
   token), reference chains deeper than one level, whether `allowed-tools` covers each
   injected command
-- Bank: `SK19` warns on `agents-md-review` and `skills-review`, which name `npx qol-mini`
-  with no version. Pinning freezes the gates a skill calls; decide, then pin or exempt
 - Vitals, commands that are missing for a `run:` line: moving a skill into
   `.claude/skills/` (`SK02`–`SK05`), a `.claude/CLAUDE.md` or a nested `CLAUDE.md`
   (`AM03`, `AM09`)

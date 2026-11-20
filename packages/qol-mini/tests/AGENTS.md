@@ -9,3 +9,7 @@ A test guards the rules of the code it runs. Read them before changing a test:
 | `harmonize-*`, `bin-harmonize*` | `packages/qol-mini/src/harmonize/AGENTS.md` |
 | `vitals-*` | `packages/qol-mini/src/vitals/AGENTS.md` |
 | `shipped-skills*`, `builtins*` | `packages/qol-mini/skills/AGENTS.md` |
+
+- Hooks are tested as real processes with the event JSON on stdin; the installer
+  and the skills commands run in-process against `CLAUDE_CONFIG_DIR` and
+  temporary projects. No test touches `~/.claude` or `~/.config/opencode`.

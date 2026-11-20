@@ -12,6 +12,25 @@
     "rules": "pure",
     "version": 1
   },
-  "skills": {},
+  "skills": {
+    "kaizen": {
+      "answers": {
+        "QOL_MINI_VERSION": "0.8.0",
+        "RELEASE_COMMAND": "npx qol-mini@0.8.0 kaizen release"
+      },
+      "files": {
+        "SKILL.md": "4b5a76f26f705133b048cc73f966041f599c77740efafbffd00e0cb5f992f3fa"
+      },
+      "path": ".claude/skills/kaizen",
+      "ref": "0.8.0",
+      "renderedHash": "ea31638762640f100e91e427eb74d66ee66479cade632d73065a6d9c614c91e4",
+      "secrets": [],
+      "sha": "local:54e3376c0daca601d3cc7236fdd7071802ad6a9b7840b982e5a970993bb6cae8",
+      "skillPath": "skills/kaizen",
+      "source": "qol-mini",
+      "sourceType": "local",
+      "templateHash": "bfc75381a96810281248292f5caae469927abba22c5cf18213bc1957eb0d4698"
+    }
+  },
   "version": 1
 }
