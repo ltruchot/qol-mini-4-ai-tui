@@ -16,7 +16,7 @@ the ADR 0007 stack. The first gate, `agents-md`, proves the model.
 | `agents-md` gate: cascade probes            | ✅ Done    | `crates/agents-md-chkr/src/{cascade,nested,ancestors}.rs` |
 | `agents-md` gate: content probes (`AM16`–`AM21`) | ✅ Done    | `crates/agents-md-chkr/src/{imports,content,rules}.rs` |
 | Container end-to-end tests                  | ✅ Done    | `crates/*-chkr/tests/container.rs`         |
-| `skills` gate: probes                       | ✅ Done    | `crates/skills-chkr/`                        |
+| `skills` gate: probes (`SK01`–`SK20`)       | ✅ Done    | `crates/skills-chkr/`                        |
 | `skills` gate: review skill                 | ✅ Done    | `packages/qol-mini/skills/skills-review/`   |
 | Other gates (catalog below)                 | ⏳ Planned | -                                          |
 
@@ -86,7 +86,7 @@ in Claude Code and OpenCode, which read the same `SKILL.md`.
 | Gate | Pillar | Probes (deterministic) | Review (agent, advisory) | Status |
 | --- | --- | --- | --- | --- |
 | `agents-md` | 1. Instruction files | `AM01`–`AM21`, below | `agents-md-review`: 22-criterion rubric | ✅ |
-| `skills` | 2. Skills | `SK01`–`SK15`, below | `skills-review`: 12-criterion rubric | ✅ |
+| `skills` | 2. Skills | `SK01`–`SK20`, below | `skills-review`: 15-criterion rubric | ✅ |
 | `codebase-memory` | 3. Codebase memory | a code-intelligence MCP server or plugin is wired in for both agents | - | ⏳ |
 | `context-limiting` | 4. Context limiting | an output-capping tool or hook is wired in for both agents | - | ⏳ |
 | `commit-gates` | 5. Deterministic gates | an active hook runner whose hooks call lint, format, type check, tests, vulnerability and secret scans; CI runs the same list | whether the gate list fits the stack | ⏳ |
@@ -336,6 +336,11 @@ Claude Code:
 | C16 | `.claude/skills/<name>.md` (a file directly in the skills directory) does not load as a skill | only `<skill-name>/SKILL.md` is documented; `.claude/commands/*.md` is the file form | yes (documented layout) |
 | C17 | Deeper layouts (`.claude/skills/<group>/<name>/SKILL.md`) | not documented | **no** |
 | C18 | Unclosed frontmatter (opening `---`, no closing one) | not documented | **no** (probe treats it as "no frontmatter", same fix) |
+| C19 | The frontmatter reference holds twenty fields: `name`, `description`, `when_to_use`, `argument-hint`, `arguments`, `disable-model-invocation`, `user-invocable`, `allowed-tools`, `disallowed-tools`, `model`, `effort`, `context`, `agent`, `background`, `hooks`, `paths`, `shell`, `metadata`, `license`, `compatibility`; "Claude Code ignores a field it doesn't recognize without reporting an error" | skills.md, "Frontmatter reference", read on 2026-11-20 | yes |
+| C20 | `` !`command` `` is recognized "when `!` appears at the start of a line or immediately after whitespace", and a fence opened with three backticks and `!` holds a multi-line command; both run before the skill content reaches Claude | skills.md, "Inject dynamic context" | yes |
+| C21 | An injected command never prompts. Outside auto mode, "when a command's permission check returns anything other than allow, Claude Code aborts the invocation"; `allowed-tools` pre-approves it | skills.md, "Permission checks on injected commands" | yes |
+| C22 | `compatibility` "accepts a string of up to 500 characters"; Claude Code does not act on it. `allowed-tools` accepts a space- or comma-separated string, or a YAML list | skills.md, "Frontmatter reference" | yes |
+| C23 | Whether an injection mark inside a fenced code block runs | not documented | **no** (probed as an injection: the documented rule names no exemption) |
 
 Agent Skills spec:
 
@@ -345,6 +350,11 @@ Agent Skills spec:
 | S2 | `description`: 1–1,024 chars, non-empty | "description field" | yes |
 | S3 | Keep `SKILL.md` under 500 lines; body under 5,000 tokens recommended; file references relative to the skill root, one level deep | "Progressive disclosure", "File references" | yes |
 | S4 | YAML: a plain (unquoted) scalar cannot contain `: `; `[x] text` opens a flow sequence and fails | YAML 1.2, 7.3.3 plain scalars (the reason OpenCode's `sanitize` exists, see O7) | yes |
+| S5 | `compatibility`: "Must be 1-500 characters if provided"; `metadata`: "a map from string keys to string values"; `allowed-tools`: "a space-separated string", experimental | specification.md, read on 2026-11-20 | yes |
+| S6 | "List available scripts in your `SKILL.md` so the agent knows they exist"; paths relative to the skill root | agentskills.io, skill-creation/using-scripts.md | yes |
+| S7 | "Pin versions (e.g., `npx eslint@9.0.0`) so the command behaves the same over time" | using-scripts.md | yes |
+| S8 | A script takes no interactive prompt ("a hard requirement of the agent execution environment"), documents itself through `--help`, sends structured data to stdout and diagnostics to stderr | using-scripts.md | yes (review, criteria 13–15) |
+| S9 | How many chars a token holds | Claude glossary: "depends on the model and the language" | **no** (the 5,000-token body target is not probed) |
 
 OpenCode 2:
 
@@ -386,6 +396,11 @@ The [Agent Skills spec](https://agentskills.io/specification) adds the portable 
 | `SK12` | references resolve | fail for each relative Markdown link in `SKILL.md`, outside code, inline or a reference definition (`[label]: path`), whose target does not exist, `%XX` escapes decoded; links that leave the repository are not judged. A link that leaves a symbolic-link skill folder passes when it resolves from where the folder is linked or from where it really is; behind a folder outside the repository it is not judged |
 | `SK13` | skill inventory | lists every skill with its root, for the review to read |
 | `SK14` | user scope: skill roots only OpenCode reads | warn for `.claude/skills/`, `.agents/skills/`, `.opencode/skill(s)/` in a parent directory of the repository (OpenCode loads them in every session here, Claude Code stops at the repository root), and for `~/.agents/skills/` and `~/.config/opencode/skill(s)/` (personal skills Claude Code never reads) |
+| `SK16` | fields an agent reads | warn for a top-level frontmatter key outside the twenty of the Claude Code reference (C19): both agents ignore it without an error, so a misspelled `disable_model_invocation` does nothing |
+| `SK17` | `compatibility` | warn above 500 chars, or when it is a list or a map (S5, C22) |
+| `SK18` | scripts are named | warn for a file under the skill's `scripts/` whose file name `SKILL.md` never holds (S6); hidden files and `__*` directories are not judged |
+| `SK19` | package commands are pinned | warn for `npx`, `bunx`, `uvx`, `pnpm dlx`, `yarn dlx`, or `pipx run` in a code span or a fenced block of `SKILL.md` whose package holds no `@version` or `==version` (S7); a path, a variable, or a placeholder is not a package |
+| `SK20` | injected commands are pre-approved | warn for an injection line (C20) in a `SKILL.md` with no `allowed-tools`: outside auto mode Claude Code aborts the skill unless a permission rule allows the command (C21) |
 | `SK15` | user scope: personal skills that shadow project skills | warn for each skill in the repository's `.claude/skills/` whose name is also in `~/.claude/skills/`: Claude Code runs the personal copy, OpenCode the project one |
 
 The tree is the one `agents-md` walks (hidden files, `.gitignore` honored, `.git/` and
@@ -394,7 +409,8 @@ both agents read it: the four at the repository root, each root the walk crosses
 root behind a symbolic link (`.claude`, or `.claude/skills` itself). Symbolic-link skill
 folders are followed. Roots outside the repository are read the same way, so a home
 directory whose `.gitignore` holds `*` hides none of them. `SK07`–`SK10` skip
-a skill that `SK06` reports without frontmatter. The frontmatter is read by a line scanner
+a skill that `SK06` reports without frontmatter. `SK16`–`SK20` print after `SK15`: ids are
+stable, and the report follows them. The frontmatter is read by a line scanner
 for top-level keys and their scalar values, not by a YAML parser: it decides only the cases
 above, so no YAML crate is admitted (ADR 0007). `SK14` and `SK15` are user scope: labeled,
 warn only, skipped by `--repo-only`.
@@ -415,8 +431,16 @@ The review (`skills-review`) judges what reading decides:
 | 10 | Behavior both agents need sits in fields both read (`name`, `description`, `disable-model-invocation`); a body that relies on Claude Code-only fields (`context: fork`, `paths`, `allowed-tools`, `hooks`, `!` injection) still works without them | OpenCode `config/plugin/skill-file.ts`; Claude Code, "Frontmatter reference" |
 | 11 | It belongs in a skill: not a rule every session needs (that is `AGENTS.md`), not a one-line command | `agents-md-review` criterion 15, inverted |
 | 12 | The commands, paths, and tools it names exist in this repository | ADR 0005, pillar 1 "no references to files or commands that do not exist" |
+| 13 | An operation that is fragile, repeated, or bound to one sequence is a bundled script, not prose the agent re-derives each time | agentskills.io, best-practices ("write a tested script once and bundle it in `scripts/`"); using-scripts |
+| 14 | `SKILL.md` tells the agent to run a script, not to read it: only its output enters the context | Claude Code skills docs, "Add supporting files" (`scripts/`: "executed, not loaded") |
+| 15 | A script asks nothing interactively, documents itself through `--help`, prints structured data on stdout and diagnostics on stderr, says in an error what to try, and offers `--dry-run` before it destroys | using-scripts (S8) |
 
-Not probed yet: script safety and per-agent format lint by an external scanner
+Not probed yet: the 5,000-token body target (S9: no char count stands for a token), reference
+chains deeper than one level (criterion 5 judges them), the type of `metadata` values, the
+form of `allowed-tools` (the spec asks for a string, Claude Code also takes a list), what a
+script itself does (criteria 9 and 15), whether an `allowed-tools` entry covers each injected
+command, an external validator (`claude plugin validate`, `skills-ref validate`: launched by
+the CLI, never from a gate — a later amendment), script safety and per-agent format lint by an external scanner
 (SkillSpector `--no-llm --format json` and agnix are the candidates, ADR 0005 "integrate";
 detecting and running one amends this ADR when it lands — until then the review covers
 script safety),
