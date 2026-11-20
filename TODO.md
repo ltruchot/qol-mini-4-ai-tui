@@ -11,10 +11,9 @@ Next action: publish 0.8.0 (`git tag v0.8.0`, push the tag, approve the `release
 `docs/release.md`). This repo's own kaizen copy releases through `npx qol-mini@0.8.0`,
 which works once that version is on npm.
 
-`qol-mini vitals . --repo-only` reports no warning on this repository. Without
-`--repo-only`, the user scope of this machine reports `SK14` (personal skills under
-`~/.agents/skills` and `~/.config/opencode/skills`) and `SK15` (the global kaizen copy
-shadows the project one).
+`qol-mini vitals .` reports no warning on this repository. The user scope of this machine
+reports `SK14` alone: personal skills under `~/.agents/skills` and
+`~/.config/opencode/skills`, installed by their own tools, left in place on purpose.
 
 The changed bank skills (`qa-pr`, `npm-vulnerability-check`, `datastar`, `kaizen`, the
 two review skills) load under `claude -p` and `opencode run`; their `skill-creator`
