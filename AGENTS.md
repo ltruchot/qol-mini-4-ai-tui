@@ -106,11 +106,13 @@ points to the file to read.
 - One bank: `packages/qol-mini/skills/`, shipped in the package. `QOL_MINI_BANK`
   points the CLI at another directory; the tests use it.
 - A skill declares its `{{NAME}}` placeholders in `qol-mini.yaml`. Only declared
-  names are substituted. `RELEASE_COMMAND` and `QOL_MINI_VERSION` are computed, never
-  asked; `skills check --frozen` reads the pin from the lock, so a kit upgrade alone
-  changes no installed copy (`commands/builtins.ts`). A skill copy in a project names no
-  machine path: its `RELEASE_COMMAND` is `npx qol-mini@<pin> kaizen release`; only the
-  global copy names the hook by absolute path (ADR 0011).
+  names are substituted.
+- `RELEASE_COMMAND` and `QOL_MINI_VERSION` are computed, never asked
+  (`commands/builtins.ts`). `skills check --frozen` reads the pin from the lock: a kit
+  upgrade alone changes no installed copy.
+- A skill copy in a project names no machine path: its `RELEASE_COMMAND` is
+  `npx qol-mini@<pin> kaizen release`. Only the global copy names the hook by absolute
+  path (ADR 0011).
 - The lock, `.claude/qol-mini.lock.json`, is the managed set: a skill directory
   absent from it is never touched without `--replace`.
 - `install` on a managed skill is an update: three-way merge of the installed
