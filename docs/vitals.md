@@ -14,6 +14,8 @@ never writes, except under `--fix`.
 | `qol-mini vitals [gate] [path] --fix` | run the `qol-mini` commands the findings name, then audit again |
 | `qol-mini vitals [gate] [path] --fix --dry-run` | name those commands, run none |
 
+`--dry-run` goes with `--fix` only, and `--json` does not combine with `--fix`.
+
 | Exit status | Meaning |
 |---|---|
 | 0 | no repository probe failed |
@@ -28,12 +30,13 @@ Each line is `[verdict] ID evidence: message`, verdicts `pass`, `warn`, `fail`, 
 
 A `run:` line under a `fix:` names the `qol-mini` command that applies it; the repository
 goes last. `--fix` runs each named command once, then audits again: the exit status is
-that second audit's, and at least 1 when a command failed or refused
+that second audit's, and at least 1 when a command failed or refused; a cancelled prompt
+stops the run with 130. A `run:` line quotes an argument the shell would split
 ([ADR 0010](adr/0010-a-finding-names-the-command-that-fixes-it.md)).
 
 | Probe | When | `run:` |
 |---|---|---|
-| `AM01` | the rules live in `CLAUDE.md` alone | `qol-mini harmonize --only rules` |
+| `AM01` | the rules live in `CLAUDE.md` alone | `qol-mini harmonize --only rules`; with a `CLAUDE.local.md`, `--rules bridge`; none when a `.claude/CLAUDE.md` holds its own rules |
 | `AM02` | a root `CLAUDE.md` shadows `AGENTS.md` | `qol-mini harmonize --only rules`: merges when one file imports the other, refuses otherwise |
 | `AM04` | a `CLAUDE.local.md` and no bridge | `qol-mini harmonize --only rules --rules bridge` |
 | `AM08` | no kaizen skill | `qol-mini skills install kaizen` |

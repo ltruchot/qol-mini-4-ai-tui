@@ -125,19 +125,38 @@ fn not_applicable(probe: &'static str, evidence: &str) -> Finding {
 fn presence(snapshot: &Snapshot) -> Finding {
     match (&snapshot.agents_md, &snapshot.claude_md.content) {
         (Some(_), _) => Finding::new("AM01", Verdict::Pass, AGENTS_MD, "AGENTS.md is at the root"),
-        (None, Some(_)) => Finding::new(
-            "AM01",
-            Verdict::Fail,
-            AGENTS_MD,
-            "no AGENTS.md: the rules live in CLAUDE.md, which OpenCode 2 does not read",
-        )
-        .with_fix("rename CLAUDE.md to AGENTS.md; Claude Code 2.1.277 and later reads it")
-        .with_command(HARMONIZE_RULES),
+        (None, Some(_)) => {
+            let finding = Finding::new(
+                "AM01",
+                Verdict::Fail,
+                AGENTS_MD,
+                "no AGENTS.md: the rules live in CLAUDE.md, which OpenCode 2 does not read",
+            )
+            .with_fix("rename CLAUDE.md to AGENTS.md; Claude Code 2.1.277 and later reads it");
+            match rename_command(snapshot) {
+                Some(command) => finding.with_command(command),
+                None => finding,
+            }
+        }
         (None, None) => Finding::new("AM01", Verdict::Fail, AGENTS_MD, "no AGENTS.md at the root")
             .with_fix(
                 "create AGENTS.md: project summary, build/test/lint commands, and the \
                  conventions an agent cannot infer",
             ),
+    }
+}
+
+/// The command that moves a lone root `CLAUDE.md` to `AGENTS.md` and leaves Claude Code
+/// loading it. A `CLAUDE.local.md` makes Claude Code skip `AGENTS.md`, so the move keeps a
+/// bridge `CLAUDE.md`. A `.claude/CLAUDE.md` with its own rules shadows `AGENTS.md` whatever
+/// the root holds: no command, the merge is by hand.
+fn rename_command(snapshot: &Snapshot) -> Option<&'static [&'static str]> {
+    if layout(&snapshot.dot_claude_md, DOT_CLAUDE_MD.agents) == Layout::Own {
+        None
+    } else if snapshot.claude_local_md {
+        Some(HARMONIZE_BRIDGE)
+    } else {
+        Some(HARMONIZE_RULES)
     }
 }
 
@@ -478,6 +497,33 @@ mod tests {
         assert_eq!(presence.verdict(), Verdict::Fail);
         assert!(presence.fix().unwrap().starts_with("rename CLAUDE.md"));
         assert_eq!(presence.command(), Some(HARMONIZE_RULES));
+    }
+
+    #[test]
+    fn the_rename_command_keeps_claude_code_on_the_rules() {
+        let am01 = |snapshot: &Snapshot| {
+            let report = check(snapshot);
+            report.findings().first().unwrap().command()
+        };
+        let local = Snapshot {
+            claude_md: content("# Rules\n"),
+            claude_local_md: true,
+            ..Snapshot::default()
+        };
+        // CLAUDE.local.md makes Claude Code skip AGENTS.md: the move keeps a bridge.
+        assert_eq!(am01(&local), Some(HARMONIZE_BRIDGE));
+        let dot = Snapshot {
+            dot_claude_md: content("# More rules\n"),
+            ..local.clone()
+        };
+        // .claude/CLAUDE.md shadows AGENTS.md whatever the root holds: no command.
+        assert_eq!(am01(&dot), None);
+        let dot_bridge = Snapshot {
+            dot_claude_md: content("@../AGENTS.md"),
+            claude_local_md: false,
+            ..local
+        };
+        assert_eq!(am01(&dot_bridge), Some(HARMONIZE_RULES));
     }
 
     #[test]

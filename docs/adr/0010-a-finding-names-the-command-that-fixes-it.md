@@ -26,7 +26,7 @@
 - `qol-mini vitals --fix` reads those reports, keeps each command that a
   repository-scope finding names, once, in probe order, runs it with the repository as
   last argument, then audits again in text. `--dry-run` names the commands and runs
-  none.
+  none. `--dry-run` without `--fix`, and `--json` with it, are refused.
 - The CLI runs a command only when its first word is `harmonize` or `skills`. Any other
   is an error.
 - TypeScript reads the report and launches. It decides no verdict and sets no command.
@@ -40,7 +40,10 @@
 - The exit status of `vitals --fix` is the second audit's, and at least 1 when a command
   failed or refused.
 - A new command in a probe is a claim about another part of the kit: its test runs the
-  gate, then the command, then the gate again (`tests/e2e/vitals-fix.test.ts`).
+  gate, then the command, then the gate again (`tests/e2e/vitals-fix*.test.ts`).
+- A command is judged on the layout it leaves: `AM01` names the bridge mode beside a
+  `CLAUDE.local.md`, and no command beside a `.claude/CLAUDE.md` with its own rules,
+  since either file makes Claude Code skip `AGENTS.md`.
 - The WASI host gains no call: stdout goes to a sink the launcher passes.
 - The JSON object is an interface. A field is added, never renamed.
 - `serde_json` enters the gates' modules, already admitted in the workspace (ADR 0007).

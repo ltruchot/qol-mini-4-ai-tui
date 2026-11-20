@@ -29,6 +29,8 @@ async function text({ gates, flags, view }: Target): Promise<number> {
 
 // --json prints the reports; --fix runs the commands they name, then audits again
 export async function runVitals(args: string[], opts: Opts): Promise<number> {
+  if (opts.dryRun === true && opts.fix !== true) fail("--dry-run goes with --fix");
+  if (opts.json === true && opts.fix === true) fail("--json and --fix do not combine");
   const { gates, repo } = parse(args);
   const flags = opts.repoOnly === true ? ["--repo-only"] : [];
   const target = { gates, flags, view: guestView(repo, homedir()) };
