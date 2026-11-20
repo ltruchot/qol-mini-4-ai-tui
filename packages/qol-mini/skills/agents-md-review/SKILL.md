@@ -13,7 +13,7 @@ gate's exit code or score.
 ## 1. Run the probes first
 
 ```sh
-npx qol-mini vitals agents-md <repo>         # or: pnpm dlx qol-mini vitals agents-md <repo>
+npx qol-mini@{{QOL_MINI_VERSION}} vitals agents-md <repo>         # or: pnpm dlx qol-mini@{{QOL_MINI_VERSION}} vitals agents-md <repo>
 ```
 
 Run it without `--repo-only`: the user-scope probes (`AM14`, `AM15`, `AM21`) find
@@ -28,7 +28,7 @@ propose the layout fix first and review the files that agents actually read.
 A finding that ends with a `run:` line names the `qol-mini` command that applies its fix
 (`AM01`, `AM02`, `AM04`, `AM08`). Propose that command as printed, with the repository as
 its last argument, instead of a hand edit: `qol-mini harmonize` keeps a backup and
-`qol-mini harmonize undo <repo>` restores it. `npx qol-mini vitals <repo> --fix --dry-run`
+`qol-mini harmonize undo <repo>` restores it. `npx qol-mini@{{QOL_MINI_VERSION}} vitals <repo> --fix --dry-run`
 lists every such command, `--fix` runs them and audits again. Run one only on a yes.
 
 Exit status: 0 = no repository probe failed, 1 = one failed, 2 = the repository cannot be

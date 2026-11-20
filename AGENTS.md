@@ -102,7 +102,9 @@ for the code you change before you change it:
 - One bank: `packages/qol-mini/skills/`, shipped in the package. `QOL_MINI_BANK`
   points the CLI at another directory; the tests use it.
 - A skill declares its `{{NAME}}` placeholders in `qol-mini.yaml`. Only declared
-  names are substituted. `RELEASE_COMMAND` is computed, never asked.
+  names are substituted. `RELEASE_COMMAND` and `QOL_MINI_VERSION` are computed, never
+  asked; `skills check --frozen` reads the pin from the lock, so a kit upgrade alone
+  changes no installed copy (`commands/builtins.ts`).
 - The lock, `.claude/qol-mini.lock.json`, is the managed set: a skill directory
   absent from it is never touched without `--replace`.
 - `install` on a managed skill is an update: three-way merge of the installed

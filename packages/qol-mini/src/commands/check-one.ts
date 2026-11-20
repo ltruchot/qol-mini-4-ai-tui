@@ -24,7 +24,10 @@ export async function checkOne(
   const skill = findSkill(bank, name)?.skill;
   let frozenRenderedHash: string | undefined;
   if (frozen && skill !== undefined && skill.templateHash === entry.templateHash) {
-    const answers = { ...knownAnswers(ctx, name, entry), ...builtinAnswers(skill.manifest) };
+    const answers = {
+      ...knownAnswers(ctx, name, entry),
+      ...builtinAnswers(skill.manifest, entry.answers),
+    };
     frozenRenderedHash = hashTree(renderTree(skill.files, skill.manifest, answers)).tree;
   }
   const statuses = computeStatus({

@@ -1,2 +1,5 @@
 version: 1
-placeholders: []
+placeholders:
+  # Computed by the installer: the kit version the qol-mini commands pin
+  - name: QOL_MINI_VERSION
+    prompt: Version of qol-mini the skill runs

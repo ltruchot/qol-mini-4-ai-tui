@@ -14,7 +14,7 @@ Findings are **advisory**: they never change the gate's exit code or score.
 ## 1. Run the probes first
 
 ```sh
-npx qol-mini vitals skills <repo>         # or: pnpm dlx qol-mini vitals skills <repo>
+npx qol-mini@{{QOL_MINI_VERSION}} vitals skills <repo>         # or: pnpm dlx qol-mini@{{QOL_MINI_VERSION}} vitals skills <repo>
 ```
 
 Run it without `--repo-only`: the user-scope probes (`SK14`, `SK15`) find skill roots above

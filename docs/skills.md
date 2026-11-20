@@ -63,7 +63,8 @@ skipIfExists:
 - Only declared names are substituted. `{{OTHER}}`, `$ARGUMENTS` and `${CLAUDE_*}` stay as written.
 - Answer order: the lock, then `QOL_MINI_ANSWER_<NAME>`, then `default`, then a prompt.
 - A value holding `${CLAUDE_` is refused.
-- `RELEASE_COMMAND` is computed by the kit.
+- `RELEASE_COMMAND` and `QOL_MINI_VERSION` are computed by the kit. `QOL_MINI_VERSION` is the
+  kit version at install or update; `check --frozen` reads it from the lock.
 
 ## Files
 
