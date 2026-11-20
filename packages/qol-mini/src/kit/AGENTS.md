@@ -3,7 +3,7 @@
 Sources: `packages/qol-mini/src/kit/` (`hooks/` holds the delivered scripts). The
 OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGENTS.md`.
 
-#### Hook output
+## Hook output
 
 - `terminalSequence` is a **root** field. Inside `hookSpecificOutput` it is ignored
   with no error. Keep the test that requires it at the root.
@@ -19,7 +19,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - When behavior contradicts the published schema, trust the behavior and read the
   binary with `grep -a`. Without `-a`, grep reports nothing on a binary.
 
-#### The tab marker needs three things, and none reports its absence
+## The tab marker needs three things, and none reports its absence
 
 1. `"terminal.integrated.tabs.title": "${sequence}"` in the editor.
 2. `CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1` in the `env` block: Claude Code redraws its
@@ -34,7 +34,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - `${sequence}` retitles every terminal, a shell tab included. Hence
   `--tab-state` is opt-in, and `qol-mini vscode --revert` exists.
 
-#### A project opts out with a file
+## A project opts out with a file
 
 - Hook entries merge across settings levels and no project file removes one of
   ours: `disableAllHooks` in a project takes that project's own hooks down too.
@@ -50,7 +50,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - The status line is not in the opt-out: a project that wants another one sets
   `statusLine` in its own settings, which outranks ours.
 
-#### PreCompact hands the agent nothing
+## PreCompact hands the agent nothing
 
 - `exit 2` blocks the compaction and shows stderr to the **user** only. It never
   reaches the conversation.
@@ -69,7 +69,8 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - The release token is keyed on the working directory, not the session: the
   skill writes it from a plain shell, a manual `/kaizen` arms the next `/compact`,
   and one project's review does not release another's.
-#### One marker per event
+
+## One marker per event
 
 - Hooks on one event run concurrently and each sequence is applied: two markers on
   one event race. Register one `terminalSequence` emitter per event.
@@ -80,7 +81,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - On the blocking path the sequence is applied before the exit status is read.
 - `PostCompact` matches `manual` only: an automatic compaction happens mid-turn.
 
-#### When green is set
+## When green is set
 
 - No event fires when the model starts thinking. Reclaim green on `UserPromptSubmit`,
   `PostToolBatch` and `SubagentStop`, the last moments before work resumes.
@@ -94,7 +95,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
   silent: the session wakes itself. The registry can lag by one task at the instant
   it settles; do not treat it as exact.
 
-#### When red is set
+## When red is set
 
 - `PermissionRequest` fires when the dialog appears; `permission_prompt` fires only
   after about six seconds without a keystroke. Red rides `PermissionRequest`; the
@@ -109,7 +110,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
   `quota_auto_resume_disabled` red with sound, `quota_auto_resume_fired` green,
   `StopFailure` red without sound. If one misbehaves, unwire it in `kit/wire.ts`.
 
-#### Nothing fires when a turn is cut short
+## Nothing fires when a turn is cut short
 
 - Esc, or refusing a permission, emits no hook. The marker holds until the next
   prompt. This is a known gap.
@@ -123,7 +124,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - A transcript watcher per session would close the gap. It is a process on a clock,
   which this kit does not carry.
 
-#### Installer
+## Installer
 
 - Hooks use exec form: `{"type": "command", "command": <node>, "args": [<script>,
   <arg>]}`. The interpreter is `process.execPath`. No shell string, no Git Bash.
@@ -161,7 +162,7 @@ OpenCode faces of the same features are ruled in `packages/qol-mini/opencode/AGE
 - An editor `settings.json` is JSONC: insert the key textually, never parse and
   reserialize.
 
-#### Status line
+## Status line
 
 - The gauge and the fraction share one denominator, the alert threshold, not the
   window: on a 1M model a window-relative bar is near empty when the alert matters.

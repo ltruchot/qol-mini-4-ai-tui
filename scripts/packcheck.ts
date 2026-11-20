@@ -30,6 +30,9 @@ try {
   for (const gate of ["agents-md-chkr", "skills-chkr"])
     if (!listing.includes(`package/wasm/${gate}.wasm`))
       throw new Error(`${gate}.wasm is not in the tarball: run vp run wasm before packing`);
+  // The rules files of the repository stay in it: `files` excludes the nested ones
+  if (/(^|\/)AGENTS\.md$/mu.test(listing))
+    throw new Error("an AGENTS.md is in the tarball: exclude it in the files field");
   console.log("packcheck: ok (zero runtime deps, bin present, gates shipped)");
 } finally {
   rmSync(out, { recursive: true, force: true });
