@@ -33,9 +33,10 @@ Real-tree cases:
 
 Containers:
 
-- Add the gate to `e2e()` in `crates/xtask/src/plan.rs`: build the static binary
-  (`--target` `STATIC_TARGET`, `-p <id>-chkr`), then
-  `cargo test -p <id>-chkr --test container -- --ignored`. `check` runs `e2e()`, so update
-  both plan tests: the `e2e` step list and the step count of `check`.
+- Add the crate to `CONTAINER_GATES` in `crates/xtask/src/plan.rs`, and the array length
+  in its type: `e2e()`, `wasm()` and `wasm_lints()` read it. `e2e()` builds the static
+  binary (`--target` `STATIC_TARGET`, `-p <id>-chkr`), then runs
+  `cargo test -p <id>-chkr --test container -- --ignored`. `check` runs `e2e()`: raise the
+  step count in `check_runs_static_gates_before_coverage` by 2.
 - The image helper reads the binary from
   `target/x86_64-unknown-linux-musl/release/<id>-chkr`.

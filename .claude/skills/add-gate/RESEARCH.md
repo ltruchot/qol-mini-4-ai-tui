@@ -50,4 +50,4 @@ run it once per question.
 
 ADR 0006 catalogs the scanners per pillar. Record each maintained one that covers part of the
 gate under "Not probed yet" in the gate's ADR section, as the later integration PR.
-Re-measure its freshness before citing it (AGENTS.md, "Architecture Decision Records").
+Re-measure its freshness before citing it (ADR 0006: the snapshot status, and "Re-run the freshness gate").

@@ -2,7 +2,7 @@
 name: qa-pr
 description: Reviews a pull request of {{GITHUB_REPO}} and reports findings, without approving, merging or changing anything. Use when asked to QA, review or check a PR, or to say whether a PR is ready.
 argument-hint: "[pr-number]"
-allowed-tools: Bash(gh:*) Bash(git:*) Read Grep
+allowed-tools: Bash(gh pr list *) Bash(gh pr view *) Bash(gh pr diff *) Bash(gh pr checks *) Bash(git fetch *) Bash(git show *) Bash(git log *) Bash(git diff *) Read Grep
 ---
 
 # QA a pull request
@@ -15,17 +15,18 @@ Read-only: never approve, never merge, never push, never comment on the PR. Repo
 
 ## Steps
 
-1. The PR is `$ARGUMENTS`. Empty: `gh pr list --repo {{GITHUB_REPO}}` and ask which one.
+1. The PR number `<pr>` is the skill's argument (`$ARGUMENTS` in Claude Code). None given, or
+   the text `$ARGUMENTS` left as is: `gh pr list --repo {{GITHUB_REPO}}` and ask which one.
 2. Read what it claims and where it goes:
-   `gh pr view $ARGUMENTS --repo {{GITHUB_REPO}} --json title,body,baseRefName,headRefName,isDraft,additions,deletions,files,statusCheckRollup`
-3. Read the change: `gh pr diff $ARGUMENTS --repo {{GITHUB_REPO}}`
+   `gh pr view <pr> --repo {{GITHUB_REPO}} --json title,body,baseRefName,headRefName,isDraft,additions,deletions,files,statusCheckRollup`
+3. Read the change: `gh pr diff <pr> --repo {{GITHUB_REPO}}`
    (`--name-only` first on a large PR).
 4. A diff shows lines, not their effect. For each file that matters, read the whole file at the
    PR's head, and `grep` the callers of what changed. A finding rests on code you read, never
    on what a name suggests.
 5. Walk [references/checklist.md](references/checklist.md): correctness, safety, quality,
    process. One finding per problem.
-6. CI: `gh pr checks $ARGUMENTS --repo {{GITHUB_REPO}}`. A failing or missing check is a finding.
+6. CI: `gh pr checks <pr> --repo {{GITHUB_REPO}}`. A failing or missing check is a finding.
 7. Flag separately anything that touches production configuration or {{PROD_URL}}.
 
 ## A finding

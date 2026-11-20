@@ -157,7 +157,7 @@ both ends. An `ADD` picks its target here:
 | this project's `CLAUDE.md`, its traps section | a generic shell, git, container or CI trap: anything that bites regardless of what you were working on |
 | this project's `CLAUDE.md`, another section | a rule of this repo, or a dated decision by its owner |
 | a skill of this project — name it and the section | a trap or fact tied to one tool or workflow of a domain (test harness, editor, images, SEO, deployment): something you only need when doing that |
-| the project's ops log (`LEADS.md` or equivalent) | a fact about the environment or production |
+| the project's ops log, if it keeps one | a fact about the environment or production |
 | `TODO.md` (step 0) / a ticket | work to do, not a rule |
 | `README` or docs | something a user of the project needs |
 | a code comment | a trap you can't see from where it bites |

@@ -1,6 +1,6 @@
 ---
 name: add-gate
-description: Add a gate to qol-mini vitals end to end, on its own branch and pull request — source both agents' real behavior, specify the gate in ADR 0008, build the deterministic Rust probes app (crates/GATE-chkr) with unit, real-tree, and container tests, wire it into the qol-mini vitals command, write its advisory review skill in the bank, update the docs, and open a draft PR for code review. Use whenever the task is to implement, start, or extend a gate or a pillar check (skills, codebase-memory, context-limiting, commit-gates, agent-config, or a new one), or to add probes to an existing gate.
+description: Add a gate to qol-mini vitals end to end, on its own branch and pull request — source both agents' real behavior, specify the gate in ADR 0008, build the deterministic Rust probes app (crates/GATE-chkr) with unit, real-tree, and container tests, wire it into the qol-mini vitals command, write its advisory review skill in the bank, update the docs, and open a draft PR for code review. Use whenever the task is to implement, start, or extend a gate or a pillar check (codebase-memory, context-limiting, commit-gates, agent-config, or a new one), or to add probes to an existing gate (agents-md, skills).
 ---
 
 # Add a gate
@@ -47,7 +47,9 @@ unconfirmed fact feeds the review or "Not probed yet", never a probe.
 
 Design the probes per "What goes where". Give each probe an id, a scope (repository, or
 user: warn at most, skipped by `--repo-only`), its verdicts, its evidence path, and a fix
-for every warn and fail. List the review rubric, each criterion with its source. Add a
+for every warn and fail. A fix that a `qol-mini` command applies names it with
+`with_command` (ADR 0010), with a test that runs the gate, the command, the gate again.
+List the review rubric, each criterion with its source. Add a
 `### The <id> gate` section to ADR 0008 shaped like the `agents-md` one, holding the whole
 step 2 table, the probe table, and what is not probed yet; add its References. The
 catalog row stays ⏳ until step 7. A decision ADR 0008 does not cover (a new crate, an
@@ -89,8 +91,8 @@ imports that `src/vitals/wasi/` lacks fails at instantiation: add it there.
 ## 6. Write the review skill — commit
 
 Create `packages/qol-mini/skills/<id>-review/` (`SKILL.md`, `references/sources.md`,
-`qol-mini.yaml`), in the shape of `agents-md-review`, under the bank rules of AGENTS.md
-("Skills": public, generic, through `skill-creator`): run the probes and quote them, read what they point to,
+`qol-mini.yaml`), in the shape of `agents-md-review`, under the bank rules of
+`packages/qol-mini/skills/AGENTS.md` (public, generic, through `skill-creator`): run the probes and quote them, read what they point to,
 judge with a numbered rubric (present, `ADD`, `MOVE`, `CUT`, `REWORD`), report at most
 five items in the block format of `agents-md-review` step 4, labeled advisory, and apply
 only what the user accepts.
@@ -103,7 +105,7 @@ has nothing for the gate to judge. Commit `Add the <id>-review skill`.
 
 Set the ADR 0008 catalog row and the Implementation Status rows to ✅. Update
 `docs/vitals.md` (the Gates row, a `### <id>` section with the command and the probe
-table), the README (the Vitals gate table, the shipped skills), the Implementation Status
+table, and a row in the `run:` table for each probe that names a command), the README (the Vitals gate table, the shipped skills), the Implementation Status
 row in ADR 0005, the alias list and commands table in ADR 0007, the feature row of
 AGENTS.md, and `TODO.md` ("Where we stopped", and the
 not-probed-yet items under "Later").

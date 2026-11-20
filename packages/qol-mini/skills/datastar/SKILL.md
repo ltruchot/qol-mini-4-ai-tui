@@ -7,7 +7,7 @@ description: Datastar v1 API reference, backend-agnostic - data-* attributes, si
 
 Checked against Datastar **v1.0.4**; a line that depends on a release says which. This skill
 holds the API, not an architecture: where state lives, when a stream stays open and how much
-is patched at once are project decisions, written in the project's own skill or `CLAUDE.md`.
+is patched at once are project decisions, written in the project's own skill or rules file (`AGENTS.md`, else `CLAUDE.md`).
 
 Reference: <https://data-star.dev/docs.md> is the whole documentation in one Markdown file.
 Read it with `curl -sL` and `grep` before using anything not listed here.
