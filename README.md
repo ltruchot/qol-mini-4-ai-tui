@@ -208,13 +208,16 @@ Details: [docs/harmonize.md](docs/harmonize.md).
 
 ## Vitals
 
-One repo, audited for both agents. Reads, never writes.
+One repo, audited for both agents. Reads; writes only under `--fix`.
 
 ```bash
 qol-mini vitals /path/to/my-project              # every gate
 qol-mini vitals agents-md /path/to/my-project    # one gate
 qol-mini vitals skills /path/to/my-project
 qol-mini vitals /path/to/my-project --repo-only  # CI: skip the parent directories and home
+qol-mini vitals /path/to/my-project --json       # one JSON object per gate
+qol-mini vitals /path/to/my-project --fix --dry-run  # name the commands the findings call for
+qol-mini vitals /path/to/my-project --fix        # run them, audit again
 ```
 
 | Gate | Probes | Checks | Review skill |
@@ -225,7 +228,8 @@ qol-mini vitals /path/to/my-project --repo-only  # CI: skip the parent directori
 | | |
 |---|---|
 | Exit status | 0 no repository probe failed · 1 one failed · 2 the repository cannot be read; with several gates, the highest |
-| Output | one line per probe, `[pass\|warn\|fail\|n/a] ID evidence: message`, a `fix:` line under a `warn` or a `fail`, a summary per gate |
+| Output | one line per probe, `[pass\|warn\|fail\|n/a] ID evidence: message`, a `fix:` line under a `warn` or a `fail`, a `run:` line when a `qol-mini` command applies the fix, a summary per gate |
+| `--fix` | runs each `run:` command once (`harmonize`, `skills install`), then audits again; exit status of that audit, 1 at least when a command refused |
 | Scopes | repository probes set the exit status; user-scope probes (parent directories, home) report only; `--repo-only` skips them |
 | Gate or path | a first word naming a gate picks it: `skills` is the gate, `./skills` the directory |
 | Review | `qol-mini skills install agents-md-review skills-review /path/to/my-project`; at most five `ADD`, `CUT`, `MOVE`, `REWORD` edits, advisory, applied on a yes |

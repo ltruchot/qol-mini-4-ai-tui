@@ -55,7 +55,7 @@ Sources are under `packages/qol-mini/src/`.
 | `qol-mini vscode` | sets the editor (`kit/vscode.ts`) |
 | `qol-mini skills install\|update\|list\|check\|remove` | project scope, or `--global` |
 | `qol-mini harmonize <project>\|check\|undo\|scan` | repo scope, both agents: one command converts, `check` exits for CI, `undo` restores, `scan` lists repos under named roots |
-| `qol-mini vitals [agents-md\|skills] [project] [--repo-only]` | repo scope, both agents, read-only: every gate or the named one; exit 0, 1 a probe failed, 2 unreadable |
+| `qol-mini vitals [agents-md\|skills] [project] [--repo-only] [--json] [--fix [--dry-run]]` | repo scope, both agents: every gate or the named one; exit 0, 1 a probe failed, 2 unreadable; read-only, except `--fix`, which runs the commands the findings name |
 
 `install.sh`, `uninstall.sh`, `install-vscode.sh`, `install-skills.sh` and their
 `.ps1` twins run the same commands from a clone, through `scripts/qol-mini.sh`.
@@ -379,6 +379,11 @@ A prompt that blocks a script or CI is a bug.
   TypeScript. Why: `docs/adr/0009-the-gates-ship-as-webassembly.md`.
 - The gates read and never write. The WASI host (`src/vitals/wasi/`) refuses an open
   that would create or truncate and holds no write call for a file.
+- A probe whose fix a `qol-mini` command applies names it with `with_command`: the
+  arguments without the repository. `vitals --fix` runs it only under `harmonize` or
+  `skills`. A new command gets a test that runs the gate, the command, the gate
+  again. Why: `docs/adr/0010-a-finding-names-the-command-that-fixes-it.md`.
+- The `--json` report is an interface: add a field, never rename one.
 - The host implements the preview1 calls the modules import, and no other. A new
   import fails at instantiation: list them with `WebAssembly.Module.imports` and add
   the call. `node:wasi` is not used: on Windows its `fd_readdir` is not implemented.

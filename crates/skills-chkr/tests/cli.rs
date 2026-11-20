@@ -537,3 +537,16 @@ fn defaults_to_the_current_directory() {
         .code(0)
         .stdout(contains("skills gate passed"));
 }
+
+#[test]
+fn json_prints_the_report_as_one_object() {
+    chkr()
+        .args(["--repo-only", "--json"])
+        .arg(repo(&[]).path())
+        .assert()
+        .code(0)
+        .stdout(
+            contains(r#"{"findings":[{"command":null,"#)
+                .and(contains(r#""gate":"skills","passed":true}"#)),
+        );
+}

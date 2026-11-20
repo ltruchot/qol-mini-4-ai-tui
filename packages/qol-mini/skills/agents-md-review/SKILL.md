@@ -25,6 +25,12 @@ Quote the output verbatim, every line. A `fail` comes before any content review:
 `CLAUDE.md` with its own rules) fail, or `AM14` reports a `CLAUDE.md` above the repository,
 propose the layout fix first and review the files that agents actually read.
 
+A finding that ends with a `run:` line names the `qol-mini` command that applies its fix
+(`AM01`, `AM02`, `AM04`, `AM08`). Propose that command as printed, with the repository as
+its last argument, instead of a hand edit: `qol-mini harmonize` keeps a backup and
+`qol-mini harmonize undo <repo>` restores it. `npx qol-mini vitals <repo> --fix --dry-run`
+lists every such command, `--fix` runs them and audits again. Run one only on a yes.
+
 Exit status: 0 = no repository probe failed, 1 = one failed, 2 = the repository cannot be
 read. User-scope findings never change it.
 

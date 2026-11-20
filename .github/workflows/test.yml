@@ -99,5 +99,7 @@ jobs:
       # The same modules on every OS: repository scope, then with the home directory
       - run: node packages/qol-mini/dist/cli.js vitals skills ./project --repo-only
       - run: node packages/qol-mini/dist/cli.js vitals skills ./project
+      # The captured path: the report read back from the gate's stdout
+      - run: node packages/qol-mini/dist/cli.js vitals skills ./project --repo-only --json
       - run: node packages/qol-mini/dist/cli.js uninstall
       - run: node scripts/cycle.ts --uninstalled

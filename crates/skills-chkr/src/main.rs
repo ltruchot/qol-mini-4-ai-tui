@@ -26,13 +26,21 @@ struct Cli {
     /// Skip the user scope (parent directories, home): for reproducible CI runs.
     #[arg(long)]
     repo_only: bool,
+
+    /// Print the report as one JSON object.
+    #[arg(long)]
+    json: bool,
 }
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
     match audit(&cli.path, Reach::from_repo_only(cli.repo_only)) {
         Ok(gate) => {
-            println!("{gate}");
+            if cli.json {
+                println!("{}", gate.to_json());
+            } else {
+                println!("{gate}");
+            }
             gate.outcome().into()
         }
         Err(error) => {

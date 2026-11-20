@@ -2,8 +2,6 @@ import { fstatSync, readSync } from "node:fs";
 import { BADF, INVAL, OK } from "./errno.ts";
 import { fileOf, type Calls, type Ctx, type File } from "./fds.ts";
 
-const STREAMS = [undefined, process.stdout, process.stderr];
-
 // Fill the buffers in order; a short read ends the call
 function fill(file: File, buffers: Uint8Array[]): number {
   let total = 0;
@@ -24,7 +22,7 @@ function read(ctx: Ctx, fd: number, iovs: number, count: number, nread: number):
 }
 
 function write(ctx: Ctx, fd: number, iovs: number, count: number, nwritten: number): number {
-  const stream = STREAMS[fd];
+  const stream = [undefined, ctx.out, process.stderr][fd];
   if (stream === undefined) return BADF;
   const data = Buffer.concat(ctx.mem.iovecs(iovs, count));
   stream.write(data);

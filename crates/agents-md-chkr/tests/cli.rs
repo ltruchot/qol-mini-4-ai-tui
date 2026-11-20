@@ -96,6 +96,30 @@ fn a_repository_with_only_claude_md_fails_with_a_rename_fix() {
 }
 
 #[test]
+fn a_fix_a_command_applies_is_printed_as_a_run_line_and_in_json() {
+    let dir = tempfile::tempdir().unwrap();
+    write(dir.path(), "CLAUDE.md", HANDOFF);
+    gate(&dir).code(1).stdout(contains(
+        "       fix: rename CLAUDE.md to AGENTS.md; Claude Code 2.1.277 and later reads it\n       \
+         run: qol-mini harmonize --only rules\n",
+    ));
+    chkr()
+        .args(["--repo-only", "--json"])
+        .arg(dir.path())
+        .assert()
+        .code(1)
+        .stdout(
+            contains(
+                r#"{"findings":[{"command":["harmonize","--only","rules"],"evidence":"AGENTS.md","#,
+            )
+            .and(contains(
+                r#""probe":"AM01","scope":"repository","verdict":"fail"}"#,
+            ))
+            .and(contains(r#""gate":"agents-md","passed":false}"#)),
+        );
+}
+
+#[test]
 fn without_agents_md_the_budgets_judge_the_claude_md_that_loads() {
     let dir = tempfile::tempdir().unwrap();
     let long = format!("{HANDOFF}{}", "- rule\n".repeat(250));

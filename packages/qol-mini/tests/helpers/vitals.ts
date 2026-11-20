@@ -11,8 +11,10 @@ const KAIZEN =
   "---\nname: kaizen\ndescription: Reviews the session. Use before compacting.\n---\n# Kaizen\n";
 
 // The gates write to the process's own stdout: run the CLI as a real process
-export async function vitals(args: string[]): Promise<{ code: number; out: string; err: string }> {
-  const run = await execa("node", [CLI, "vitals", ...args], { reject: false });
+type Ran = { code: number; out: string; err: string };
+
+export async function vitals(args: string[], env: Record<string, string> = {}): Promise<Ran> {
+  const run = await execa("node", [CLI, "vitals", ...args], { reject: false, env });
   return { code: run.exitCode ?? -1, out: run.stdout, err: run.stderr };
 }
 

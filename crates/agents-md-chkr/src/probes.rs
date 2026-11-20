@@ -44,6 +44,13 @@ pub const ATTACHED_CHARS: Budget = Budget::soft(70_000);
 /// How many leading lines of `AGENTS.md` must name the handoff file.
 pub const HANDOFF_WINDOW: usize = 10;
 
+/// `qol-mini harmonize` on the rules slice: it renames a lone CLAUDE.md to AGENTS.md and
+/// merges two rules files where one imports the other.
+const HARMONIZE_RULES: &[&str] = &["harmonize", "--only", "rules"];
+/// The same run in bridge mode: it adds a CLAUDE.md that only imports AGENTS.md.
+const HARMONIZE_BRIDGE: &[&str] = &["harmonize", "--only", "rules", "--rules", "bridge"];
+/// Installs the kaizen skill from the bank.
+const INSTALL_KAIZEN: &[&str] = &["skills", "install", "kaizen"];
 const QOL_MINI: &str = "https://github.com/ltruchot/qol-mini-4-ai-tui";
 
 /// A file Claude Code reads instead of `AGENTS.md` when it exists.
@@ -124,7 +131,8 @@ fn presence(snapshot: &Snapshot) -> Finding {
             AGENTS_MD,
             "no AGENTS.md: the rules live in CLAUDE.md, which OpenCode 2 does not read",
         )
-        .with_fix("rename CLAUDE.md to AGENTS.md; Claude Code 2.1.277 and later reads it"),
+        .with_fix("rename CLAUDE.md to AGENTS.md; Claude Code 2.1.277 and later reads it")
+        .with_command(HARMONIZE_RULES),
         (None, None) => Finding::new("AM01", Verdict::Fail, AGENTS_MD, "no AGENTS.md at the root")
             .with_fix(
                 "create AGENTS.md: project summary, build/test/lint commands, and the \
@@ -165,13 +173,17 @@ fn shadow(at: &Location, file: &RulesFile, snapshot: &Snapshot) -> Finding {
         ),
     };
     let finding = Finding::new(at.probe, verdict, at.path, message);
-    if verdict == Verdict::Fail {
-        finding.with_fix(format!(
-            "merge it into AGENTS.md, then delete it or reduce it to the single line `@{}`",
-            at.agents
-        ))
+    if verdict != Verdict::Fail {
+        return finding;
+    }
+    let fixed = finding.with_fix(format!(
+        "merge it into AGENTS.md, then delete it or reduce it to the single line `@{}`",
+        at.agents
+    ));
+    if at.probe == ROOT_CLAUDE_MD.probe {
+        fixed.with_command(HARMONIZE_RULES)
     } else {
-        finding
+        fixed
     }
 }
 
@@ -200,7 +212,8 @@ fn local_file(snapshot: &Snapshot) -> Finding {
         .with_fix(
             "add a CLAUDE.md holding only `@AGENTS.md`, or move the local rules to \
              ~/.claude/CLAUDE.md",
-        ),
+        )
+        .with_command(HARMONIZE_BRIDGE),
     }
 }
 
@@ -355,9 +368,10 @@ fn kaizen(snapshot: &Snapshot) -> Finding {
              .opencode/skill, .opencode/skills): nothing turns session friction into rule edits",
         )
         .with_fix(format!(
-            "`qol-mini skills install kaizen <repo>` ({QOL_MINI}); the agents-md-review \
-             skill also recognizes an equivalent under another name"
-        ));
+            "install the qol-mini kaizen skill ({QOL_MINI}); the agents-md-review skill also \
+             recognizes an equivalent under another name"
+        ))
+        .with_command(INSTALL_KAIZEN);
     };
     if path.starts_with(SHARED_SKILLS) {
         return Finding::new("AM08", Verdict::Pass, path, "kaizen skill present");
@@ -378,7 +392,7 @@ fn kaizen(snapshot: &Snapshot) -> Finding {
 #[cfg(test)]
 #[cfg_attr(coverage_nightly, coverage(off))]
 mod tests {
-    use super::{LAUNCH_BYTES, LINES, check};
+    use super::{HARMONIZE_BRIDGE, HARMONIZE_RULES, LAUNCH_BYTES, LINES, check};
     use crate::snapshot::{RulesFile, Snapshot};
     use std::path::PathBuf;
     use vitals_utils::{Finding, Outcome, Verdict};
@@ -463,6 +477,27 @@ mod tests {
         let presence = report.findings().first().unwrap();
         assert_eq!(presence.verdict(), Verdict::Fail);
         assert!(presence.fix().unwrap().starts_with("rename CLAUDE.md"));
+        assert_eq!(presence.command(), Some(HARMONIZE_RULES));
+    }
+
+    #[test]
+    fn a_fix_that_harmonize_applies_names_its_command() {
+        let command = |snapshot: &Snapshot, probe: &str| {
+            let report = check(snapshot);
+            let found = report.findings().iter().find(|f| f.probe() == probe);
+            found.and_then(Finding::command)
+        };
+        let shadowed = Snapshot {
+            claude_md: content("# Other rules\n"),
+            dot_claude_md: content("# Other rules\n"),
+            claude_local_md: true,
+            ..healthy()
+        };
+        assert_eq!(command(&shadowed, "AM02"), Some(HARMONIZE_RULES));
+        // No command moves a .claude/CLAUDE.md: its fix stays a sentence.
+        assert_eq!(command(&shadowed, "AM03"), None);
+        assert_eq!(command(&shadowed, "AM04"), Some(HARMONIZE_BRIDGE));
+        assert_eq!(command(&healthy(), "AM02"), None);
     }
 
     #[test]
@@ -647,12 +682,8 @@ mod tests {
             .find(|f| f.probe() == "AM08")
             .unwrap();
         assert_eq!(kaizen.verdict(), Verdict::Warn);
-        assert!(
-            kaizen
-                .fix()
-                .unwrap()
-                .contains("qol-mini skills install kaizen")
-        );
+        assert!(kaizen.fix().unwrap().contains("qol-mini kaizen skill"));
+        assert_eq!(kaizen.command(), Some(&["skills", "install", "kaizen"][..]));
         assert_eq!(report.outcome(), Outcome::Passed);
     }
 }

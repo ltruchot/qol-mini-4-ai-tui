@@ -9,7 +9,7 @@ both agents. One install wires both agents.
 |---|---|---|
 | `qol-mini install` | global | hooks, status line, sounds, tab marker, the kaizen review before `/compact`, the OpenCode plugin |
 | `qol-mini skills install qa-pr ./my-project` | project | renders shipped skills into `.claude/skills/`, read by both agents; merges local edits on update |
-| `qol-mini vitals ./my-project` | repo | audits the rules file and the skills as each agent loads them; reads only, exit 1 when a probe fails |
+| `qol-mini vitals ./my-project` | repo | audits the rules file and the skills as each agent loads them; reads only, exit 1 when a probe fails; `--fix` runs the `qol-mini` commands the findings name |
 | `qol-mini harmonize ./my-project` | repo | converts rules (`AGENTS.md`), permissions, commands, agents and MCP between the two agents |
 
 ```bash

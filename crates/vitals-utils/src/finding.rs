@@ -4,6 +4,11 @@ use core::fmt;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
+use serde_json::{Value, json};
+
+/// The program a finding's command belongs to.
+const PROGRAM: &str = "qol-mini";
+
 /// What a probe concluded, ordered from best to worst: a report's verdict is its maximum.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Verdict {
@@ -94,6 +99,7 @@ pub struct Finding {
     evidence: PathBuf,
     message: String,
     fix: Option<String>,
+    command: Option<&'static [&'static str]>,
 }
 
 impl Finding {
@@ -111,6 +117,7 @@ impl Finding {
             evidence: evidence.into(),
             message: message.into(),
             fix: None,
+            command: None,
         }
     }
 
@@ -118,6 +125,15 @@ impl Finding {
     pub fn with_fix(self, fix: impl Into<String>) -> Self {
         Self {
             fix: Some(fix.into()),
+            ..self
+        }
+    }
+
+    /// The same finding with the `qol-mini` command that applies its fix: the arguments
+    /// after the program name, without the repository, which the caller appends.
+    pub fn with_command(self, command: &'static [&'static str]) -> Self {
+        Self {
+            command: Some(command),
             ..self
         }
     }
@@ -165,6 +181,27 @@ impl Finding {
     pub fn fix(&self) -> Option<&str> {
         self.fix.as_deref()
     }
+
+    /// The `qol-mini` arguments that apply the fix, when a command does.
+    #[must_use]
+    pub const fn command(&self) -> Option<&'static [&'static str]> {
+        self.command
+    }
+
+    fn to_json(&self) -> Value {
+        json!({
+            "probe": self.probe,
+            "verdict": self.verdict.to_string(),
+            "scope": match self.scope {
+                Scope::Repository => "repository",
+                Scope::User => "user",
+            },
+            "evidence": self.evidence.display().to_string(),
+            "message": self.message,
+            "fix": self.fix,
+            "command": self.command,
+        })
+    }
 }
 
 impl fmt::Display for Finding {
@@ -183,7 +220,10 @@ impl fmt::Display for Finding {
         )?;
         self.fix
             .as_ref()
-            .map_or(Ok(()), |fix| write!(f, "\n       fix: {fix}"))
+            .map_or(Ok(()), |fix| write!(f, "\n       fix: {fix}"))?;
+        self.command.map_or(Ok(()), |command| {
+            write!(f, "\n       run: {PROGRAM} {}", command.join(" "))
+        })
     }
 }
 
@@ -274,6 +314,28 @@ impl Report {
         } else {
             Outcome::Passed
         }
+    }
+
+    /// The report as one JSON object: the gate, whether it passed, and every finding with
+    /// its probe, verdict, scope, evidence, message, fix and command.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use vitals_utils::{Finding, Report, Verdict};
+    ///
+    /// let report = Report::new("demo", vec![Finding::new("D01", Verdict::Pass, "a", "fine")]);
+    /// assert!(report.to_json().starts_with(r#"{"findings":[{"command":null,"#));
+    /// ```
+    #[must_use]
+    pub fn to_json(&self) -> String {
+        let findings: Vec<Value> = self.findings.iter().map(Finding::to_json).collect();
+        json!({
+            "gate": self.gate,
+            "passed": self.outcome() == Outcome::Passed,
+            "findings": findings,
+        })
+        .to_string()
     }
 
     fn count(&self, verdict: Verdict) -> usize {
@@ -374,6 +436,27 @@ mod tests {
              [fail] T01 AGENTS.md: observed\n       fix: rename it\n\
              [n/a] T01 AGENTS.md: observed\n\
              demo gate failed: 1 fail, 0 warn, 1 pass, 1 n/a"
+        );
+    }
+
+    #[test]
+    fn a_command_is_shown_after_the_fix_and_in_json() {
+        let built = finding(Verdict::Fail).with_fix("rename it").with_command(&[
+            "harmonize",
+            "--only",
+            "rules",
+        ]);
+        assert_eq!(built.command(), Some(&["harmonize", "--only", "rules"][..]));
+        assert_eq!(finding(Verdict::Pass).command(), None);
+        assert_eq!(
+            built.to_string(),
+            "[fail] T01 AGENTS.md: observed\n       fix: rename it\n       \
+             run: qol-mini harmonize --only rules"
+        );
+        let report = Report::new("demo", vec![built, finding(Verdict::Warn).in_user_scope()]);
+        assert_eq!(
+            report.to_json(),
+            r#"{"findings":[{"command":["harmonize","--only","rules"],"evidence":"AGENTS.md","fix":"rename it","message":"observed","probe":"T01","scope":"repository","verdict":"fail"},{"command":null,"evidence":"AGENTS.md","fix":null,"message":"observed","probe":"T01","scope":"user","verdict":"warn"}],"gate":"demo","passed":false}"#
         );
     }
 

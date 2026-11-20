@@ -2,7 +2,7 @@
 
 `qol-mini vitals` audits whether a repository is ready for coding agents: what Claude Code
 and OpenCode load from it, and whether each of them gets the same thing. It reads and
-never writes.
+never writes, except under `--fix`.
 
 | Command | Does |
 |---|---|
@@ -10,6 +10,9 @@ never writes.
 | `qol-mini vitals agents-md [path]` | the `agents-md` gate alone |
 | `qol-mini vitals skills [path]` | the `skills` gate alone |
 | `qol-mini vitals [gate] [path] --repo-only` | skip the user scope: parent directories and the home directory |
+| `qol-mini vitals [gate] [path] --json` | the reports as a JSON array, one object per gate |
+| `qol-mini vitals [gate] [path] --fix` | run the `qol-mini` commands the findings name, then audit again |
+| `qol-mini vitals [gate] [path] --fix --dry-run` | name those commands, run none |
 
 | Exit status | Meaning |
 |---|---|
@@ -22,6 +25,22 @@ A first word that names a gate picks it: `./skills` is the directory, `skills` t
 
 Each line is `[verdict] ID evidence: message`, verdicts `pass`, `warn`, `fail`, `n/a`; a
 `fix:` line follows a `warn` or a `fail`; a summary line closes each gate.
+
+A `run:` line under a `fix:` names the `qol-mini` command that applies it; the repository
+goes last. `--fix` runs each named command once, then audits again: the exit status is
+that second audit's, and at least 1 when a command failed or refused
+([ADR 0010](adr/0010-a-finding-names-the-command-that-fixes-it.md)).
+
+| Probe | When | `run:` |
+|---|---|---|
+| `AM01` | the rules live in `CLAUDE.md` alone | `qol-mini harmonize --only rules` |
+| `AM02` | a root `CLAUDE.md` shadows `AGENTS.md` | `qol-mini harmonize --only rules`: merges when one file imports the other, refuses otherwise |
+| `AM04` | a `CLAUDE.local.md` and no bridge | `qol-mini harmonize --only rules --rules bridge` |
+| `AM08` | no kaizen skill | `qol-mini skills install kaizen` |
+
+Under `--json` a report is `{"findings": [...], "gate": "...", "passed": true}`; a finding
+holds `probe`, `verdict`, `scope` (`repository` or `user`), `evidence`, `message`, `fix`
+and `command`, the last two `null` when there is none.
 
 Every check is a gate with two parts: deterministic probes, which alone set the exit
 status, and an agent review shipped as a skill, which proposes at most five `ADD`, `CUT`,
