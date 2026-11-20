@@ -2,14 +2,12 @@
 
 ## Where we stopped
 
-`qol-mini@0.7.1` is published and `latest` on npm. `main` holds 0.8.0, not published:
+`qol-mini@0.8.0` is published and `latest` on npm, from `main` at `v0.8.0`:
 `qol-mini vitals --fix` and `--json` (ADR 0010), probes `SK16`–`SK20`, the review skills
 pinned to the kit version, `qol-mini kaizen release` and project kaizen copies that name
-no machine path (ADR 0011), the rules split into nested `AGENTS.md` files.
-
-Next action: publish 0.8.0 (`git tag v0.8.0`, push the tag, approve the `release` run,
-`docs/release.md`). This repo's own kaizen copy releases through `npx qol-mini@0.8.0`,
-which works once that version is on npm.
+no machine path (ADR 0011), `SK15` passing the kit's two copies of one bank skill, the
+rules split into nested `AGENTS.md` files. This repo's kaizen copy releases through
+`npx qol-mini@0.8.0 kaizen release`, checked against the registry.
 
 `qol-mini vitals .` reports no warning on this repository. The user scope of this machine
 reports `SK14` alone: personal skills under `~/.agents/skills` and
