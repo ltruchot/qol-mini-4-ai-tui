@@ -1,5 +1,9 @@
 version: 1
 placeholders:
-  # Computed by the installer: the interpreter and the hook's absolute path
+  # Computed by the installer: in a project, `npx qol-mini@<pin> kaizen release`;
+  # in the global copy, the interpreter and the hook's absolute path
   - name: RELEASE_COMMAND
     prompt: Command that releases /compact
+  # Computed by the installer: the kit version the project release command pins
+  - name: QOL_MINI_VERSION
+    prompt: Version of qol-mini the skill runs

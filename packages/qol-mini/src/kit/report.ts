@@ -44,7 +44,7 @@ export const USAGE = [
   "  One run wires two agents with one feature set: Claude Code in ~/.claude",
   "  (or $CLAUDE_CONFIG_DIR), OpenCode in ~/.config/opencode (or $XDG_CONFIG_HOME).",
   "",
-  "       qol-mini uninstall | vscode | skills --help",
+  "       qol-mini uninstall | vscode | skills --help | kaizen release",
   "       qol-mini harmonize <project>|check|undo|scan  one repo, both agents",
   "       qol-mini vitals [agents-md|skills] [path]     audit one repo, read-only",
 ];

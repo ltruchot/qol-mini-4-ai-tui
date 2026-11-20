@@ -9,7 +9,7 @@
 //   precompact-kaizen.js --after-compact  SessionStart `compact`: name TODO.md
 import { afterCompact } from "./after-compact.ts";
 import { BLOCKED, compactionPasses } from "./compact-gate.ts";
-import { release, tokenFor } from "./kaizen-token.ts";
+import { release, RELEASED, tokenFor } from "./kaizen-token.ts";
 import { hookOutput, type State } from "./marker.ts";
 import { optedOut } from "./optout.ts";
 import { emit, type Payload, readPayloadOrNull, text } from "./payload.ts";
@@ -38,8 +38,7 @@ function gate(data: Payload | null): number {
 }
 
 if (args.has("--token")) out(tokenFor(process.cwd()));
-else if (args.has("--release"))
-  out(`Kaizen recorded. /compact will now go through.\n${release(process.cwd())}`);
+else if (args.has("--release")) out(`${RELEASED}\n${release(process.cwd())}`);
 else if (args.has("--after-compact")) {
   const body = afterCompact(cwdOf(readPayloadOrNull() ?? {}));
   if (body !== null) emit(body);

@@ -322,8 +322,8 @@ Run /kaizen to review it, then /compact again.
 After any compaction, the agent is told to read `TODO.md` when it exists: a
 `SessionStart` hook in Claude Code, a reminder from the plugin in OpenCode.
 
-Automatic compaction is never blocked. Skip a review:
-`node ~/.claude/hooks/precompact-kaizen.mjs --release`. In OpenCode the
+Automatic compaction is never blocked. Skip a review: `npx qol-mini kaizen release`, from the
+project directory. In OpenCode the
 built-in `/compact` entry is beyond a plugin: it compacts ungated, and the
 plugin's own entry is the one that holds back.
 
